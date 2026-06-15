@@ -60,3 +60,45 @@ fastlane/report.xml
 fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
+
+# ============================================================================
+# Kōchi: keep the repo to just the macOS/iOS app + its docs.
+# The shippable project lives in app/. Everything below is local tooling,
+# generated state, or separate experiments and must not be published.
+# ============================================================================
+
+# --- macOS noise ---
+.DS_Store
+
+# --- Xcode build output / indexes ---
+build/
+DerivedData/
+
+# --- Editor/tool backup files ---
+*.backup
+*.backup[0-9]*
+*.bak
+*.orig
+
+# --- Claude Code / AI assistant files ---
+CLAUDE.md
+.claude/
+.mcp.json
+claude-flow.config.json
+
+# --- Ruflo / claude-flow / ruvector / swarm coordination state ---
+coordination/
+memory/
+.swarm/
+.hive-mind/
+*.db
+*.db-shm
+*.db-wal
+*.db-journal
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+ruvector.db
+
+# --- Old design/coordination notes (not app docs) ---
+docs/archive/
