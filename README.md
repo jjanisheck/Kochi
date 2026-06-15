@@ -29,9 +29,11 @@ to the front whenever you need it. Built entirely in SwiftUI, native to macOS.
 ### Watch the tutorial
 
 <p align="center">
-  <video src="https://github.com/jjanisheck/Kochi/raw/main/docs/screenshots/kochi-tutorial.mp4" controls width="436"></video>
+  <a href="https://youtube.com/shorts/eApAqi_FtKY">
+    <img src="https://img.youtube.com/vi/eApAqi_FtKY/hqdefault.jpg" alt="Watch the Kōchi tutorial on YouTube" width="320">
+  </a>
 </p>
-<p align="center"><sub>If the player doesn't load, <a href="docs/screenshots/kochi-tutorial.mp4">watch the tutorial here</a>.</sub></p>
+<p align="center"><sub>▶ <a href="https://youtube.com/shorts/eApAqi_FtKY">Watch the tutorial on YouTube</a></sub></p>
 
 ---
 
