@@ -75,8 +75,25 @@ Kōchi runs Apple's newest on-device models, so it needs current hardware and OS
   available on macOS 27, so the app targets that version.
 - **Xcode** with the macOS 27 beta SDK.
 
-There's no prebuilt download yet — you build it from source in Xcode (a few
-minutes).
+You can either **download a prebuilt build** or **build it from source** in
+Xcode (a few minutes).
+
+---
+
+## Download
+
+Grab the latest build from the
+[**Releases**](https://github.com/jjanisheck/Kochi/releases/latest) page, unzip
+it, and drag **Kochi.app** to your Applications folder.
+
+> [!NOTE]
+> The build is signed for development, **not notarized** for distribution, so
+> macOS Gatekeeper will block it on first launch. To open it anyway:
+> right-click **Kochi.app → Open**, or run
+> `xattr -dr com.apple.quarantine /Applications/Kochi.app`.
+> And remember it only runs on **macOS 27** (developer beta).
+
+No release published yet? Build from source below.
 
 ---
 
