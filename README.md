@@ -26,6 +26,13 @@ to the front whenever you need it. Built entirely in SwiftUI, native to macOS.
 </p>
 <p align="center"><sub>Live coaching & goal tracking · saved meeting detail · search across transcripts</sub></p>
 
+### Watch the tutorial
+
+<p align="center">
+  <video src="https://github.com/jjanisheck/Kochi/raw/main/docs/screenshots/kochi-tutorial.mp4" controls width="436"></video>
+</p>
+<p align="center"><sub>If the player doesn't load, <a href="docs/screenshots/kochi-tutorial.mp4">watch the tutorial here</a>.</sub></p>
+
 ---
 
 ## Why Kōchi instead of a cloud notetaker?
