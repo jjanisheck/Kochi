@@ -953,7 +953,7 @@ struct MeetingDetailView: View {
 
     /// True when there's anything worth copying (goals and/or a transcript).
     private var hasCopyableContent: Bool {
-        !meeting.goals.isEmpty || !displayedNotes.isEmpty
+        !meeting.goals.isEmpty || !displayedNotes.isEmpty || analysis != nil
     }
 
     /// Builds a plain-text export of the meeting — session, goals, transcript —
@@ -980,6 +980,11 @@ struct MeetingDetailView: View {
         lines.append("")
         lines.append("TRANSCRIPT")
         lines.append(displayedNotes.isEmpty ? "(no transcript)" : displayedNotes)
+
+        if let analysis {
+            lines.append("")
+            lines.append(analysis.plainText())
+        }
 
         return lines.joined(separator: "\n")
     }
@@ -1128,7 +1133,10 @@ struct MeetingDetailView: View {
         Task {
             do {
                 let result = try await cloudAnalysisManager.analyze(meeting: meeting)
-                goalManager.updateMeetingAnalysis(meeting, analysis: result)
+                let folder = fileManager.writeAnalysisMarkdown(result.markdown(),
+                                                               folderName: meeting.audioFolderName,
+                                                               startTime: meeting.startTime)
+                goalManager.updateMeetingAnalysis(meeting, analysis: result, folderName: folder)
                 analysis = result
             } catch let e as CloudLLMError {
                 analysisError = message(for: e)

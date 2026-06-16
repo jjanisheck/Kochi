@@ -185,9 +185,14 @@ class GoalManager: ObservableObject {
     }
 
     /// Saves a cloud-LLM analysis onto a meeting in history and persists it.
-    func updateMeetingAnalysis(_ meeting: MeetingSession, analysis: MeetingAnalysis) {
+    func updateMeetingAnalysis(_ meeting: MeetingSession, analysis: MeetingAnalysis, folderName: String? = nil) {
         guard let index = meetingHistory.firstIndex(where: { $0.id == meeting.id }) else { return }
         meetingHistory[index].analysis = analysis
+        // Link the on-disk folder if this meeting didn't have one (e.g. legacy
+        // meetings whose analysis.md we just created).
+        if meetingHistory[index].audioFolderName == nil, let folderName {
+            meetingHistory[index].audioFolderName = folderName
+        }
         saveMeetingHistory()
     }
 

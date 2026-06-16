@@ -18,6 +18,7 @@ class MeetingFileManager {
     private let transcriptFileName = "transcript.txt"
     private let metadataFileName = "metadata.json"
     private let audioFileName = "audio.m4a"
+    private let analysisFileName = "analysis.md"
 
     init() {
         // Create root Meetings folder in Documents
@@ -174,6 +175,34 @@ class MeetingFileManager {
     func audioURL(forFolderName name: String) -> URL? {
         let url = meetingsRootURL.appendingPathComponent(name).appendingPathComponent(audioFileName)
         return FileManager.default.fileExists(atPath: url.path) ? url : nil
+    }
+
+    /// Writes the AI analysis as `analysis.md` into the meeting's folder, creating
+    /// the folder if it doesn't exist yet. `folderName` is the meeting's existing
+    /// folder (its `audioFolderName`); when nil, a folder name is derived from
+    /// `startTime` so a file is still saved for meetings that never recorded audio.
+    /// Returns the folder name used, or nil on failure.
+    @discardableResult
+    func writeAnalysisMarkdown(_ markdown: String, folderName: String?, startTime: Date) -> String? {
+        let name = folderName ?? Self.meetingFolderName(for: startTime)
+        let folderURL = meetingsRootURL.appendingPathComponent(name)
+        do {
+            try FileManager.default.createDirectory(at: folderURL, withIntermediateDirectories: true)
+            let url = folderURL.appendingPathComponent(analysisFileName)
+            try markdown.data(using: .utf8)?.write(to: url)
+            print("\u{2728} Analysis written: \(url.path)")
+            return name
+        } catch {
+            print("\u{274C} Failed to write analysis.md: \(error)")
+            return nil
+        }
+    }
+
+    /// The `meeting_yyyy-MM-dd_HH-mm-ss` folder name for a date (matches startNewMeeting()).
+    static func meetingFolderName(for date: Date) -> String {
+        let f = DateFormatter()
+        f.dateFormat = "yyyy-MM-dd_HH-mm-ss"
+        return "meeting_\(f.string(from: date))"
     }
 
     // MARK: - Metadata Management
