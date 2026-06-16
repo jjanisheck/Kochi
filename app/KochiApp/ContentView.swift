@@ -11,16 +11,12 @@ struct ContentView: View {
     @StateObject private var videoManager = VideoCoachingManager()
     @State private var showSettings = false
     @State private var showOnboarding = !UserDefaults.standard.bool(forKey: "HasCompletedOnboarding")
-    /// True once a meeting has been ended, so we can show the `ended` recap
-    /// until the next meeting starts.
-    @State private var hasEnded = false
     @State private var evaluationTimer: Timer?
     /// Length (in characters) of the transcript at the last goal evaluation.
     @State private var lastEvaluatedTranscriptLength = 0
 
     private var phase: MeetingPhase {
-        if audioManager.isRecording { return .live }
-        return hasEnded ? .ended : .pre
+        audioManager.isRecording ? .live : .pre
     }
 
     private var goalsHit: Int { goalManager.goals.prefix(3).filter { $0.isCompleted }.count }
@@ -110,11 +106,18 @@ struct ContentView: View {
         }
     }
 
-    /// Caption shown over the coach video — real coaching text when available,
-    /// otherwise an ambient line per phase.
+    /// Caption shown over the coach video. During a live meeting it surfaces the
+    /// on-device coach's actual sentence (the canned line only for a goal-hit
+    /// celebration); at rest it's the idle clip's ambient line.
     private var coachLine: String {
+        if phase == .live {
+            if videoManager.currentVideoLabel != .goal, !llmManager.coachingResponse.isEmpty {
+                return llmManager.coachingResponse
+            }
+            if !videoManager.coachingText.isEmpty { return videoManager.coachingText }
+            return "You're on. Set the tone early."
+        }
         if !videoManager.coachingText.isEmpty { return videoManager.coachingText }
-        if !llmManager.coachingResponse.isEmpty { return llmManager.coachingResponse }
         switch phase {
         case .pre:  return "Breathe and prepare."
         case .live: return "You're on. Set the tone early."
@@ -131,7 +134,6 @@ struct ContentView: View {
     // MARK: - Recording Logic (unchanged behavior)
 
     private func startMeetingAndRecord() {
-        hasEnded = false
         goalManager.startNewMeeting()
         // Hold coaching videos for the duration (no idle revert until we stop).
         videoManager.setMeetingActive(true)
@@ -146,27 +148,32 @@ struct ContentView: View {
     private func stopRecordingAndEvaluate() {
         evaluationTimer?.invalidate()
         evaluationTimer = nil
-        hasEnded = true
-        // Meeting over — ease back to the idle loop (after the wrap-up clip).
+        // Meeting over — freeze the coach back on the idle frame.
         videoManager.setMeetingActive(false)
 
         Task {
-            try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 second
+            try? await Task.sleep(nanoseconds: 500_000_000) // 0.5s to flush trailing transcript
 
             let fullTranscript = await MainActor.run { audioManager.transcriptionText }
             print("📝 FULL TRANSCRIPT CAPTURED (before stop): \(fullTranscript.count) characters")
 
             await MainActor.run { audioManager.stopRecording() }
 
-            guard !fullTranscript.isEmpty else {
-                await MainActor.run { goalManager.endCurrentMeeting() }
-                return
+            // Save the finished meeting to history.
+            await MainActor.run {
+                if !fullTranscript.isEmpty { goalManager.updateNotes(fullTranscript) }
+                goalManager.endCurrentMeeting()
             }
 
+            // Reset the panel to a clean START state: clear the live transcript,
+            // uncheck goals, drop the coaching line. (handleTranscriptUpdate is
+            // gated on isRecording, so clearing here won't touch the saved notes.)
             await MainActor.run {
-                print("💾 SAVING FULL TRANSCRIPT: \(fullTranscript.count) characters")
-                goalManager.updateNotes(fullTranscript)
-                goalManager.endCurrentMeeting()
+                audioManager.transcriptionText = ""
+                audioManager.recordingTime = 0
+                llmManager.coachingResponse = ""
+                goalManager.resetGoals()
+                lastEvaluatedTranscriptLength = 0
             }
         }
     }
@@ -174,6 +181,11 @@ struct ContentView: View {
     /// Live transcript → notes + history sync, plus growth-throttled on-device
     /// goal evaluation and coach-video selection (behavior preserved from before).
     private func handleTranscriptUpdate(_ newText: String) {
+        // Only sync notes / evaluate while actually recording. Once a meeting
+        // ends and we clear the live transcript, this must not run — otherwise
+        // it would overwrite the just-saved meeting's notes with empty text.
+        guard audioManager.isRecording else { return }
+
         DispatchQueue.main.async {
             goalManager.notes = newText
             if !goalManager.meetingHistory.isEmpty {
@@ -181,8 +193,6 @@ struct ContentView: View {
                 goalManager.saveMeetingHistory()
             }
         }
-
-        guard audioManager.isRecording else { return }
 
         let currentLength = newText.count
         let evaluationGrowthThreshold = 50  // re-check goals after ~a sentence of speech

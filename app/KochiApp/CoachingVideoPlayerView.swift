@@ -29,11 +29,11 @@ struct CoachingVideoPlayerView: View {
                     .allowsHitTesting(false) // not interactive
                     .id(videoManager.currentVideoLabel) // Force re-render on video change
                     .onAppear {
-                        print("📺 VideoPlayer appeared for: \(videoManager.currentVideoLabel.rawValue)")
-                        // Ensure playback starts
+                        // Nudge playback only when the manager intends to animate.
+                        // When it deliberately freezes the idle clip at rest
+                        // (isPlaying == false), leave the player paused.
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                            if player.rate == 0 {
-                                print("📺 Player paused, restarting...")
+                            if videoManager.isPlaying && player.rate == 0 {
                                 player.seek(to: .zero)
                                 player.play()
                             }

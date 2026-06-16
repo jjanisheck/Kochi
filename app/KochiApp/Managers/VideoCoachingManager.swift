@@ -185,9 +185,15 @@ class VideoCoachingManager: ObservableObject {
     }
 
     // MARK: - Video Playback
-    func playVideo(label: VideoLabel) {
+    func playVideo(label requestedLabel: VideoLabel) {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
+
+            // The coach only animates during an active meeting. Any non-idle clip
+            // requested while no meeting is running collapses to the calm idle loop —
+            // so stray async coaching results, goal toggles, or wrap clips never
+            // animate when you're not in a meeting.
+            let label = (requestedLabel == .idle || self.isMeetingActive) ? requestedLabel : .idle
 
             print("🎬 Playing video: \(label.rawValue)")
 
@@ -232,11 +238,7 @@ class VideoCoachingManager: ObservableObject {
                         print("📺 Player item status changed: \(status.rawValue)")
 
                         if status == .readyToPlay {
-                            print("✅ Player ready, starting playback...")
-                            self.player?.seek(to: .zero)
-                            self.player?.play()
-                            self.isPlaying = true
-                            print("✅ Player rate: \(self.player?.rate ?? 0)")
+                            self.startOrFreeze(label: label)
                         } else if status == .failed {
                             print("❌ Player item failed: \(item.error?.localizedDescription ?? "unknown error")")
                         }
@@ -244,9 +246,7 @@ class VideoCoachingManager: ObservableObject {
 
                 // Also try playing immediately in case item is already ready
                 if item.status == .readyToPlay {
-                    self.player?.seek(to: .zero)
-                    self.player?.play()
-                    self.isPlaying = true
+                    self.startOrFreeze(label: label)
                 }
 
                 print("✅ Player status: \(self.player?.status.rawValue ?? -1), rate: \(self.player?.rate ?? 0)")
@@ -263,6 +263,19 @@ class VideoCoachingManager: ObservableObject {
                     self.playVideo(label: .idle)
                 }
             }
+        }
+    }
+
+    /// Animate during a meeting; at rest, freeze the idle clip on its first frame
+    /// so the coach holds still instead of looping.
+    private func startOrFreeze(label: VideoLabel) {
+        player?.seek(to: .zero)
+        if label == .idle && !isMeetingActive {
+            player?.pause()
+            isPlaying = false
+        } else {
+            player?.play()
+            isPlaying = true
         }
     }
 
@@ -373,10 +386,15 @@ class VideoCoachingManager: ObservableObject {
     /// the idle loop.
     func setMeetingActive(_ active: Bool) {
         isMeetingActive = active
+        idleTimer?.invalidate()
         if active {
-            idleTimer?.invalidate() // stay on coaching videos for the duration
+            // Coach comes alive when the meeting starts — kick off an animated
+            // clip; the live transcript then cycles through the coaching clips.
+            playVideo(label: .focus)
         } else {
-            startIdleTimer()        // return to the idle loop after the meeting
+            // Meeting over — snap back and freeze on the idle frame. No wrap
+            // clip, no lingering coaching video.
+            playVideo(label: .idle)
         }
     }
 
