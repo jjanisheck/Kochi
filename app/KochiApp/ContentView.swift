@@ -641,5 +641,6 @@ struct ContentView_Previews: PreviewProvider {
             .environmentObject(GoalManager())
             .environmentObject(ThemeManager())
             .environmentObject(LLMManager())
+            .environmentObject(CloudAnalysisManager())
     }
 }

@@ -10,6 +10,7 @@ struct SettingsView: View {
     @EnvironmentObject var audioManager: AudioManager
     @EnvironmentObject var goalManager: GoalManager
     @EnvironmentObject var themeManager: ThemeManager
+    @EnvironmentObject var cloudAnalysisManager: CloudAnalysisManager
 
     var body: some View {
         VStack(spacing: 0) {
@@ -40,7 +41,7 @@ struct SettingsView: View {
                     )
                     .overlay(Rectangle().fill(KColor.line).frame(height: 1), alignment: .bottom)
 
-                    // Beveled tab bar — 4 tabs
+                    // Beveled tab bar — 5 tabs
                     HStack(spacing: 5) {
                         TabButton(title: "Transcripts", icon: "doc.text.fill", isSelected: selectedTab == 0) {
                             withAnimation { selectedTab = 0 }
@@ -51,8 +52,11 @@ struct SettingsView: View {
                         TabButton(title: "Goals", icon: "target", isSelected: selectedTab == 2) {
                             withAnimation { selectedTab = 2 }
                         }
-                        TabButton(title: "About", icon: "info.circle", isSelected: selectedTab == 3) {
+                        TabButton(title: "AI", icon: "sparkles", isSelected: selectedTab == 3) {
                             withAnimation { selectedTab = 3 }
+                        }
+                        TabButton(title: "About", icon: "info.circle", isSelected: selectedTab == 4) {
+                            withAnimation { selectedTab = 4 }
                         }
                     }
                     .padding(.horizontal, 10)
@@ -77,6 +81,8 @@ struct SettingsView: View {
                         case 2:
                             GoalsTab(showGoals: $showGoals)
                         case 3:
+                            AITab()
+                        case 4:
                             AboutTab()
                         default:
                             TranscriptsTab(onSelect: { selectedMeeting = $0 })
@@ -1386,10 +1392,155 @@ struct PrivacyBenefitRow: View {
     }
 }
 
+// MARK: - AI / API Key tab
+
+/// Manages the optional cloud-LLM API key that unlocks post-meeting analysis.
+struct AITab: View {
+    @EnvironmentObject var cloudAnalysisManager: CloudAnalysisManager
+    @State private var keyInput = ""
+    @State private var saveError: String?
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 15) {
+                providerCard
+                keyCard
+                disclosureCard
+            }
+            .padding()
+            .padding(.bottom)
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+
+    private var providerCard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            SlabLabel("Provider") { EmptyView() }
+            Picker("", selection: Binding(
+                get: { cloudAnalysisManager.provider },
+                set: { cloudAnalysisManager.selectProvider($0); keyInput = "" }
+            )) {
+                ForEach(CloudProvider.allCases, id: \.self) { p in
+                    Text(p.displayName).tag(p)
+                }
+            }
+            .pickerStyle(.segmented)
+            .labelsHidden()
+
+            HStack(spacing: 9) {
+                Text("MODEL")
+                    .font(KFont.mono(9, .medium))
+                    .tracking(1.0)
+                    .foregroundColor(KColor.muted)
+                TextField(cloudAnalysisManager.provider.defaultModel, text: Binding(
+                    get: { cloudAnalysisManager.model },
+                    set: { cloudAnalysisManager.setModel($0) }
+                ))
+                .textFieldStyle(.plain)
+                .font(KFont.sans(13, .medium))
+                .foregroundColor(KColor.ink)
+                .tint(KColor.orange)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 9)
+            .background(
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .fill(KColor.paper)
+                    .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .strokeBorder(KColor.line, lineWidth: 1))
+            )
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .kCard()
+    }
+
+    private var keyCard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            SlabLabel("API Key") {
+                Text(cloudAnalysisManager.hasKey ? "✓ Key saved" : "No key set")
+                    .font(KFont.mono(10))
+                    .foregroundColor(cloudAnalysisManager.hasKey ? KColor.good : KColor.muted)
+            }
+            SecureField("Paste your \(cloudAnalysisManager.provider.displayName) API key",
+                        text: $keyInput)
+                .textFieldStyle(.plain)
+                .font(KFont.sans(13, .medium))
+                .foregroundColor(KColor.ink)
+                .tint(KColor.orange)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 10)
+                .background(
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .fill(KColor.paper)
+                        .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous)
+                            .strokeBorder(KColor.line, lineWidth: 1))
+                )
+
+            if let saveError {
+                Text(saveError)
+                    .font(KFont.mono(10))
+                    .foregroundColor(KColor.orangeDeep)
+            }
+
+            HStack(spacing: 8) {
+                Button(action: saveKey) {
+                    Text("Save")
+                        .font(KFont.zilla(12.5, .bold))
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 7)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(BeveledKeyStyle(variant: .primary, radius: 7))
+                .disabled(keyInput.trimmingCharacters(in: .whitespaces).isEmpty)
+
+                if cloudAnalysisManager.hasKey {
+                    Button(action: { cloudAnalysisManager.removeKey(); keyInput = "" }) {
+                        Text("Remove key")
+                            .font(KFont.zilla(12.5, .bold))
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 7)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(BeveledKeyStyle(variant: .light, radius: 7))
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .kCard()
+    }
+
+    private var disclosureCard: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            SlabLabel("Privacy") { EmptyView() }
+            Text("Kōchi is on-device by default. With a personal API key, the meeting "
+                 + "transcript you choose to analyze is sent to your selected provider "
+                 + "(Anthropic or OpenAI). This is the only feature that leaves your device, "
+                 + "and it only runs when you tap \u{201C}Run AI Analysis\u{201D} on a meeting.")
+                .font(KFont.sans(12, .regular))
+                .foregroundColor(KColor.inkSoft)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .kCard()
+    }
+
+    private func saveKey() {
+        do {
+            try cloudAnalysisManager.saveKey(keyInput)
+            keyInput = ""
+            saveError = nil
+        } catch {
+            saveError = "Could not save the key to the Keychain."
+        }
+    }
+}
+
 struct SettingsView_Previews: PreviewProvider {
     static var previews: some View {
         SettingsView(isPresented: .constant(true))
             .environmentObject(AudioManager())
             .environmentObject(ThemeManager())
+            .environmentObject(GoalManager())
+            .environmentObject(CloudAnalysisManager())
     }
 }

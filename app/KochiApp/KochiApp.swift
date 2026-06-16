@@ -36,6 +36,7 @@ struct KochiApp: App {
     @StateObject private var goalManager = GoalManager()
     @StateObject private var themeManager = ThemeManager()
     @StateObject private var llmManager = LLMManager()
+    @StateObject private var cloudAnalysisManager = CloudAnalysisManager()
     @StateObject private var enhancedThemeManager = EnhancedThemeManager()
     @StateObject private var performanceMonitor = PerformanceMonitor.shared
     @StateObject private var appStoreHelper = AppStoreHelper.shared
@@ -47,6 +48,7 @@ struct KochiApp: App {
                 .environmentObject(goalManager)
                 .environmentObject(themeManager)
                 .environmentObject(llmManager)
+                .environmentObject(cloudAnalysisManager)
                 .onAppear { setupApp() }
                 // Fixed device-card width. The card fills to the very top;
                 // the header rows inset their content past the traffic lights so
