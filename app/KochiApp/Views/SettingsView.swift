@@ -768,6 +768,11 @@ struct MeetingDetailView: View {
     var onBack: () -> Void = {}
     @EnvironmentObject var themeManager: ThemeManager
     @EnvironmentObject var goalManager: GoalManager
+    @EnvironmentObject var cloudAnalysisManager: CloudAnalysisManager
+    @State private var isAnalyzing = false
+    @State private var analysisError: String?
+    /// The analysis to display — seeded from the saved meeting, updated on re-run.
+    @State private var analysis: MeetingAnalysis?
     @State private var showDeleteAlert = false
     @State private var didCopy = false
     @State private var showAudioShare = false
@@ -825,6 +830,9 @@ struct MeetingDetailView: View {
                     sessionCard
                     goalsCard
                     transcriptCard
+                    if cloudAnalysisManager.isConfigured || analysis != nil {
+                        analysisCard
+                    }
                     if let audioURL = audioURL { audioCard(audioURL) }
                 }
                 .padding(.horizontal, 14)
@@ -845,6 +853,7 @@ struct MeetingDetailView: View {
         .sheet(isPresented: $showAudioShare) {
             ShareSheet(items: [audioURL].compactMap { $0 })
         }
+        .onAppear { analysis = meeting.analysis }
     }
 
     // MARK: - Sections (device-card design system)
@@ -1006,6 +1015,139 @@ struct MeetingDetailView: View {
             return String(format: "%dm %ds", minutes, seconds)
         } else {
             return String(format: "%ds", seconds)
+        }
+    }
+
+    // MARK: - AI analysis
+
+    private var analysisCard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            SlabLabel("AI Analysis") {
+                if let analysis {
+                    Text(analysis.provider)
+                        .font(KFont.mono(9))
+                        .foregroundColor(KColor.muted)
+                }
+            }
+
+            if let analysis {
+                analysisContent(analysis)
+            } else {
+                Text("Summarize this meeting into tasks and a professional-effectiveness review.")
+                    .font(KFont.sans(12, .regular))
+                    .foregroundColor(KColor.inkSoft)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            if let analysisError {
+                Text(analysisError)
+                    .font(KFont.mono(10))
+                    .foregroundColor(KColor.orangeDeep)
+            }
+
+            if cloudAnalysisManager.isConfigured {
+                Button(action: runAnalysis) {
+                    HStack(spacing: 6) {
+                        if isAnalyzing { ProgressView().controlSize(.small) }
+                        Text(isAnalyzing ? "Analyzing\u{2026}"
+                             : (analysis == nil ? "Run AI Analysis" : "Re-run"))
+                            .font(KFont.zilla(12.5, .bold))
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 7)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(BeveledKeyStyle(variant: .primary, radius: 7))
+                .disabled(isAnalyzing)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .kCard(radius: 12, padding: 13)
+    }
+
+    @ViewBuilder
+    private func analysisContent(_ a: MeetingAnalysis) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(a.summary)
+                .font(KFont.sans(13, .medium))
+                .foregroundColor(KColor.ink)
+                .fixedSize(horizontal: false, vertical: true)
+
+            if !a.actionItems.isEmpty {
+                VStack(alignment: .leading, spacing: 5) {
+                    Text("ACTION ITEMS")
+                        .font(KFont.mono(9, .medium)).tracking(1.0).foregroundColor(KColor.muted)
+                    ForEach(Array(a.actionItems.enumerated()), id: \.offset) { _, item in
+                        HStack(alignment: .top, spacing: 6) {
+                            Text("\u{2022}").foregroundColor(KColor.orange)
+                            Text(item.owner.map { "\(item.task) \u{2014} \($0)" } ?? item.task)
+                                .font(KFont.sans(12.5, .regular))
+                                .foregroundColor(KColor.ink)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
+                }
+            }
+
+            VStack(alignment: .leading, spacing: 5) {
+                Text("EFFECTIVENESS")
+                    .font(KFont.mono(9, .medium)).tracking(1.0).foregroundColor(KColor.muted)
+                gradeRow("Communication", a.effectiveness.communication)
+                gradeRow("Focus", a.effectiveness.focus)
+                gradeRow("Professionalism", a.effectiveness.professionalism)
+            }
+
+            Text(a.overallCoaching)
+                .font(KFont.sans(12.5, .regular))
+                .foregroundColor(KColor.inkSoft)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    private func gradeRow(_ title: String, _ d: Dimension) -> some View {
+        HStack(alignment: .top, spacing: 8) {
+            Text(d.grade)
+                .font(KFont.zilla(14, .bold))
+                .foregroundColor(KColor.orangeDeep)
+                .frame(width: 26, alignment: .leading)
+            VStack(alignment: .leading, spacing: 1) {
+                Text(title)
+                    .font(KFont.sans(12, .semibold))
+                    .foregroundColor(KColor.ink)
+                Text(d.note)
+                    .font(KFont.sans(11.5, .regular))
+                    .foregroundColor(KColor.inkSoft)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+
+    private func runAnalysis() {
+        isAnalyzing = true
+        analysisError = nil
+        Task {
+            do {
+                let result = try await cloudAnalysisManager.analyze(meeting: meeting)
+                goalManager.updateMeetingAnalysis(meeting, analysis: result)
+                analysis = result
+            } catch let e as CloudLLMError {
+                analysisError = message(for: e)
+            } catch {
+                analysisError = "Analysis failed. Please try again."
+            }
+            isAnalyzing = false
+        }
+    }
+
+    private func message(for error: CloudLLMError) -> String {
+        switch error {
+        case .missingKey:   return "No API key set. Add one in Settings \u{2192} AI."
+        case .auth:         return "The API key was rejected. Check it in Settings \u{2192} AI."
+        case .rateLimited:  return "Rate limited by the provider. Try again shortly."
+        case .refusal:      return "The model declined to analyze this transcript."
+        case .badResponse:  return "The provider returned an unexpected response."
+        case .http(let s):  return "Request failed (HTTP \(s))."
+        case .network:      return "Network error. Check your connection and try again."
         }
     }
 }
