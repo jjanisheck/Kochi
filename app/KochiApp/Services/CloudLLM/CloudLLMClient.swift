@@ -6,6 +6,7 @@ enum CloudLLMError: Error, Equatable {
     case auth
     case rateLimited
     case refusal
+    case truncated
     case badResponse
     case http(Int)
     case network(String)

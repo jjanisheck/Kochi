@@ -1145,6 +1145,7 @@ struct MeetingDetailView: View {
         case .auth:         return "The API key was rejected. Check it in Settings \u{2192} AI."
         case .rateLimited:  return "Rate limited by the provider. Try again shortly."
         case .refusal:      return "The model declined to analyze this transcript."
+        case .truncated:    return "The analysis was too long to finish. Try a shorter meeting and re-run."
         case .badResponse:  return "The provider returned an unexpected response."
         case .http(let s):  return "Request failed (HTTP \(s))."
         case .network:      return "Network error. Check your connection and try again."

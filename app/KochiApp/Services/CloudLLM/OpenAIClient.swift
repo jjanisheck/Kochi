@@ -37,6 +37,7 @@ struct OpenAIClient: CloudLLMClient {
               let message = choices.first?["message"] as? [String: Any] else {
             throw CloudLLMError.badResponse
         }
+        if (choices.first?["finish_reason"] as? String) == "length" { throw CloudLLMError.truncated }
         if let refusal = message["refusal"] as? String, !refusal.isEmpty {
             throw CloudLLMError.refusal
         }

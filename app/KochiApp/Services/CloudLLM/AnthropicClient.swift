@@ -13,7 +13,7 @@ struct AnthropicClient: CloudLLMClient {
         req.setValue("2023-06-01", forHTTPHeaderField: "anthropic-version")
         let body: [String: Any] = [
             "model": model,
-            "max_tokens": 4000,
+            "max_tokens": 8000,
             "system": system,
             "messages": [["role": "user", "content": user]],
             "output_config": ["format": ["type": "json_schema", "schema": AnalysisSchema.jsonSchema]]
@@ -29,6 +29,7 @@ struct AnthropicClient: CloudLLMClient {
             throw CloudLLMError.badResponse
         }
         if (obj["stop_reason"] as? String) == "refusal" { throw CloudLLMError.refusal }
+        if (obj["stop_reason"] as? String) == "max_tokens" { throw CloudLLMError.truncated }
         guard let content = obj["content"] as? [[String: Any]],
               let text = content.first(where: { ($0["type"] as? String) == "text" })?["text"] as? String,
               !text.isEmpty else {
