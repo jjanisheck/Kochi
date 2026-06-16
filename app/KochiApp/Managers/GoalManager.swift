@@ -184,6 +184,13 @@ class GoalManager: ObservableObject {
         saveMeetingHistory()
     }
 
+    /// Saves a cloud-LLM analysis onto a meeting in history and persists it.
+    func updateMeetingAnalysis(_ meeting: MeetingSession, analysis: MeetingAnalysis) {
+        guard let index = meetingHistory.firstIndex(where: { $0.id == meeting.id }) else { return }
+        meetingHistory[index].analysis = analysis
+        saveMeetingHistory()
+    }
+
     func loadGoalsFromMeeting(_ meeting: MeetingSession) {
         goals = meeting.goals.map { goal in
             Goal(text: goal.text, isCompleted: false)
@@ -334,6 +341,10 @@ struct MeetingSession: Identifiable, Codable {
     /// Name of the MeetingFileManager folder holding this meeting's audio.m4a
     /// (optional — nil for meetings recorded before audio linking existed).
     var audioFolderName: String? = nil
+    /// Cloud-LLM analysis (summary, action items, effectiveness), if the user has
+    /// run "Run AI Analysis" on this meeting. Optional → old saved meetings decode
+    /// unchanged.
+    var analysis: MeetingAnalysis? = nil
 
     var duration: TimeInterval {
         if let end = endTime {
