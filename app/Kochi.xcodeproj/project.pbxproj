@@ -111,6 +111,12 @@
 		048F21AA2E2990B0001FA450 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 048F21A92E29710E001FA450 /* Assets.xcassets */; };
 		04DUALENG001 /* KochiApp/Services/DualTranscriptionEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04DUALENG002 /* KochiApp/Services/DualTranscriptionEngine.swift */; };
 		04SYSAUD001 /* KochiApp/Services/SystemAudioCapture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04SYSAUD002 /* KochiApp/Services/SystemAudioCapture.swift */; };
+		04KEYCH001 /* KochiApp/Services/KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04KEYCH002 /* KochiApp/Services/KeychainStore.swift */; };
+		04CAMODELS001 /* KochiApp/Services/CloudLLM/CloudAnalysisModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04CAMODELS002 /* KochiApp/Services/CloudLLM/CloudAnalysisModels.swift */; };
+		04CLLMCL001 /* KochiApp/Services/CloudLLM/CloudLLMClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04CLLMCL002 /* KochiApp/Services/CloudLLM/CloudLLMClient.swift */; };
+		04ANTHRO001 /* KochiApp/Services/CloudLLM/AnthropicClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04ANTHRO002 /* KochiApp/Services/CloudLLM/AnthropicClient.swift */; };
+		04OPENAI001 /* KochiApp/Services/CloudLLM/OpenAIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04OPENAI002 /* KochiApp/Services/CloudLLM/OpenAIClient.swift */; };
+		04CAMGR001 /* KochiApp/Managers/CloudAnalysisManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04CAMGR002 /* KochiApp/Managers/CloudAnalysisManager.swift */; };
 		04MIXREC001 /* KochiApp/Services/MixedAudioRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04MIXREC002 /* KochiApp/Services/MixedAudioRecorder.swift */; };
 		04FILETR001 /* KochiApp/Services/FileTranscriber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04FILETR002 /* KochiApp/Services/FileTranscriber.swift */; };
 		04SELFTEST001 /* KochiApp/Services/TranscriptionSelfTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04SELFTEST002 /* KochiApp/Services/TranscriptionSelfTest.swift */; };
@@ -260,6 +266,12 @@
 		048F21A92E29710E001FA450 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		04DUALENG002 /* KochiApp/Services/DualTranscriptionEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Services/DualTranscriptionEngine.swift; sourceTree = "<group>"; };
 		04SYSAUD002 /* KochiApp/Services/SystemAudioCapture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Services/SystemAudioCapture.swift; sourceTree = "<group>"; };
+		04KEYCH002 /* KochiApp/Services/KeychainStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Services/KeychainStore.swift; sourceTree = "<group>"; };
+		04CAMODELS002 /* KochiApp/Services/CloudLLM/CloudAnalysisModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Services/CloudLLM/CloudAnalysisModels.swift; sourceTree = "<group>"; };
+		04CLLMCL002 /* KochiApp/Services/CloudLLM/CloudLLMClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Services/CloudLLM/CloudLLMClient.swift; sourceTree = "<group>"; };
+		04ANTHRO002 /* KochiApp/Services/CloudLLM/AnthropicClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Services/CloudLLM/AnthropicClient.swift; sourceTree = "<group>"; };
+		04OPENAI002 /* KochiApp/Services/CloudLLM/OpenAIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Services/CloudLLM/OpenAIClient.swift; sourceTree = "<group>"; };
+		04CAMGR002 /* KochiApp/Managers/CloudAnalysisManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Managers/CloudAnalysisManager.swift; sourceTree = "<group>"; };
 		04MIXREC002 /* KochiApp/Services/MixedAudioRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Services/MixedAudioRecorder.swift; sourceTree = "<group>"; };
 		04FILETR002 /* KochiApp/Services/FileTranscriber.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Services/FileTranscriber.swift; sourceTree = "<group>"; };
 		04SELFTEST002 /* KochiApp/Services/TranscriptionSelfTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Services/TranscriptionSelfTest.swift; sourceTree = "<group>"; };
@@ -313,6 +325,12 @@
 				04VIDEO001 /* KochiApp/Managers/VideoCoachingManager.swift */,
 				04DUALENG002 /* KochiApp/Services/DualTranscriptionEngine.swift */,
 				04SYSAUD002 /* KochiApp/Services/SystemAudioCapture.swift */,
+				04KEYCH002 /* KochiApp/Services/KeychainStore.swift */,
+				04CAMODELS002 /* KochiApp/Services/CloudLLM/CloudAnalysisModels.swift */,
+				04CLLMCL002 /* KochiApp/Services/CloudLLM/CloudLLMClient.swift */,
+				04ANTHRO002 /* KochiApp/Services/CloudLLM/AnthropicClient.swift */,
+				04OPENAI002 /* KochiApp/Services/CloudLLM/OpenAIClient.swift */,
+				04CAMGR002 /* KochiApp/Managers/CloudAnalysisManager.swift */,
 				04MIXREC002 /* KochiApp/Services/MixedAudioRecorder.swift */,
 				04FILETR002 /* KochiApp/Services/FileTranscriber.swift */,
 				04SELFTEST002 /* KochiApp/Services/TranscriptionSelfTest.swift */,
@@ -700,6 +718,12 @@
 				04F1EB772E28C2850086D5BC /* TranscriptionManager.swift in Sources */,
 				04DUALENG001 /* KochiApp/Services/DualTranscriptionEngine.swift in Sources */,
 				04SYSAUD001 /* KochiApp/Services/SystemAudioCapture.swift in Sources */,
+				04KEYCH001 /* KochiApp/Services/KeychainStore.swift in Sources */,
+				04CAMODELS001 /* KochiApp/Services/CloudLLM/CloudAnalysisModels.swift in Sources */,
+				04CLLMCL001 /* KochiApp/Services/CloudLLM/CloudLLMClient.swift in Sources */,
+				04ANTHRO001 /* KochiApp/Services/CloudLLM/AnthropicClient.swift in Sources */,
+				04OPENAI001 /* KochiApp/Services/CloudLLM/OpenAIClient.swift in Sources */,
+				04CAMGR001 /* KochiApp/Managers/CloudAnalysisManager.swift in Sources */,
 				04MIXREC001 /* KochiApp/Services/MixedAudioRecorder.swift in Sources */,
 				04FILETR001 /* KochiApp/Services/FileTranscriber.swift in Sources */,
 				04SELFTEST001 /* KochiApp/Services/TranscriptionSelfTest.swift in Sources */,
