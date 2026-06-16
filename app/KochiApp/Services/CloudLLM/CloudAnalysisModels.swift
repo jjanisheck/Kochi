@@ -1,3 +1,179 @@
 import Foundation
 
-enum CloudProvider: String, CaseIterable, Codable { case claude, openai }
+/// Which cloud provider runs the analysis. Raw value persisted in UserDefaults.
+enum CloudProvider: String, CaseIterable, Codable {
+    case claude
+    case openai
+
+    var displayName: String {
+        switch self {
+        case .claude: return "Claude"
+        case .openai: return "OpenAI"
+        }
+    }
+
+    /// Default model id used when this provider is freshly selected.
+    var defaultModel: String {
+        switch self {
+        case .claude: return "claude-sonnet-4-6"
+        case .openai: return "gpt-5.5"
+        }
+    }
+
+    /// Keychain account under which this provider's key is stored.
+    var keychainAccount: String { "cloud-llm-\(rawValue)" }
+}
+
+/// A single action item extracted from a meeting.
+struct ActionItem: Codable, Equatable {
+    var task: String
+    var owner: String?   // nil when the transcript named no owner
+}
+
+/// One graded effectiveness dimension.
+struct Dimension: Codable, Equatable {
+    var grade: String    // normalized "A"…"F" (or "N/A")
+    var note: String
+}
+
+struct Effectiveness: Codable, Equatable {
+    var communication: Dimension
+    var focus: Dimension
+    var professionalism: Dimension
+}
+
+/// The full saved analysis for a meeting.
+struct MeetingAnalysis: Codable, Equatable {
+    var summary: String
+    var actionItems: [ActionItem]
+    var effectiveness: Effectiveness
+    var overallCoaching: String
+    var provider: String     // provenance, e.g. "Claude (claude-sonnet-4-6)"
+    var generatedAt: Date
+
+    /// Normalizes a model-emitted grade to a single uppercase letter A–F, else "N/A".
+    /// Accepts "A", "B-", "c+", etc. (1–2 char strings starting with a grade letter).
+    /// Rejects words like "excellent" that merely start with a valid letter.
+    static func normalizeGrade(_ raw: String) -> String {
+        let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        // Allow at most 2 characters: the letter and an optional modifier (+/-)
+        guard trimmed.count <= 2,
+              let firstChar = trimmed.uppercased().first,
+              ["A", "B", "C", "D", "E", "F"].contains(firstChar) else {
+            return "N/A"
+        }
+        return String(firstChar)
+    }
+
+    /// The JSON shape the model returns (no provenance fields — we stamp those).
+    private struct Payload: Codable {
+        struct Dim: Codable { var grade: String; var note: String }
+        struct Eff: Codable { var communication: Dim; var focus: Dim; var professionalism: Dim }
+        struct Item: Codable { var task: String; var owner: String? }
+        var summary: String
+        var actionItems: [Item]
+        var effectiveness: Eff
+        var overallCoaching: String
+    }
+
+    /// Builds a `MeetingAnalysis` from the model's raw JSON text plus provenance.
+    /// Throws `CloudLLMError.badResponse` if the JSON doesn't match the schema.
+    static func from(jsonText: String, providerLabel: String, date: Date) throws -> MeetingAnalysis {
+        guard let data = jsonText.data(using: .utf8),
+              let payload = try? JSONDecoder().decode(Payload.self, from: data) else {
+            throw CloudLLMError.badResponse
+        }
+        func dim(_ d: Payload.Dim) -> Dimension {
+            Dimension(grade: normalizeGrade(d.grade), note: d.note)
+        }
+        return MeetingAnalysis(
+            summary: payload.summary,
+            actionItems: payload.actionItems.map { ActionItem(task: $0.task, owner: $0.owner) },
+            effectiveness: Effectiveness(
+                communication: dim(payload.effectiveness.communication),
+                focus: dim(payload.effectiveness.focus),
+                professionalism: dim(payload.effectiveness.professionalism)
+            ),
+            overallCoaching: payload.overallCoaching,
+            provider: providerLabel,
+            generatedAt: date
+        )
+    }
+}
+
+/// JSON Schema describing the analysis payload, shared by both providers'
+/// structured-output features. All objects set `additionalProperties: false`
+/// and list every property as required; `owner` is nullable.
+enum AnalysisSchema {
+    static let jsonSchema: [String: Any] = {
+        func dim() -> [String: Any] {
+            [
+                "type": "object",
+                "additionalProperties": false,
+                "properties": [
+                    "grade": ["type": "string", "description": "Letter grade A–F"],
+                    "note": ["type": "string", "description": "One-sentence justification"]
+                ],
+                "required": ["grade", "note"]
+            ]
+        }
+        return [
+            "type": "object",
+            "additionalProperties": false,
+            "properties": [
+                "summary": ["type": "string", "description": "2–3 sentence meeting summary"],
+                "actionItems": [
+                    "type": "array",
+                    "items": [
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": [
+                            "task": ["type": "string"],
+                            "owner": ["type": ["string", "null"], "description": "Owner if stated, else null"]
+                        ],
+                        "required": ["task", "owner"]
+                    ]
+                ],
+                "effectiveness": [
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": [
+                        "communication": dim(),
+                        "focus": dim(),
+                        "professionalism": dim()
+                    ],
+                    "required": ["communication", "focus", "professionalism"]
+                ],
+                "overallCoaching": ["type": "string", "description": "Actionable coaching paragraph"]
+            ],
+            "required": ["summary", "actionItems", "effectiveness", "overallCoaching"]
+        ]
+    }()
+}
+
+/// Builds the system and user prompts for the analysis call.
+enum AnalysisPrompt {
+    static let system = """
+    You are a professional meeting-effectiveness coach. You are given a transcript \
+    of a meeting where the user's own speech is labeled "Me:" and others are "Them:". \
+    Produce a concise summary, the concrete action items with their owners (use null \
+    when no owner was stated), and an honest assessment of how the user ("Me") \
+    performed across three dimensions: communication, focus, and professionalism. \
+    Grade each dimension with a single letter A–F and a one-sentence note, then give \
+    one short paragraph of overall coaching. Be specific and direct; base every claim \
+    on the transcript. Respond only with the requested JSON.
+    """
+
+    static func user(goalTexts: [String], transcript: String) -> String {
+        let goals = goalTexts.isEmpty ? "None set." : goalTexts.map { "- \($0)" }.joined(separator: "\n")
+        return """
+        Meeting goals:
+        \(goals)
+
+        Transcript:
+        \"\"\"
+        \(transcript)
+        \"\"\"
+        """
+    }
+}
