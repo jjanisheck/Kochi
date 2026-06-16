@@ -13,7 +13,7 @@ struct AnthropicClient: CloudLLMClient {
         req.setValue("2023-06-01", forHTTPHeaderField: "anthropic-version")
         let body: [String: Any] = [
             "model": model,
-            "max_tokens": 2000,
+            "max_tokens": 4000,
             "system": system,
             "messages": [["role": "user", "content": user]],
             "output_config": ["format": ["type": "json_schema", "schema": AnalysisSchema.jsonSchema]]

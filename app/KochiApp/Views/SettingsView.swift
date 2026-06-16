@@ -661,7 +661,7 @@ struct AboutTab: View {
                         .font(.headline)
                         .foregroundColor(.black)
 
-                    Text("Everything runs entirely on your device. Transcription, live coaching, goal analysis, and session notes all use Apple's on-device models — nothing is ever sent to the cloud or any third party. Your audio, transcripts, and goals stay stored locally on your device.")
+                    Text("K\u{014D}chi runs entirely on your device by default \u{2014} audio, transcription, and coaching all happen locally with no account or API key. The optional AI Analysis feature (Settings \u{2192} AI) is the one exception: if you add your own API key and tap Run AI Analysis on a meeting, that meeting\u{2019}s transcript is sent to your chosen provider. Your audio, transcripts, and goals stay stored locally on your device.")
                         .font(.body)
                         .foregroundColor(.black.opacity(0.8))
                 }
@@ -1560,7 +1560,7 @@ struct AITab: View {
             SlabLabel("Provider") { EmptyView() }
             Picker("", selection: Binding(
                 get: { cloudAnalysisManager.provider },
-                set: { cloudAnalysisManager.selectProvider($0); keyInput = "" }
+                set: { cloudAnalysisManager.selectProvider($0); keyInput = ""; saveError = nil }
             )) {
                 ForEach(CloudProvider.allCases, id: \.self) { p in
                     Text(p.displayName).tag(p)
