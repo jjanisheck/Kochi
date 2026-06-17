@@ -266,28 +266,30 @@ class VideoCoachingManager: ObservableObject {
         }
     }
 
-    /// Animate during a meeting; at rest, freeze the idle clip on its first frame
-    /// so the coach holds still instead of looping.
+    /// Animate during a meeting; at rest, drift slowly through the idle clips
+    /// (quarter speed) so the coach feels alive instead of frozen.
     private func startOrFreeze(label: VideoLabel) {
         player?.seek(to: .zero)
         if label == .idle && !isMeetingActive {
-            player?.pause()
-            isPlaying = false
+            // Slow, calm idle motion. Each clip advances to a random next one on end
+            // (see setupPlayerObserver / advanceIdleVideo).
+            player?.playImmediately(atRate: idleRate)
+            isPlaying = true
         } else {
             player?.play()
             isPlaying = true
         }
     }
 
-    private func createPlayerItem(for label: VideoLabel) -> AVPlayerItem? {
+    private func createPlayerItem(for label: VideoLabel, variation: Int? = nil) -> AVPlayerItem? {
         // Try to find video in Resources/Videos folder
         // Videos are named like: general-idle-1.mp4, zen-goal-2.mp4, etc.
 
         // Use configured theme (general or zen)
         let theme = videoTheme
 
-        // Randomly select variation (1-4 available for each video)
-        let variation = Int.random(in: 1...4)
+        // Use the requested variation, or randomly select one (1-4 available).
+        let variation = variation ?? Int.random(in: 1...4)
         let videoName = "\(theme)-\(label.rawValue)-\(variation)"
 
         print("🎬 Looking for video: \(videoName).mp4")
@@ -356,8 +358,14 @@ class VideoCoachingManager: ObservableObject {
         return nil
     }
 
+    /// Idle playback speed — slow drift so the resting coach isn't static.
+    private let idleRate: Float = 0.25
+    /// Last idle variation shown, to avoid playing the same clip twice in a row.
+    private var lastIdleVariation = 0
+
     private func setupPlayerObserver() {
-        // Loop videos when they end
+        // When a clip ends: at rest, advance to a different random idle clip
+        // (slow loop through the four). During a meeting, loop the current clip.
         playerObserver = NotificationCenter.default.addObserver(
             forName: .AVPlayerItemDidPlayToEndTime,
             object: nil, // Observe all items
@@ -367,9 +375,46 @@ class VideoCoachingManager: ObservableObject {
                   let item = notification.object as? AVPlayerItem,
                   item == self.player?.currentItem else { return }
 
-            print("🔄 Video ended, looping...")
-            self.player?.seek(to: .zero)
-            self.player?.play()
+            if self.currentVideoLabel == .idle && !self.isMeetingActive {
+                self.advanceIdleVideo()
+            } else {
+                print("🔄 Video ended, looping...")
+                self.player?.seek(to: .zero)
+                self.player?.play()
+            }
+        }
+    }
+
+    /// Swap in a different random idle clip and play it slowly. Keeps the resting
+    /// coach drifting through the four idle videos instead of freezing.
+    private func advanceIdleVideo() {
+        var variation = Int.random(in: 1...4)
+        if variation == lastIdleVariation { variation = (variation % 4) + 1 }
+        lastIdleVariation = variation
+
+        guard let item = createPlayerItem(for: .idle, variation: variation) else {
+            // No alternate clip — just loop the current one slowly.
+            player?.seek(to: .zero)
+            player?.playImmediately(atRate: idleRate)
+            return
+        }
+        currentPlayerItem = item
+        player?.replaceCurrentItem(with: item)
+
+        // Play at quarter speed once the new clip is ready.
+        statusObserver?.cancel()
+        statusObserver = item.publisher(for: \.status)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] status in
+                guard let self = self, status == .readyToPlay else { return }
+                self.player?.seek(to: .zero)
+                self.player?.playImmediately(atRate: self.idleRate)
+                self.isPlaying = true
+            }
+        if item.status == .readyToPlay {
+            player?.seek(to: .zero)
+            player?.playImmediately(atRate: idleRate)
+            isPlaying = true
         }
     }
 
@@ -392,8 +437,8 @@ class VideoCoachingManager: ObservableObject {
             // clip; the live transcript then cycles through the coaching clips.
             playVideo(label: .focus)
         } else {
-            // Meeting over — snap back and freeze on the idle frame. No wrap
-            // clip, no lingering coaching video.
+            // Meeting over — ease back into the slow idle loop (no wrap clip,
+            // no lingering coaching video).
             playVideo(label: .idle)
         }
     }
