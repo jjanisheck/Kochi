@@ -4,8 +4,10 @@
 
 Kōchi listens to your meetings, transcribes both sides of the conversation,
 tracks your goals, and coaches you in real time — and it does **all of it on your
-Mac**. No cloud, no account, no API keys, no subscription. Your audio never
-leaves your device.
+Mac**. No cloud, no account, no subscription, and **your audio never leaves your
+device**. Optionally, you can add your own Claude or OpenAI API key for a deeper
+written meeting analysis — that's the one feature that sends anything out, it's
+off by default, and it sends only the text transcript (never your audio).
 
 It runs as a compact Mac app with a **menu-bar icon** you can click to bring it
 to the front whenever you need it. Built entirely in SwiftUI, native to macOS.
@@ -46,7 +48,8 @@ everything is local.
 |                         | Kōchi                          | Typical cloud notetaker |
 | ----------------------- | ------------------------------ | ----------------------- |
 | Transcription           | On-device (Apple Speech)       | Cloud servers           |
-| AI notes / analysis     | On-device (Apple Intelligence) | Cloud LLM               |
+| AI notes / coaching     | On-device (Apple Intelligence) | Cloud LLM               |
+| Deeper AI analysis      | Optional — your own API key, off by default | Always on the cloud |
 | Your audio leaves the Mac? | **Never**                   | Yes                     |
 | Account / sign-in       | None                           | Required                |
 | Price                   | Free, open source (MIT)        | Subscription            |
@@ -70,6 +73,13 @@ If privacy, cost, or working on a plane matter to you, Kōchi is for you.
 - **Saves every session locally** — transcript, goals, and a mixed mic + system
   audio recording (`.m4a`).
 - **Search** across all your past transcripts and jump straight to a meeting.
+- **Optional: deeper AI analysis (bring your own key).** Add a personal Claude or
+  OpenAI API key to turn a finished meeting's transcript into a written summary,
+  action items with owners, and an honest A–F effectiveness review (communication,
+  focus, professionalism) — plus an auto-suggested meeting name you can edit. It's
+  off until you add a key, runs only when you click **Run AI Analysis**, sends only
+  the transcript text, saves an `analysis.md` with the meeting, and records the
+  token usage and an estimated cost for each run.
 
 ---
 
@@ -165,9 +175,14 @@ Kōchi asks for three permissions the first time you record:
 
 ## Privacy
 
-Everything — transcription, goal analysis, and coaching — runs on-device with
-Apple's frameworks. Your audio, transcripts, and goals stay on your machine and
-are never uploaded anywhere.
+By default, everything — transcription, goal analysis, live coaching, and saved
+recordings — runs on-device with Apple's frameworks, and nothing leaves your Mac.
+
+The **optional AI Analysis** feature is the single exception. If you add your own
+Claude or OpenAI API key and tap **Run AI Analysis** on a meeting, Kōchi sends that
+meeting's **text transcript** to the provider you chose to generate the written
+analysis. Your **audio is never sent**, the key is stored in the macOS Keychain, and
+nothing is sent unless you opt in by adding a key and running the analysis yourself.
 
 ## Building & contributing
 
@@ -199,11 +214,13 @@ secrets or build artifacts (`DerivedData/`, `.build/`).
 - **`ContentView.swift`** — home screen: coach video, goals, live transcript.
   `GoalRow` is the goal bar (tap to toggle hit). Phases: `.pre / .live / .ended`.
 - **`Views/SettingsView.swift`** — settings panel (Transcripts · Search · Goals ·
-  About) plus `MeetingDetailView`, presented as a full-panel overlay.
+  AI · About) plus `MeetingDetailView`, presented as a full-panel overlay.
 - **`Managers/`** — `AudioManager`, `TranscriptionManager`, `GoalManager`,
-  `LLMManager` (Foundation Models, gated by `@available`), `ThemeManager`.
+  `LLMManager` (Foundation Models, gated by `@available`), `ThemeManager`,
+  `CloudAnalysisManager` (optional cloud AI analysis).
 - **`Services/`** — `DualTranscriptionEngine`, `SystemAudioCapture`,
-  `MixedAudioRecorder`, `FileTranscriber`.
+  `MixedAudioRecorder`, `FileTranscriber`, `KeychainStore`, and `CloudLLM/`
+  (`AnthropicClient`, `OpenAIClient`) for the opt-in analysis.
 - **Design system — `KochiDeviceStyle.swift`** — `KColor`, `KFont` (Zilla Slab /
   JetBrains Mono / Hanken Grotesk), `kCard()`, `SlabLabel`, `BeveledKeyStyle`,
   `ChatTranscriptView`. Reuse these instead of system fonts and colors.
