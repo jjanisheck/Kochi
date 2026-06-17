@@ -773,6 +773,8 @@ struct MeetingDetailView: View {
     @State private var analysisError: String?
     /// The analysis to display — seeded from the saved meeting, updated on re-run.
     @State private var analysis: MeetingAnalysis?
+    /// Whether to feed the meeting's goals into the analysis prompt (checkbox).
+    @State private var includeGoals = true
     @State private var showDeleteAlert = false
     @State private var didCopy = false
     @State private var showAudioShare = false
@@ -1051,6 +1053,12 @@ struct MeetingDetailView: View {
             }
 
             if cloudAnalysisManager.isConfigured {
+                Toggle("Include goals in analysis", isOn: $includeGoals)
+                    .toggleStyle(.checkbox)
+                    .font(KFont.sans(12, .medium))
+                    .foregroundColor(KColor.inkSoft)
+                    .tint(KColor.orange)
+                    .disabled(isAnalyzing)
                 Button(action: runAnalysis) {
                     HStack(spacing: 6) {
                         if isAnalyzing { ProgressView().controlSize(.small) }
@@ -1132,7 +1140,7 @@ struct MeetingDetailView: View {
         analysisError = nil
         Task {
             do {
-                let result = try await cloudAnalysisManager.analyze(meeting: meeting)
+                let result = try await cloudAnalysisManager.analyze(meeting: meeting, includeGoals: includeGoals)
                 let folder = fileManager.writeAnalysisMarkdown(result.markdown(),
                                                                folderName: meeting.audioFolderName,
                                                                startTime: meeting.startTime)

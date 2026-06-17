@@ -56,12 +56,13 @@ final class CloudAnalysisManager: ObservableObject {
     }
 
     /// Runs the analysis for a meeting and returns a stamped `MeetingAnalysis`.
-    func analyze(meeting: MeetingSession) async throws -> MeetingAnalysis {
+    func analyze(meeting: MeetingSession, includeGoals: Bool = true) async throws -> MeetingAnalysis {
         guard let key = KeychainStore.read(account: provider.keychainAccount), !key.isEmpty else {
             throw CloudLLMError.missingKey
         }
         let client: CloudLLMClient = (provider == .claude) ? AnthropicClient() : OpenAIClient()
-        let user = AnalysisPrompt.user(goalTexts: meeting.goals.map { $0.text },
+        let goalTexts = includeGoals ? meeting.goals.map { $0.text } : []
+        let user = AnalysisPrompt.user(goalTexts: goalTexts,
                                        transcript: meeting.notes)
         let json = try await client.complete(system: AnalysisPrompt.system,
                                              user: user,
