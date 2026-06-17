@@ -359,7 +359,7 @@ class VideoCoachingManager: ObservableObject {
     }
 
     /// Idle playback speed — slow drift so the resting coach isn't static.
-    private let idleRate: Float = 0.25
+    private let idleRate: Float = 0.5
     /// Last idle variation shown, to avoid playing the same clip twice in a row.
     private var lastIdleVariation = 0
 
