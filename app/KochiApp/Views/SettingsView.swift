@@ -780,6 +780,10 @@ struct MeetingDetailView: View {
     @State private var showAudioShare = false
     /// Transcript is collapsed by default so the analysis is visible first.
     @State private var transcriptExpanded = false
+    /// Display name (custom or AI-suggested); seeded from the meeting on appear.
+    @State private var meetingName: String?
+    @State private var isEditingName = false
+    @State private var nameDraft = ""
 
     private let fileManager = MeetingFileManager()
     /// The saved mixed mic + system-audio recording for this meeting, if present.
@@ -857,12 +861,14 @@ struct MeetingDetailView: View {
         .sheet(isPresented: $showAudioShare) {
             ShareSheet(items: [audioURL].compactMap { $0 })
         }
-        .onAppear { analysis = meeting.analysis }
+        .onAppear { analysis = meeting.analysis; meetingName = meeting.name }
     }
 
     // MARK: - Sections (device-card design system)
 
     /// When + how long, as a slab-labelled white card.
+    private var hasName: Bool { !(meetingName ?? "").isEmpty }
+
     private var sessionCard: some View {
         VStack(alignment: .leading, spacing: 9) {
             SlabLabel("Session") {
@@ -872,13 +878,66 @@ struct MeetingDetailView: View {
                         .foregroundColor(KColor.inkSoft)
                 }
             }
-            Text(formatDate(meeting.startTime))
-                .font(KFont.zilla(16.5, .bold))
-                .foregroundColor(KColor.ink)
-                .fixedSize(horizontal: false, vertical: true)
+
+            if isEditingName {
+                HStack(spacing: 8) {
+                    TextField("Meeting name", text: $nameDraft)
+                        .textFieldStyle(.plain)
+                        .font(KFont.zilla(16.5, .bold))
+                        .foregroundColor(KColor.ink)
+                        .tint(KColor.orange)
+                        .onSubmit { saveName() }
+                    Button(action: saveName) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.system(size: 16, weight: .bold))
+                            .foregroundColor(KColor.good)
+                    }
+                    .buttonStyle(.plain)
+                    Button(action: { isEditingName = false }) {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.system(size: 16, weight: .bold))
+                            .foregroundColor(KColor.muted)
+                    }
+                    .buttonStyle(.plain)
+                }
+            } else {
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    Text(hasName ? (meetingName ?? "") : formatDate(meeting.startTime))
+                        .font(KFont.zilla(16.5, .bold))
+                        .foregroundColor(KColor.ink)
+                        .fixedSize(horizontal: false, vertical: true)
+                    // Discrete inline rename control.
+                    Button(action: beginEditName) {
+                        Image(systemName: "pencil")
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundColor(KColor.muted)
+                    }
+                    .buttonStyle(.plain)
+                    .help("Rename meeting")
+                }
+            }
+
+            // Once a name is shown (or being edited), keep the timestamp visible but small.
+            if hasName || isEditingName {
+                Text(formatDate(meeting.startTime))
+                    .font(KFont.mono(10))
+                    .foregroundColor(KColor.muted)
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .kCard(radius: 12, padding: 13)
+    }
+
+    private func beginEditName() {
+        nameDraft = meetingName ?? ""
+        isEditingName = true
+    }
+
+    private func saveName() {
+        let trimmed = nameDraft.trimmingCharacters(in: .whitespacesAndNewlines)
+        meetingName = trimmed.isEmpty ? nil : trimmed
+        goalManager.updateMeetingName(meeting, name: meetingName)
+        isEditingName = false
     }
 
     /// Every goal, with hit goals rendered as the app's glossy orange key.
@@ -977,6 +1036,10 @@ struct MeetingDetailView: View {
     private func meetingPlainText() -> String {
         var lines: [String] = []
 
+        if hasName {
+            lines.append(meetingName ?? "")
+            lines.append("")
+        }
         lines.append("SESSION")
         lines.append(formatDate(meeting.startTime))
         if let end = meeting.endTime {
@@ -1163,6 +1226,13 @@ struct MeetingDetailView: View {
                                                                startTime: meeting.startTime)
                 goalManager.updateMeetingAnalysis(meeting, analysis: result, folderName: folder)
                 analysis = result
+                // Auto-apply the AI's suggested name if the user hasn't named it yet.
+                if !hasName,
+                   let suggested = result.suggestedName?.trimmingCharacters(in: .whitespacesAndNewlines),
+                   !suggested.isEmpty {
+                    meetingName = suggested
+                    goalManager.updateMeetingName(meeting, name: suggested)
+                }
             } catch let e as CloudLLMError {
                 analysisError = message(for: e)
             } catch {

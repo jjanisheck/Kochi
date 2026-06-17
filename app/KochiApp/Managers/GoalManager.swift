@@ -196,6 +196,13 @@ class GoalManager: ObservableObject {
         saveMeetingHistory()
     }
 
+    /// Sets (or clears, when nil) a meeting's custom name and persists it.
+    func updateMeetingName(_ meeting: MeetingSession, name: String?) {
+        guard let index = meetingHistory.firstIndex(where: { $0.id == meeting.id }) else { return }
+        meetingHistory[index].name = name
+        saveMeetingHistory()
+    }
+
     func loadGoalsFromMeeting(_ meeting: MeetingSession) {
         goals = meeting.goals.map { goal in
             Goal(text: goal.text, isCompleted: false)
@@ -350,6 +357,8 @@ struct MeetingSession: Identifiable, Codable {
     /// run "Run AI Analysis" on this meeting. Optional → old saved meetings decode
     /// unchanged.
     var analysis: MeetingAnalysis? = nil
+    /// Custom or AI-suggested meeting name. Optional → old meetings decode unchanged.
+    var name: String? = nil
 
     var duration: TimeInterval {
         if let end = endTime {
