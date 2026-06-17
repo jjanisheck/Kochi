@@ -46,7 +46,7 @@ final class GoalDictationService: ObservableObject {
         self.engine = engine
         let input = engine.inputNode
         let format = input.outputFormat(forBus: 0)
-        input.installTap(onBus: 0, bufferSize: 1024, format: format) { [weak self] buffer, _ in
+        input.kochi_installTap(onBus: 0, bufferSize: 1024, format: format) { [weak self] buffer, _ in
             self?.channel.append(buffer)
         }
         engine.prepare()

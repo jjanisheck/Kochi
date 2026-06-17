@@ -111,6 +111,7 @@
 		048F21AA2E2990B0001FA450 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 048F21A92E29710E001FA450 /* Assets.xcassets */; };
 		04DUALENG001 /* KochiApp/Services/DualTranscriptionEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04DUALENG002 /* KochiApp/Services/DualTranscriptionEngine.swift */; };
 		04SYSAUD001 /* KochiApp/Services/SystemAudioCapture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04SYSAUD002 /* KochiApp/Services/SystemAudioCapture.swift */; };
+		04TAPSHIM001 /* KochiApp/AudioTapShim.m in Sources */ = {isa = PBXBuildFile; fileRef = 04TAPSHIM002 /* KochiApp/AudioTapShim.m */; };
 		04GOALDICT001 /* KochiApp/Services/GoalDictationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04GOALDICT002 /* KochiApp/Services/GoalDictationService.swift */; };
 		04KEYCH001 /* KochiApp/Services/KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04KEYCH002 /* KochiApp/Services/KeychainStore.swift */; };
 		04CAMODELS001 /* KochiApp/Services/CloudLLM/CloudAnalysisModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04CAMODELS002 /* KochiApp/Services/CloudLLM/CloudAnalysisModels.swift */; };
@@ -267,6 +268,9 @@
 		048F21A92E29710E001FA450 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		04DUALENG002 /* KochiApp/Services/DualTranscriptionEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Services/DualTranscriptionEngine.swift; sourceTree = "<group>"; };
 		04SYSAUD002 /* KochiApp/Services/SystemAudioCapture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Services/SystemAudioCapture.swift; sourceTree = "<group>"; };
+		04TAPSHIM002 /* KochiApp/AudioTapShim.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KochiApp/AudioTapShim.m; sourceTree = "<group>"; };
+		04TAPSHIMH /* KochiApp/AudioTapShim.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KochiApp/AudioTapShim.h; sourceTree = "<group>"; };
+		04BRIDGEH /* KochiApp/Kochi-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KochiApp/Kochi-Bridging-Header.h; sourceTree = "<group>"; };
 		04GOALDICT002 /* KochiApp/Services/GoalDictationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Services/GoalDictationService.swift; sourceTree = "<group>"; };
 		04KEYCH002 /* KochiApp/Services/KeychainStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Services/KeychainStore.swift; sourceTree = "<group>"; };
 		04CAMODELS002 /* KochiApp/Services/CloudLLM/CloudAnalysisModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Services/CloudLLM/CloudAnalysisModels.swift; sourceTree = "<group>"; };
@@ -327,6 +331,9 @@
 				04VIDEO001 /* KochiApp/Managers/VideoCoachingManager.swift */,
 				04DUALENG002 /* KochiApp/Services/DualTranscriptionEngine.swift */,
 				04SYSAUD002 /* KochiApp/Services/SystemAudioCapture.swift */,
+				04TAPSHIM002 /* KochiApp/AudioTapShim.m */,
+				04TAPSHIMH /* KochiApp/AudioTapShim.h */,
+				04BRIDGEH /* KochiApp/Kochi-Bridging-Header.h */,
 				04GOALDICT002 /* KochiApp/Services/GoalDictationService.swift */,
 				04KEYCH002 /* KochiApp/Services/KeychainStore.swift */,
 				04CAMODELS002 /* KochiApp/Services/CloudLLM/CloudAnalysisModels.swift */,
@@ -721,6 +728,7 @@
 				04F1EB772E28C2850086D5BC /* TranscriptionManager.swift in Sources */,
 				04DUALENG001 /* KochiApp/Services/DualTranscriptionEngine.swift in Sources */,
 				04SYSAUD001 /* KochiApp/Services/SystemAudioCapture.swift in Sources */,
+				04TAPSHIM001 /* KochiApp/AudioTapShim.m in Sources */,
 				04GOALDICT001 /* KochiApp/Services/GoalDictationService.swift in Sources */,
 				04KEYCH001 /* KochiApp/Services/KeychainStore.swift in Sources */,
 				04CAMODELS001 /* KochiApp/Services/CloudLLM/CloudAnalysisModels.swift in Sources */,
@@ -893,6 +901,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 27.0;
 				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = KochiApp/Kochi.entitlements;
 				ENABLE_HARDENED_RUNTIME = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "KochiApp/Kochi-Bridging-Header.h";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};
@@ -925,6 +934,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 27.0;
 				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = KochiApp/Kochi.entitlements;
 				ENABLE_HARDENED_RUNTIME = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "KochiApp/Kochi-Bridging-Header.h";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};
