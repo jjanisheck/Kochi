@@ -209,9 +209,19 @@ struct TranscriptRow: View {
         Button(action: onTap) {
             HStack {
                 VStack(alignment: .leading, spacing: 5) {
-                    Text(formatDate(meeting.startTime))
-                        .font(KFont.zilla(14, .bold))
-                        .foregroundColor(KColor.ink)
+                    // Show the meeting name when set, with the timestamp kept visible but small.
+                    if let name = meeting.name, !name.isEmpty {
+                        Text(name)
+                            .font(KFont.zilla(14, .bold))
+                            .foregroundColor(KColor.ink)
+                        Text(formatDate(meeting.startTime))
+                            .font(KFont.mono(9))
+                            .foregroundColor(KColor.muted)
+                    } else {
+                        Text(formatDate(meeting.startTime))
+                            .font(KFont.zilla(14, .bold))
+                            .foregroundColor(KColor.ink)
+                    }
 
                     let completedCount = meeting.goals.filter { $0.isCompleted }.count
                     Text("\(completedCount)/\(meeting.goals.count) goals")
