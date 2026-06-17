@@ -210,6 +210,25 @@ xcodebuild -project Kochi.xcodeproj -scheme KochiApp -destination 'platform=macO
 Always confirm the macOS build succeeds before committing, and don't commit
 secrets or build artifacts (`DerivedData/`, `.build/`).
 
+### Building a signed release
+
+The app builds with **Hardened Runtime** enabled (required for notarization). Its
+entitlements (`KochiApp/Kochi.entitlements`) cover everything it needs —
+microphone, network (for the optional cloud analysis), user-selected files, and
+the sandbox; ScreenCaptureKit needs no entitlement.
+
+To produce a notarized build that opens cleanly on any Mac, you need a paid Apple
+Developer account with a *Developer ID Application* certificate:
+
+1. In Xcode: scheme **KochiApp**, destination **Any Mac** → **Product → Archive**.
+2. In the Organizer: **Distribute App → Direct Distribution** — Xcode signs with
+   Developer ID and submits to Apple for notarization automatically.
+3. When notarization finishes, **Export** the `.app`, zip it, and attach it to a
+   GitHub Release.
+
+A plain `xcodebuild … build` (or Run in Xcode) is signed for your own machine and
+doesn't need notarization.
+
 ### Project layout
 
 - **`KochiApp.swift`** — app entry. A regular windowed app (Dock icon + window)
@@ -226,6 +245,10 @@ secrets or build artifacts (`DerivedData/`, `.build/`).
   `MixedAudioRecorder`, `FileTranscriber`, `GoalDictationService` (voice goal
   entry), `KeychainStore`, and `CloudLLM/` (`AnthropicClient`, `OpenAIClient`)
   for the opt-in analysis.
+- **`AudioTapShim.{h,m}` + `Kochi-Bridging-Header.h`** — the project's only
+  Objective-C: a tiny category that wraps the audio `installTap` (deprecated on
+  macOS 27 but still functional) so the unusable refined replacement's deprecation
+  stays out of the Swift build. Remove once Apple ships a usable Swift overlay.
 - **Design system — `KochiDeviceStyle.swift`** — `KColor`, `KFont` (Zilla Slab /
   JetBrains Mono / Hanken Grotesk), `kCard()`, `SlabLabel`, `BeveledKeyStyle`,
   `ChatTranscriptView`. Reuse these instead of system fonts and colors.
