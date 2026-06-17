@@ -76,6 +76,18 @@ class GoalManager: ObservableObject {
         saveGoals()
     }
 
+    /// Replaces the current goals with up to three fresh (uncompleted) goals —
+    /// used by the "Speak new goals" flow. Pads to three slots so the editor is stable.
+    func setGoals(_ texts: [String]) {
+        let cleaned = texts
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+        var newGoals = cleaned.prefix(3).map { Goal(text: $0, isCompleted: false) }
+        while newGoals.count < 3 { newGoals.append(Goal(text: "", isCompleted: false)) }
+        goals = Array(newGoals)
+        saveGoals()
+    }
+
     func toggleGoalCompletion(_ goal: Goal) {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }

@@ -97,6 +97,25 @@ final class FoundationModelsService {
         return try await session.respond(to: prompt, generating: SessionNotes.self).content
     }
 
+    // MARK: - Spoken goals -> short goals (on-device, structured)
+
+    /// Parses a freely-spoken phrase into up to three short, actionable goals.
+    func parseGoals(from spokenText: String) async throws -> [String] {
+        let session = LanguageModelSession(model: onDevice, instructions: Self.parseGoalsInstructions)
+        let prompt = """
+        The user spoke the following to set their goals for an upcoming meeting:
+        "\(spokenText)"
+
+        Extract 1 to 3 short, actionable goals from what they said. Each goal is a
+        concise phrase (about 2-8 words), no numbering, no trailing punctuation.
+        Keep the user's wording and order where you can. Return only the goals.
+        """
+        let output = try await session.respond(to: prompt, generating: ParsedGoals.self).content
+        return output.goals
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+    }
+
     // MARK: - Instructions
 
     private static let goalInstructions = """
@@ -111,5 +130,11 @@ final class FoundationModelsService {
     """
     private static let notesInstructions = """
     You write concise, well-structured meeting notes: a short summary, key points, and action items.
+    """
+    private static let parseGoalsInstructions = """
+    You convert a short spoken phrase into 1-3 concise, actionable meeting goals.
+    Each goal is a brief phrase (about 2-8 words), no numbering, no trailing
+    punctuation. Preserve the speaker's intent and order; do not invent goals
+    they did not mention.
     """
 }

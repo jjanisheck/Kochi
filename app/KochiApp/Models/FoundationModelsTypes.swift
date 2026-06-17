@@ -34,6 +34,15 @@ struct SessionNotes {
     var actionItems: [String]
 }
 
+// MARK: - Spoken goals (structured generation)
+
+@available(macOS 27, iOS 27, *)
+@Generable
+struct ParsedGoals {
+    @Guide(description: "1 to 3 short, actionable meeting goals extracted from the spoken text. Each goal is a concise phrase of about 2-8 words, with no numbering or punctuation. Preserve the speaker's intent and ordering.")
+    var goals: [String]
+}
+
 // MARK: - Conversion to the app's existing GoalEvaluation shape
 
 @available(macOS 27, iOS 27, *)

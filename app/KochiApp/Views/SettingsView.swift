@@ -467,7 +467,11 @@ struct GoalsTab: View {
     @Binding var showGoals: Bool
     @EnvironmentObject var goalManager: GoalManager
     @EnvironmentObject var themeManager: ThemeManager
+    @EnvironmentObject var llmManager: LLMManager
+    @StateObject private var dictation = GoalDictationService()
     @State private var goalTexts: [String] = ["", "", ""]
+    @State private var isParsing = false
+    @State private var goalSpeechError: String?
 
     var body: some View {
         ScrollView {
@@ -485,6 +489,8 @@ struct GoalsTab: View {
                     StatTile(value: goalManager.meetingHistory.filter { !$0.goals.isEmpty && $0.goals.allSatisfy { $0.isCompleted } }.count, label: "perfect")
                 }
                 .padding(.horizontal)
+
+                speakGoalsButton
 
                 // Three fixed goal slots
                 ForEach(0..<3, id: \.self) { index in
@@ -520,6 +526,74 @@ struct GoalsTab: View {
         for i in 0..<3 {
             if i < goalManager.goals.count {
                 goalTexts[i] = goalManager.goals[i].text
+            }
+        }
+    }
+
+    // MARK: - Speak new goals
+
+    @ViewBuilder
+    private var speakGoalsButton: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Button(action: toggleDictation) {
+                HStack(spacing: 8) {
+                    if isParsing {
+                        ProgressView().controlSize(.small)
+                        Text("PARSING\u{2026}")
+                    } else if dictation.isListening {
+                        Image(systemName: "stop.fill")
+                        Text("LISTENING\u{2026} TAP TO STOP")
+                    } else {
+                        Image(systemName: "mic.fill")
+                        Text("SPEAK NEW GOALS")
+                    }
+                }
+                .font(KFont.zilla(12.5, .bold))
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 9)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(BeveledKeyStyle(variant: dictation.isListening ? .light : .primary, radius: 8))
+            .disabled(isParsing)
+
+            if dictation.isListening, !dictation.transcript.isEmpty {
+                Text(dictation.transcript)
+                    .font(KFont.sans(12, .regular))
+                    .foregroundColor(KColor.inkSoft)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            if let goalSpeechError {
+                Text(goalSpeechError)
+                    .font(KFont.mono(10))
+                    .foregroundColor(KColor.orangeDeep)
+            }
+        }
+        .padding(.horizontal)
+    }
+
+    private func toggleDictation() {
+        goalSpeechError = nil
+        if dictation.isListening {
+            Task {
+                let spoken = await dictation.stop()
+                guard !spoken.isEmpty else {
+                    goalSpeechError = "Didn\u{2019}t catch any speech. Try again."
+                    return
+                }
+                isParsing = true
+                let parsed = (try? await llmManager.parseGoalsFromSpeech(spoken)) ?? []
+                isParsing = false
+                guard !parsed.isEmpty else {
+                    goalSpeechError = "Couldn\u{2019}t turn that into goals. Try again."
+                    return
+                }
+                goalManager.setGoals(parsed)
+                loadGoalTexts()
+            }
+        } else {
+            dictation.start()
+            if !dictation.isListening {
+                goalSpeechError = "Couldn\u{2019}t start the microphone. Check Microphone & Speech permissions in System Settings."
             }
         }
     }

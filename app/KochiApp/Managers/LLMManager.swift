@@ -97,6 +97,42 @@ class LLMManager: ObservableObject {
         }
     }
 
+    /// Parses spoken text into up to three short goals via the on-device model,
+    /// falling back to a simple split if the model is unavailable or errors.
+    func parseGoalsFromSpeech(_ spokenText: String) async throws -> [String] {
+        isProcessing = true
+        defer { isProcessing = false }
+        let trimmed = spokenText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return [] }
+        do {
+            let goals = try await fm.parseGoals(from: trimmed)
+            return goals.isEmpty ? Self.fallbackSplitGoals(trimmed) : Array(goals.prefix(3))
+        } catch {
+            print("❌ LLMManager.parseGoalsFromSpeech: \(error)")
+            return Self.fallbackSplitGoals(trimmed)
+        }
+    }
+
+    /// Heuristic split used when the model is unavailable: break the phrase on
+    /// common separators ("and", commas, periods) into up to three short goals.
+    static func fallbackSplitGoals(_ text: String) -> [String] {
+        let lowered = " \(text) "
+        var working = text
+        // Replace " and " / " then " separators with a delimiter, then split.
+        for sep in [" and ", " then ", " also "] {
+            if lowered.lowercased().contains(sep) {
+                working = working.replacingOccurrences(of: sep, with: "|",
+                                                       options: [.caseInsensitive])
+            }
+        }
+        let pieces = working
+            .components(separatedBy: CharacterSet(charactersIn: "|,.;\n"))
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+        let goals = pieces.isEmpty ? [text.trimmingCharacters(in: .whitespacesAndNewlines)] : pieces
+        return Array(goals.prefix(3))
+    }
+
     // MARK: - Keyword fallbacks (used only if a model call throws)
 
     private func fallbackEvaluateGoals(_ goals: [Goal], transcription: String) -> GoalEvaluation {
