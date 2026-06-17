@@ -367,7 +367,7 @@ class VideoCoachingManager: ObservableObject {
         // When a clip ends: at rest, advance to a different random idle clip
         // (slow loop through the four). During a meeting, loop the current clip.
         playerObserver = NotificationCenter.default.addObserver(
-            forName: .AVPlayerItemDidPlayToEndTime,
+            forName: AVPlayerItem.didPlayToEndTimeNotification,
             object: nil, // Observe all items
             queue: .main
         ) { [weak self] notification in

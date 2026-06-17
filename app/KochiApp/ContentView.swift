@@ -503,7 +503,7 @@ private struct TapeDeck: View {
         .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
         // No hard border — the liquid-glass white→gray bevel defines the edge.
         .liquidGlass(9)
-        .onChange(of: isRecording) { rec in
+        .onChange(of: isRecording) { _, rec in
             if rec { startSpin() } else { stopSpin() }
         }
         .onAppear { if isRecording { startSpin() } }
@@ -534,7 +534,7 @@ private struct TapeDeck: View {
                 .padding(.horizontal, 10)
                 .padding(.vertical, 10)
             }
-            .onChange(of: transcript) { _ in
+            .onChange(of: transcript) {
                 withAnimation { proxy.scrollTo("end", anchor: .bottom) }
             }
         }

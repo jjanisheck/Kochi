@@ -127,7 +127,7 @@ struct FilmReelAnimation: View {
                     startAnimation()
                 }
             }
-            .onChange(of: isAnimating) { newValue in
+            .onChange(of: isAnimating) { _, newValue in
                 if newValue {
                     startAnimation()
                 } else {
