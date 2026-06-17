@@ -68,6 +68,10 @@ If privacy, cost, or working on a plane matter to you, Kōchi is for you.
 - **Tracks up to three goals per meeting.** Apple's on-device model marks a goal
   as hit when the conversation covers it, and you can tap any goal to override it
   yourself.
+- **Set goals by voice.** On the Goals page, tap **Speak New Goals**, say what you
+  want to focus on, and Apple's on-device model turns it into up to three short
+  goals — no typing. Goals are per-meeting (changing them never alters past
+  meetings), starting from a reusable saved set.
 - **Coaches you live** with a coach video and prompts that respond to how the
   meeting is going.
 - **Saves every session locally** — transcript, goals, and a mixed mic + system
@@ -219,8 +223,9 @@ secrets or build artifacts (`DerivedData/`, `.build/`).
   `LLMManager` (Foundation Models, gated by `@available`), `ThemeManager`,
   `CloudAnalysisManager` (optional cloud AI analysis).
 - **`Services/`** — `DualTranscriptionEngine`, `SystemAudioCapture`,
-  `MixedAudioRecorder`, `FileTranscriber`, `KeychainStore`, and `CloudLLM/`
-  (`AnthropicClient`, `OpenAIClient`) for the opt-in analysis.
+  `MixedAudioRecorder`, `FileTranscriber`, `GoalDictationService` (voice goal
+  entry), `KeychainStore`, and `CloudLLM/` (`AnthropicClient`, `OpenAIClient`)
+  for the opt-in analysis.
 - **Design system — `KochiDeviceStyle.swift`** — `KColor`, `KFont` (Zilla Slab /
   JetBrains Mono / Hanken Grotesk), `kCard()`, `SlabLabel`, `BeveledKeyStyle`,
   `ChatTranscriptView`. Reuse these instead of system fonts and colors.
