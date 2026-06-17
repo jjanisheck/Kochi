@@ -778,6 +778,8 @@ struct MeetingDetailView: View {
     @State private var showDeleteAlert = false
     @State private var didCopy = false
     @State private var showAudioShare = false
+    /// Transcript is collapsed by default so the analysis is visible first.
+    @State private var transcriptExpanded = false
 
     private let fileManager = MeetingFileManager()
     /// The saved mixed mic + system-audio recording for this meeting, if present.
@@ -904,12 +906,24 @@ struct MeetingDetailView: View {
     /// The Me/Them conversation, kept as chat bubbles inside a white card.
     private var transcriptCard: some View {
         VStack(alignment: .leading, spacing: 10) {
-            SlabLabel("Transcript")
-            if displayedNotes.isEmpty {
-                emptyLine("No transcript available")
-            } else {
-                ChatTranscriptView(turns: parseTranscript(displayedNotes), onDark: false)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+            // Tappable header — toggles the transcript open/closed.
+            Button(action: { withAnimation(.easeOut(duration: 0.2)) { transcriptExpanded.toggle() } }) {
+                SlabLabel("Transcript") {
+                    Image(systemName: transcriptExpanded ? "chevron.down" : "chevron.right")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundColor(KColor.muted)
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+
+            if transcriptExpanded {
+                if displayedNotes.isEmpty {
+                    emptyLine("No transcript available")
+                } else {
+                    ChatTranscriptView(turns: parseTranscript(displayedNotes), onDark: false)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
