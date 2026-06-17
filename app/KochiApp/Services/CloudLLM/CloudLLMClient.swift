@@ -12,9 +12,16 @@ enum CloudLLMError: Error, Equatable {
     case network(String)
 }
 
-/// A provider client that returns the raw structured-JSON text for one completion.
+/// The structured-JSON text plus token usage from one completion.
+struct CloudLLMResult: Equatable {
+    let text: String
+    let inputTokens: Int
+    let outputTokens: Int
+}
+
+/// A provider client that returns the structured-JSON text + token usage for one completion.
 protocol CloudLLMClient {
-    func complete(system: String, user: String, apiKey: String, model: String) async throws -> String
+    func complete(system: String, user: String, apiKey: String, model: String) async throws -> CloudLLMResult
 }
 
 /// Maps an HTTP status code to a `CloudLLMError`, or nil for 2xx success.

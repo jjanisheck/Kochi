@@ -1224,6 +1224,13 @@ struct MeetingDetailView: View {
                 .font(KFont.sans(12.5, .regular))
                 .foregroundColor(KColor.inkSoft)
                 .fixedSize(horizontal: false, vertical: true)
+
+            if let usage = a.usage {
+                let cost = usage.estimatedCostUSD.map { String(format: "~$%.4f", $0) } ?? "cost n/a"
+                Text("\(usage.inputTokens) in \u{00B7} \(usage.outputTokens) out \u{00B7} \(cost)")
+                    .font(KFont.mono(9))
+                    .foregroundColor(KColor.muted)
+            }
         }
     }
 

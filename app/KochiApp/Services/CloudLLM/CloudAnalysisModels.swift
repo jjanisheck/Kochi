@@ -42,6 +42,39 @@ struct Effectiveness: Codable, Equatable {
     var professionalism: Dimension
 }
 
+/// Token spend and an estimated USD cost for one analysis call.
+struct TokenUsage: Codable, Equatable {
+    var inputTokens: Int
+    var outputTokens: Int
+    /// Estimated cost from published per-token rates; nil when the model's price is unknown.
+    var estimatedCostUSD: Double?
+}
+
+/// Published per-1M-token prices for known models, used to estimate analysis cost.
+enum AnalysisPricing {
+    /// (inputPerMTok, outputPerMTok) in USD, or nil for an unknown model.
+    private static func rates(for model: String) -> (input: Double, output: Double)? {
+        switch model {
+        case "claude-opus-4-8", "claude-opus-4-7", "claude-opus-4-6", "claude-opus-4-5":
+            return (5.0, 25.0)
+        case "claude-sonnet-4-6", "claude-sonnet-4-5":
+            return (3.0, 15.0)
+        case "claude-haiku-4-5":
+            return (1.0, 5.0)
+        case "claude-fable-5", "claude-mythos-5":
+            return (10.0, 50.0)
+        default:
+            return nil
+        }
+    }
+
+    /// Estimated USD cost from token counts, or nil when the model's price is unknown.
+    static func estimatedCostUSD(model: String, inputTokens: Int, outputTokens: Int) -> Double? {
+        guard let r = rates(for: model) else { return nil }
+        return Double(inputTokens) / 1_000_000 * r.input + Double(outputTokens) / 1_000_000 * r.output
+    }
+}
+
 /// The full saved analysis for a meeting.
 struct MeetingAnalysis: Codable, Equatable {
     var summary: String
@@ -49,6 +82,7 @@ struct MeetingAnalysis: Codable, Equatable {
     var effectiveness: Effectiveness
     var overallCoaching: String
     var suggestedName: String?   // AI-proposed meeting title (nil for older analyses)
+    var usage: TokenUsage?       // token spend + estimated cost (nil for older analyses)
     var provider: String     // provenance, e.g. "Claude (claude-sonnet-4-6)"
     var generatedAt: Date
 
@@ -193,6 +227,10 @@ extension MeetingAnalysis {
         if let suggestedName, !suggestedName.isEmpty {
             out += "**Suggested name:** \(suggestedName)\n\n"
         }
+        if let usage {
+            let cost = usage.estimatedCostUSD.map { String(format: " \u{2014} ~$%.4f (est.)", $0) } ?? ""
+            out += "_Tokens: \(usage.inputTokens) in / \(usage.outputTokens) out\(cost)_\n\n"
+        }
         out += "## Summary\n\n\(summary)\n\n"
         out += "## Action Items\n\n"
         if actionItems.isEmpty {
@@ -222,6 +260,10 @@ extension MeetingAnalysis {
         lines.append("AI ANALYSIS (\(provider))")
         if let suggestedName, !suggestedName.isEmpty {
             lines.append("Suggested name: \(suggestedName)")
+        }
+        if let usage {
+            let cost = usage.estimatedCostUSD.map { String(format: " \u{2014} ~$%.4f (est.)", $0) } ?? ""
+            lines.append("Tokens: \(usage.inputTokens) in / \(usage.outputTokens) out\(cost)")
         }
         lines.append("")
         lines.append("Summary:")

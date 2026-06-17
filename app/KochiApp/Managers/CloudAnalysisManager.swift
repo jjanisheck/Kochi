@@ -64,11 +64,18 @@ final class CloudAnalysisManager: ObservableObject {
         let goalTexts = includeGoals ? meeting.goals.map { $0.text } : []
         let user = AnalysisPrompt.user(goalTexts: goalTexts,
                                        transcript: meeting.notes)
-        let json = try await client.complete(system: AnalysisPrompt.system,
-                                             user: user,
-                                             apiKey: key,
-                                             model: model)
+        let result = try await client.complete(system: AnalysisPrompt.system,
+                                               user: user,
+                                               apiKey: key,
+                                               model: model)
         let label = "\(provider.displayName) (\(model))"
-        return try MeetingAnalysis.from(jsonText: json, providerLabel: label, date: Date())
+        var analysis = try MeetingAnalysis.from(jsonText: result.text, providerLabel: label, date: Date())
+        let cost = AnalysisPricing.estimatedCostUSD(model: model,
+                                                    inputTokens: result.inputTokens,
+                                                    outputTokens: result.outputTokens)
+        analysis.usage = TokenUsage(inputTokens: result.inputTokens,
+                                    outputTokens: result.outputTokens,
+                                    estimatedCostUSD: cost)
+        return analysis
     }
 }

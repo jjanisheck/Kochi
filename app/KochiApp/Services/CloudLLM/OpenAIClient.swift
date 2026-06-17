@@ -47,7 +47,14 @@ struct OpenAIClient: CloudLLMClient {
         return content
     }
 
-    func complete(system: String, user: String, apiKey: String, model: String) async throws -> String {
+    /// Extracts (input, output) token counts from a response body, or nil if absent.
+    static func parseUsage(_ data: Data) -> (input: Int, output: Int)? {
+        guard let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let usage = obj["usage"] as? [String: Any] else { return nil }
+        return ((usage["prompt_tokens"] as? Int) ?? 0, (usage["completion_tokens"] as? Int) ?? 0)
+    }
+
+    func complete(system: String, user: String, apiKey: String, model: String) async throws -> CloudLLMResult {
         let req = Self.makeRequest(system: system, user: user, apiKey: apiKey, model: model)
         let data: Data
         let response: URLResponse
@@ -59,6 +66,8 @@ struct OpenAIClient: CloudLLMClient {
         if let http = response as? HTTPURLResponse, let err = cloudError(forStatus: http.statusCode) {
             throw err
         }
-        return try Self.parseResponse(data)
+        let text = try Self.parseResponse(data)
+        let usage = Self.parseUsage(data)
+        return CloudLLMResult(text: text, inputTokens: usage?.input ?? 0, outputTokens: usage?.output ?? 0)
     }
 }
