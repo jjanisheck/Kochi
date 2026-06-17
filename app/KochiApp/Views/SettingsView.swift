@@ -788,6 +788,8 @@ struct MeetingDetailView: View {
     @State private var showDeleteAlert = false
     @State private var didCopy = false
     @State private var showAudioShare = false
+    /// Presents the system share sheet with the meeting's text (same content as Copy).
+    @State private var showTextShare = false
     /// Transcript is collapsed by default so the analysis is visible first.
     @State private var transcriptExpanded = false
     /// Display name (custom or AI-suggested); seeded from the meeting on appear.
@@ -824,6 +826,21 @@ struct MeetingDetailView: View {
                 // Copy the whole meeting (session, goals, transcript) to the
                 // clipboard. Lives top-right, opposite the Back key.
                 if hasCopyableContent {
+                    // Share the meeting text (name, goals, transcript, analysis) to
+                    // Notes / Mail / Messages / etc. — never the audio file.
+                    Button(action: { showTextShare = true }) {
+                        HStack(spacing: 4) {
+                            Image(systemName: "square.and.arrow.up")
+                                .font(.system(size: 11, weight: .bold))
+                            Text("Share")
+                                .font(KFont.zilla(12.5, .bold))
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(BeveledKeyStyle(variant: .light, radius: 7))
+
                     Button(action: copyMeeting) {
                         HStack(spacing: 4) {
                             Image(systemName: didCopy ? "checkmark" : "doc.on.doc")
@@ -870,6 +887,9 @@ struct MeetingDetailView: View {
         )
         .sheet(isPresented: $showAudioShare) {
             ShareSheet(items: [audioURL].compactMap { $0 })
+        }
+        .sheet(isPresented: $showTextShare) {
+            ShareSheet(items: [meetingPlainText()])
         }
         .onAppear { analysis = meeting.analysis; meetingName = meeting.name }
     }
