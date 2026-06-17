@@ -1053,25 +1053,28 @@ struct MeetingDetailView: View {
             }
 
             if cloudAnalysisManager.isConfigured {
-                Toggle("Include goals in analysis", isOn: $includeGoals)
-                    .toggleStyle(.checkbox)
-                    .font(KFont.sans(12, .medium))
-                    .foregroundColor(KColor.inkSoft)
-                    .tint(KColor.orange)
-                    .disabled(isAnalyzing)
-                Button(action: runAnalysis) {
-                    HStack(spacing: 6) {
-                        if isAnalyzing { ProgressView().controlSize(.small) }
-                        Text(isAnalyzing ? "Analyzing\u{2026}"
-                             : (analysis == nil ? "Run AI Analysis" : "Re-run"))
-                            .font(KFont.zilla(12.5, .bold))
+                HStack(spacing: 12) {
+                    Toggle("Include goals", isOn: $includeGoals)
+                        .toggleStyle(.checkbox)
+                        .font(KFont.sans(12, .medium))
+                        .foregroundColor(KColor.inkSoft)
+                        .tint(KColor.orange)
+                        .disabled(isAnalyzing)
+                    Spacer()
+                    Button(action: runAnalysis) {
+                        HStack(spacing: 6) {
+                            if isAnalyzing { ProgressView().controlSize(.small) }
+                            Text(isAnalyzing ? "Analyzing\u{2026}"
+                                 : (analysis == nil ? "Run AI Analysis" : "Re-run"))
+                                .font(KFont.zilla(12.5, .bold))
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 7)
+                        .contentShape(Rectangle())
                     }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 7)
-                    .contentShape(Rectangle())
+                    .buttonStyle(BeveledKeyStyle(variant: .primary, radius: 7))
+                    .disabled(isAnalyzing)
                 }
-                .buttonStyle(BeveledKeyStyle(variant: .primary, radius: 7))
-                .disabled(isAnalyzing)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
