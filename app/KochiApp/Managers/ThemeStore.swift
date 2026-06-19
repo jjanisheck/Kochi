@@ -2,7 +2,7 @@
 //  KochiApp
 //
 //  Discovers theme folders bundled under Themes/, persists the selection, and
-//  drives live switching. KColor reads `shared.palette`.
+//  drives live switching. KColor reads the palette via ActivePalette, which ThemeStore updates on init and select.
 
 import SwiftUI
 import Combine
@@ -26,8 +26,7 @@ final class ThemeStore: ObservableObject {
         let storedID = UserDefaults.standard.string(forKey: defaultsKey) ?? "default"
         self.current = found.first(where: { $0.id == storedID })
             ?? found.first(where: { $0.id == "default" })
-            ?? found.first
-            ?? .fallbackDefault
+            ?? found[0]   // discover() guarantees a non-empty array
         ActivePalette.current = current.palette
         ActiveThemeVideo.prefix = current.videoPrefix
         ActiveThemeVideo.subdirectory = current.videoSubdirectory
@@ -43,9 +42,8 @@ final class ThemeStore: ObservableObject {
         }
         var themes: [Theme] = []
         for url in entries {
-            var isDir: ObjCBool = false
-            FileManager.default.fileExists(atPath: url.path, isDirectory: &isDir)
-            guard isDir.boolValue, let t = Theme.load(folderURL: url) else { continue }
+            let isDir = (try? url.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory ?? false
+            guard isDir, let t = Theme.load(folderURL: url) else { continue }
             themes.append(t)
         }
         if themes.isEmpty { return [.fallbackDefault] }

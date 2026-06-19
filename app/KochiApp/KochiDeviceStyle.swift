@@ -348,3 +348,4 @@ struct ChatTranscriptView: View {
         return onDark ? hue.opacity(0.30) : hue.opacity(0.25)
     }
 }
+

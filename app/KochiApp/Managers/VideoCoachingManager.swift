@@ -75,7 +75,6 @@ class VideoCoachingManager: ObservableObject {
     @Published var currentVideoLabel: VideoLabel = .idle
     @Published var isPlaying: Bool = false
     @Published var player: AVPlayer?
-    @Published var videoTheme: String = "general" // "general" or "zen"
     @Published var coachingText: String = "" // Short text displayed with video
 
     private var currentPlayerItem: AVPlayerItem?
