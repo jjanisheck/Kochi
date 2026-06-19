@@ -20,15 +20,18 @@ extension Color {
     }
 }
 
-/// The 15 palette tokens that back `KColor`.
+/// The palette tokens that back `KColor`. `buttonHi`/`buttonLo` are the primary
+/// (glossy "key") button + hit-goal gradient stops; a theme may omit them in its
+/// JSON, in which case they default to `orange`/`orangeDeep`.
 struct ThemePalette {
     let orange, orangeDeep, ink, inkSoft, paper, win, panel, panel2: Color
     let line, lineSoft, muted, muted2, good, deck, deckBorder: Color
+    let buttonHi, buttonLo: Color
 
     /// Ordered token names — used to decode/validate the `colors` map.
     static let tokenNames = ["orange","orangeDeep","ink","inkSoft","paper","win",
                              "panel","panel2","line","lineSoft","muted","muted2",
-                             "good","deck","deckBorder"]
+                             "good","deck","deckBorder","buttonHi","buttonLo"]
 
     /// Today's exact palette — the safety net if discovery ever finds nothing.
     static let fallback = ThemePalette(
@@ -39,10 +42,13 @@ struct ThemePalette {
         line: Color(themeHex: "#CDCCC6")!, lineSoft: Color(themeHex: "#DAD9D3")!,
         muted: Color(themeHex: "#8D8C86")!, muted2: Color(themeHex: "#A9A8A2")!,
         good: Color(themeHex: "#1F8A4C")!, deck: Color(themeHex: "#34332C")!,
-        deckBorder: Color(themeHex: "#26251F")!
+        deckBorder: Color(themeHex: "#26251F")!,
+        buttonHi: Color(themeHex: "#FF7A36")!, buttonLo: Color(themeHex: "#EC5000")!
     )
 
-    /// Build from a name→hex map. Returns nil if any token is missing/malformed.
+    /// Build from a name→hex map. Returns nil if any required token is
+    /// missing/malformed. `buttonHi`/`buttonLo` are optional and fall back to
+    /// `orange`/`orangeDeep`.
     init?(colors: [String: String]) {
         func c(_ k: String) -> Color? { colors[k].flatMap { Color(themeHex: $0) } }
         guard let orange = c("orange"), let orangeDeep = c("orangeDeep"),
@@ -56,17 +62,21 @@ struct ThemePalette {
         self.panel2 = panel2; self.line = line; self.lineSoft = lineSoft
         self.muted = muted; self.muted2 = muted2; self.good = good; self.deck = deck
         self.deckBorder = deckBorder
+        self.buttonHi = c("buttonHi") ?? orange
+        self.buttonLo = c("buttonLo") ?? orangeDeep
     }
 
     /// Memberwise init (used by `fallback`).
     init(orange: Color, orangeDeep: Color, ink: Color, inkSoft: Color, paper: Color,
          win: Color, panel: Color, panel2: Color, line: Color, lineSoft: Color,
-         muted: Color, muted2: Color, good: Color, deck: Color, deckBorder: Color) {
+         muted: Color, muted2: Color, good: Color, deck: Color, deckBorder: Color,
+         buttonHi: Color, buttonLo: Color) {
         self.orange = orange; self.orangeDeep = orangeDeep; self.ink = ink
         self.inkSoft = inkSoft; self.paper = paper; self.win = win; self.panel = panel
         self.panel2 = panel2; self.line = line; self.lineSoft = lineSoft
         self.muted = muted; self.muted2 = muted2; self.good = good; self.deck = deck
         self.deckBorder = deckBorder
+        self.buttonHi = buttonHi; self.buttonLo = buttonLo
     }
 }
 

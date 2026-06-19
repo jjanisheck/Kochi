@@ -437,8 +437,7 @@ private struct GoalRow: View {
         let shape = RoundedRectangle(cornerRadius: 7, style: .continuous)
         if done {
             shape
-                .fill(LinearGradient(colors: [Color(red: 255/255, green: 122/255, blue: 54/255),
-                                              Color(red: 236/255, green: 80/255, blue: 0/255)],
+                .fill(LinearGradient(colors: [KColor.buttonHi, KColor.buttonLo],
                                      startPoint: .top, endPoint: .bottom))
                 .overlay(shape.strokeBorder(
                     LinearGradient(colors: [.white.opacity(0.5), .white.opacity(0.05), .black.opacity(0.18)],

@@ -30,6 +30,8 @@ enum KColor {
     static var good: Color       { p.good }
     static var deck: Color       { p.deck }
     static var deckBorder: Color { p.deckBorder }
+    static var buttonHi: Color   { p.buttonHi }
+    static var buttonLo: Color   { p.buttonLo }
 }
 
 // MARK: - Bundled fonts
@@ -129,8 +131,7 @@ struct BeveledKeyStyle: ButtonStyle {
             }
             switch variant {
             case .primary:
-                return LinearGradient(colors: [Color(red: 255/255, green: 122/255, blue: 54/255),
-                                               Color(red: 236/255, green: 80/255, blue: 0/255)],
+                return LinearGradient(colors: [KColor.buttonHi, KColor.buttonLo],
                                       startPoint: .top, endPoint: .bottom)
             case .light:
                 return LinearGradient(colors: [Color(red: 251/255, green: 250/255, blue: 248/255),
