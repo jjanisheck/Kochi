@@ -40,6 +40,7 @@ struct KochiApp: App {
     @StateObject private var enhancedThemeManager = EnhancedThemeManager()
     @StateObject private var performanceMonitor = PerformanceMonitor.shared
     @StateObject private var appStoreHelper = AppStoreHelper.shared
+    @StateObject private var themeStore = ThemeStore.shared
 
     var body: some Scene {
         WindowGroup(id: KochiApp.mainWindowID) {
@@ -49,6 +50,10 @@ struct KochiApp: App {
                 .environmentObject(themeManager)
                 .environmentObject(llmManager)
                 .environmentObject(cloudAnalysisManager)
+                .environmentObject(themeStore)
+                .preferredColorScheme(themeStore.current.colorScheme)
+                .id(themeStore.themeVersion)
+                .animation(.easeInOut(duration: 0.3), value: themeStore.themeVersion)
                 .onAppear { setupApp() }
                 // Fixed device-card width. The card fills to the very top;
                 // the header rows inset their content past the traffic lights so
