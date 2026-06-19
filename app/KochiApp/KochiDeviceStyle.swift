@@ -34,6 +34,8 @@ enum KColor {
     static var buttonLo: Color   { p.buttonLo }
     static var goalRestFill: Color { p.goalRestFill }
     static var goalRestInk: Color  { p.goalRestInk }
+    static var onBg: Color         { p.onBg }
+    static var onBgFaint: Color    { p.onBgFaint }
 }
 
 // MARK: - Bundled fonts
@@ -159,10 +161,12 @@ struct BeveledKeyStyle: ButtonStyle {
 /// an optional trailing accessory (count / status / timer).
 struct SlabLabel<Trailing: View>: View {
     let title: String
+    let tint: Color
     @ViewBuilder var trailing: Trailing
 
-    init(_ title: String, @ViewBuilder trailing: () -> Trailing) {
+    init(_ title: String, tint: Color = KColor.inkSoft, @ViewBuilder trailing: () -> Trailing) {
         self.title = title
+        self.tint = tint
         self.trailing = trailing()
     }
 
@@ -171,7 +175,7 @@ struct SlabLabel<Trailing: View>: View {
             Text(title.uppercased())
                 .font(KFont.mono(10, .medium))
                 .tracking(1.3)
-                .foregroundColor(KColor.inkSoft)
+                .foregroundColor(tint)
             Rectangle().fill(KColor.line).frame(height: 1)
             trailing
         }
@@ -179,7 +183,7 @@ struct SlabLabel<Trailing: View>: View {
 }
 
 extension SlabLabel where Trailing == EmptyView {
-    init(_ title: String) { self.init(title) { EmptyView() } }
+    init(_ title: String, tint: Color = KColor.inkSoft) { self.init(title, tint: tint) { EmptyView() } }
 }
 
 // MARK: - Liquid-glass bevel

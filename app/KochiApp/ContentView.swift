@@ -73,10 +73,10 @@ struct ContentView: View {
 
     private var goalsSection: some View {
         VStack(spacing: 7) {
-            SlabLabel("Goals") {
+            SlabLabel("Goals", tint: KColor.onBg) {
                 Text(phase == .pre ? "set 3" : "\(goalsHit)/3 hit")
                     .font(KFont.mono(10))
-                    .foregroundColor(KColor.muted)
+                    .foregroundColor(KColor.onBgFaint)
             }
             ForEach(Array(goalManager.goals.prefix(3).enumerated()), id: \.element.id) { index, goal in
                 GoalRow(goal: goal, phase: phase, index: index)
@@ -86,14 +86,14 @@ struct ContentView: View {
 
     private var transcriptSection: some View {
         VStack(spacing: 7) {
-            SlabLabel("Transcript") {
+            SlabLabel("Transcript", tint: KColor.onBg) {
                 HStack(spacing: 8) {
                     Text(phase == .live ? "live" : phase == .ended ? "final" : "ready")
                         .font(KFont.mono(10))
-                        .foregroundColor(KColor.muted)
+                        .foregroundColor(KColor.onBgFaint)
                     Text(fmtTime(audioManager.recordingTime))
                         .font(KFont.mono(11, .medium))
-                        .foregroundColor(KColor.inkSoft)
+                        .foregroundColor(KColor.onBg)
                 }
             }
             TapeDeck(
@@ -266,7 +266,7 @@ private struct BrandRow: View {
             Text("MEETING COACH")
                 .font(KFont.mono(9.5))
                 .tracking(1.5)
-                .foregroundColor(KColor.muted)
+                .foregroundColor(KColor.onBgFaint)
             Spacer()
             // READY / REC / ENDED sits on the far right of the logo row.
             HStack(spacing: 6) {
@@ -285,7 +285,7 @@ private struct BrandRow: View {
                 Text(statusText)
                     .font(KFont.mono(10))
                     .tracking(0.8)
-                    .foregroundColor(KColor.muted)
+                    .foregroundColor(KColor.onBgFaint)
             }
         }
     }

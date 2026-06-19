@@ -30,12 +30,16 @@ struct ThemePalette {
     /// Unachieved goal-row fill + its text/checkbox ink. Optional; default to
     /// `paper`/`ink` (an achieved goal uses the `buttonHi`/`buttonLo` gradient).
     let goalRestFill, goalRestInk: Color
+    /// Text/labels that sit directly on the themed window background (brand row,
+    /// section headers) + their fainter secondary variant (counts, status).
+    /// Optional; default to `inkSoft`/`muted`.
+    let onBg, onBgFaint: Color
 
     /// Ordered token names — used to decode/validate the `colors` map.
     static let tokenNames = ["orange","orangeDeep","ink","inkSoft","paper","win",
                              "panel","panel2","line","lineSoft","muted","muted2",
                              "good","deck","deckBorder","buttonHi","buttonLo",
-                             "goalRestFill","goalRestInk"]
+                             "goalRestFill","goalRestInk","onBg","onBgFaint"]
 
     /// Today's exact palette — the safety net if discovery ever finds nothing.
     static let fallback = ThemePalette(
@@ -48,7 +52,8 @@ struct ThemePalette {
         good: Color(themeHex: "#1F8A4C")!, deck: Color(themeHex: "#34332C")!,
         deckBorder: Color(themeHex: "#26251F")!,
         buttonHi: Color(themeHex: "#FF7A36")!, buttonLo: Color(themeHex: "#EC5000")!,
-        goalRestFill: Color(themeHex: "#FFFFFF")!, goalRestInk: Color(themeHex: "#1C1B19")!
+        goalRestFill: Color(themeHex: "#FFFFFF")!, goalRestInk: Color(themeHex: "#1C1B19")!,
+        onBg: Color(themeHex: "#3B3A37")!, onBgFaint: Color(themeHex: "#8D8C86")!
     )
 
     /// Build from a name→hex map. Returns nil if any required token is
@@ -71,13 +76,16 @@ struct ThemePalette {
         self.buttonLo = c("buttonLo") ?? orangeDeep
         self.goalRestFill = c("goalRestFill") ?? paper
         self.goalRestInk = c("goalRestInk") ?? ink
+        self.onBg = c("onBg") ?? inkSoft
+        self.onBgFaint = c("onBgFaint") ?? muted
     }
 
     /// Memberwise init (used by `fallback`).
     init(orange: Color, orangeDeep: Color, ink: Color, inkSoft: Color, paper: Color,
          win: Color, panel: Color, panel2: Color, line: Color, lineSoft: Color,
          muted: Color, muted2: Color, good: Color, deck: Color, deckBorder: Color,
-         buttonHi: Color, buttonLo: Color, goalRestFill: Color, goalRestInk: Color) {
+         buttonHi: Color, buttonLo: Color, goalRestFill: Color, goalRestInk: Color,
+         onBg: Color, onBgFaint: Color) {
         self.orange = orange; self.orangeDeep = orangeDeep; self.ink = ink
         self.inkSoft = inkSoft; self.paper = paper; self.win = win; self.panel = panel
         self.panel2 = panel2; self.line = line; self.lineSoft = lineSoft
@@ -85,6 +93,7 @@ struct ThemePalette {
         self.deckBorder = deckBorder
         self.buttonHi = buttonHi; self.buttonLo = buttonLo
         self.goalRestFill = goalRestFill; self.goalRestInk = goalRestInk
+        self.onBg = onBg; self.onBgFaint = onBgFaint
     }
 }
 

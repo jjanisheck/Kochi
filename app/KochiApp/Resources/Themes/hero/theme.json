@@ -10,7 +10,8 @@
     "line": "#CDCCC6", "lineSoft": "#DAD9D3",
     "muted": "#8D8C86", "muted2": "#A9A8A2",
     "good": "#1F8A4C", "deck": "#34332C", "deckBorder": "#26251F",
-    "buttonHi": "#E84855", "buttonLo": "#1E66F0"
+    "buttonHi": "#E84855", "buttonLo": "#1E66F0",
+    "onBg": "#FFFFFF", "onBgFaint": "#E8EAED"
   },
   "images": {
     "BackgroundImage": "images/BackgroundImage.png",
