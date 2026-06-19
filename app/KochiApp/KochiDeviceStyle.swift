@@ -247,18 +247,6 @@ extension View {
     }
 }
 
-// MARK: - App theme
-
-/// User-selectable look for the Kōchi device design system. Only `default`
-/// exists today — the current `KColor`/`KFont` palette. Additional cases plug
-/// in here as the theme system grows.
-enum KochiTheme: String, CaseIterable, Identifiable {
-    case `default` = "Default"
-
-    var id: String { rawValue }
-    var displayName: String { rawValue.uppercased() }
-}
-
 // MARK: - Chat-style transcript
 
 enum TranscriptSpeaker { case me, them, other }

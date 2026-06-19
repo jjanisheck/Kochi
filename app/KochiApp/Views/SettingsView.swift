@@ -696,7 +696,7 @@ struct GoalSlotRow: View {
 
 // MARK: - About Tab
 struct AboutTab: View {
-    @AppStorage("kochiTheme") private var theme: KochiTheme = .default
+    @EnvironmentObject private var themeStore: ThemeStore
 
     var body: some View {
         ScrollView {
@@ -761,13 +761,15 @@ struct AboutTab: View {
         }
     }
 
-    // Theme picker — currently just DEFAULT; more looks plug in via KochiTheme.
     private var themesCard: some View {
         VStack(alignment: .leading, spacing: 10) {
             SlabLabel("Themes") { EmptyView() }
-            Picker("", selection: $theme) {
-                ForEach(KochiTheme.allCases) { t in
-                    Text(t.displayName).tag(t)
+            Picker("", selection: Binding(
+                get: { themeStore.current.id },
+                set: { themeStore.select($0) }
+            )) {
+                ForEach(themeStore.available) { t in
+                    Text(t.displayName).tag(t.id)
                 }
             }
             .pickerStyle(.menu)
@@ -1928,5 +1930,6 @@ struct SettingsView_Previews: PreviewProvider {
             .environmentObject(ThemeManager())
             .environmentObject(GoalManager())
             .environmentObject(CloudAnalysisManager())
+            .environmentObject(ThemeStore.shared)
     }
 }
