@@ -94,8 +94,7 @@ struct SettingsView: View {
         // header), with the halftone as a non-inflating background.
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(
-            Image("BackgroundImage")
-                .resizable()
+            ThemeImage("BackgroundImage")
                 .aspectRatio(contentMode: .fill)
                 .ignoresSafeArea()
         )
@@ -977,8 +976,7 @@ struct MeetingDetailView: View {
         .background(
             // Uniform pixel-grid camo so the top bar matches the rest of the page
             // (the gradient BackgroundImage read plainer up top).
-            Image("BackgroundPlainImage")
-                .resizable()
+            ThemeImage("BackgroundPlainImage")
                 .aspectRatio(contentMode: .fill)
                 .ignoresSafeArea()
         )

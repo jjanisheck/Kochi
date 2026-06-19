@@ -45,8 +45,7 @@ struct ContentView: View {
         // Halftone "window" background — attached as a background so it doesn't
         // inflate the content's intrinsic height (the panel sizes to the layout).
         .background(
-            Image("BackgroundImage")
-                .resizable()
+            ThemeImage("BackgroundImage")
                 .aspectRatio(contentMode: .fill)
                 .ignoresSafeArea()
         )
@@ -261,8 +260,7 @@ private struct BrandRow: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            Image("KochiLogo")
-                .resizable()
+            ThemeImage("KochiLogo")
                 .scaledToFit()
                 .frame(height: 30)
             Text("MEETING COACH")
@@ -478,8 +476,7 @@ private struct TapeDeck: View {
         // through the gaps between the volume bars.
         .background(
             GeometryReader { geo in
-                Image("FilmReel")
-                    .resizable()
+                ThemeImage("FilmReel")
                     .scaledToFit()
                     .frame(width: geo.size.width, height: geo.size.width)
                     .grayscale(1)
@@ -491,8 +488,7 @@ private struct TapeDeck: View {
         )
         .background(
             // Dark camo deck with a top-to-bottom gradient for depth.
-            Image("BackgroundPlainImage")
-                .resizable()
+            ThemeImage("BackgroundPlainImage")
                 .scaledToFill()
                 .overlay(
                     LinearGradient(colors: [Color.black.opacity(0.45),

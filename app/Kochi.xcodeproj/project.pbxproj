@@ -10,6 +10,7 @@
 		0AF00002000000000000DEFA /* Themes in Resources */ = {isa = PBXBuildFile; fileRef = 0AF00001000000000000DEFA /* Themes */; };
 		0AF10002000000000000DEFA /* KochiApp/Managers/Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AF10001000000000000DEFA /* KochiApp/Managers/Theme.swift */; };
 		0AF10004000000000000DEFA /* KochiApp/Managers/ThemeStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AF10003000000000000DEFA /* KochiApp/Managers/ThemeStore.swift */; };
+		0AF10006000000000000DEFA /* KochiApp/Views/ThemeImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AF10005000000000000DEFA /* KochiApp/Views/ThemeImage.swift */; };
 		04684A1E2EB6DAD8001E0449 /* CoachingVideoPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04684A1D2EB6DAD8001E0449 /* CoachingVideoPlayerView.swift */; };
 		04684A862EB6E1C8001E0449 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 04684A522EB6E1C8001E0449 /* README.md */; };
 		04684AE52EB81ACE001E0449 /* filmreel.png in Resources */ = {isa = PBXBuildFile; fileRef = 04684AE42EB81ACE001E0449 /* filmreel.png */; };
@@ -69,6 +70,7 @@
 		0AF00001000000000000DEFA /* Themes */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Resources/Themes; sourceTree = "<group>"; };
 		0AF10001000000000000DEFA /* KochiApp/Managers/Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Managers/Theme.swift; sourceTree = "<group>"; };
 		0AF10003000000000000DEFA /* KochiApp/Managers/ThemeStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Managers/ThemeStore.swift; sourceTree = "<group>"; };
+		0AF10005000000000000DEFA /* KochiApp/Views/ThemeImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeImage.swift; sourceTree = "<group>"; };
 		04684A1D2EB6DAD8001E0449 /* CoachingVideoPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoachingVideoPlayerView.swift; sourceTree = "<group>"; };
 		04684A522EB6E1C8001E0449 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		04684AE42EB81ACE001E0449 /* filmreel.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = filmreel.png; sourceTree = "<group>"; };
@@ -246,6 +248,7 @@
 				1A0000006 /* RecordingView.swift */,
 				1A000000A /* SettingsView.swift */,
 				04GOALS001 /* GoalsManagementView.swift */,
+				0AF10005000000000000DEFA /* KochiApp/Views/ThemeImage.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -385,6 +388,7 @@
 				04F1EB672E28AF330086D5BC /* TemporaryStubs.swift in Sources */,
 				04VIDEO002 /* KochiApp/Managers/VideoCoachingManager.swift in Sources */,
 				47C9718F353F438DB95A0329 /* FoundationModelsService.swift in Sources */,
+				0AF10006000000000000DEFA /* KochiApp/Views/ThemeImage.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
