@@ -14,24 +14,22 @@ import CoreText
 // MARK: - Palette (from the design's :root custom properties)
 
 enum KColor {
-    private static func c(_ r: Double, _ g: Double, _ b: Double) -> Color {
-        Color(red: r / 255, green: g / 255, blue: b / 255)
-    }
-    static let orange     = c(249, 88, 0)    // --orange   #F95800
-    static let orangeDeep = c(225, 78, 0)    // --orange-deep #E14E00
-    static let ink        = c(28, 27, 25)    // --ink      #1c1b19
-    static let inkSoft    = c(59, 58, 55)    // --ink-soft #3b3a37
-    static let paper      = c(255, 255, 255) // --paper
-    static let win        = c(233, 232, 228) // --win      #e9e8e4
-    static let panel      = c(239, 238, 234) // --panel
-    static let panel2     = c(228, 227, 222) // --panel-2
-    static let line       = c(205, 204, 198) // --line     #cdccc6
-    static let lineSoft   = c(218, 217, 211) // --line-soft
-    static let muted      = c(141, 140, 134) // --muted    #8d8c86
-    static let muted2     = c(169, 168, 162) // --muted-2
-    static let good       = c(31, 138, 76)   // --good     #1f8a4c
-    static let deck       = c(52, 51, 44)    // tape-deck window #34332c
-    static let deckBorder = c(38, 37, 31)    // #26251f
+    private static var p: ThemePalette { ActivePalette.current }
+    static var orange: Color     { p.orange }
+    static var orangeDeep: Color { p.orangeDeep }
+    static var ink: Color        { p.ink }
+    static var inkSoft: Color     { p.inkSoft }
+    static var paper: Color      { p.paper }
+    static var win: Color        { p.win }
+    static var panel: Color      { p.panel }
+    static var panel2: Color     { p.panel2 }
+    static var line: Color       { p.line }
+    static var lineSoft: Color   { p.lineSoft }
+    static var muted: Color      { p.muted }
+    static var muted2: Color     { p.muted2 }
+    static var good: Color       { p.good }
+    static var deck: Color       { p.deck }
+    static var deckBorder: Color { p.deckBorder }
 }
 
 // MARK: - Bundled fonts

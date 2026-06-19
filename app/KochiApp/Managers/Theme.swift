@@ -125,3 +125,13 @@ struct Theme: Identifiable {
                      folderURL: folder)
     }()
 }
+
+/// Nonisolated mirror of the active theme's palette. `KColor` is a nonisolated
+/// design-system enum read from many (non-`@MainActor`) view contexts, so it
+/// cannot touch the `@MainActor` `ThemeStore`. `ThemeStore` is the sole writer
+/// — on the main actor it pushes `current.palette` here whenever the theme
+/// changes — and reads happen during main-actor rendering, so access is
+/// effectively serialized.
+enum ActivePalette {
+    nonisolated(unsafe) static var current: ThemePalette = .fallback
+}

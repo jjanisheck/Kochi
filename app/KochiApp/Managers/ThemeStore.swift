@@ -28,6 +28,7 @@ final class ThemeStore: ObservableObject {
             ?? found.first(where: { $0.id == "default" })
             ?? found.first
             ?? .fallbackDefault
+        ActivePalette.current = current.palette
     }
 
     /// Scan `baseURL` for subfolders that load as valid themes. `default` first,
@@ -58,6 +59,7 @@ final class ThemeStore: ObservableObject {
     func select(_ id: String) {
         guard id != current.id, let theme = available.first(where: { $0.id == id }) else { return }
         current = theme
+        ActivePalette.current = theme.palette
         UserDefaults.standard.set(id, forKey: defaultsKey)
         themeVersion &+= 1
     }
