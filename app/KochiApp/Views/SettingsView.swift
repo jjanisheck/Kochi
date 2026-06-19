@@ -697,6 +697,8 @@ struct GoalSlotRow: View {
 
 // MARK: - About Tab
 struct AboutTab: View {
+    @AppStorage("kochiTheme") private var theme: KochiTheme = .default
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 15) {
@@ -705,6 +707,8 @@ struct AboutTab: View {
                     title: "About",
                     subtitle: "How Kōchi works and handles your data."
                 )
+
+                themesCard
 
                 // Main description
                 VStack(alignment: .leading, spacing: 16) {
@@ -756,6 +760,25 @@ struct AboutTab: View {
             }
             .padding(.bottom)
         }
+    }
+
+    // Theme picker — currently just DEFAULT; more looks plug in via KochiTheme.
+    private var themesCard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            SlabLabel("Themes") { EmptyView() }
+            Picker("", selection: $theme) {
+                ForEach(KochiTheme.allCases) { t in
+                    Text(t.displayName).tag(t)
+                }
+            }
+            .pickerStyle(.menu)
+            .labelsHidden()
+            .font(KFont.sans(13, .medium))
+            .tint(KColor.orange)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .kCard()
+        .padding(.horizontal)
     }
 }
 
@@ -1760,11 +1783,19 @@ struct AITab: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 15) {
-                providerCard
-                keyCard
-                disclosureCard
+                TabHeader(
+                    icon: "sparkles",
+                    title: "AI",
+                    subtitle: "Bring your own key for optional cloud analysis."
+                )
+
+                VStack(alignment: .leading, spacing: 15) {
+                    providerCard
+                    keyCard
+                    disclosureCard
+                }
+                .padding(.horizontal)
             }
-            .padding()
             .padding(.bottom)
             .frame(maxWidth: .infinity, alignment: .leading)
         }
