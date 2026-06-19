@@ -29,6 +29,8 @@ final class ThemeStore: ObservableObject {
             ?? found.first
             ?? .fallbackDefault
         ActivePalette.current = current.palette
+        ActiveThemeVideo.prefix = current.videoPrefix
+        ActiveThemeVideo.subdirectory = current.videoSubdirectory
     }
 
     /// Scan `baseURL` for subfolders that load as valid themes. `default` first,
@@ -60,7 +62,15 @@ final class ThemeStore: ObservableObject {
         guard id != current.id, let theme = available.first(where: { $0.id == id }) else { return }
         current = theme
         ActivePalette.current = theme.palette
+        ActiveThemeVideo.prefix = theme.videoPrefix
+        ActiveThemeVideo.subdirectory = theme.videoSubdirectory
+        NotificationCenter.default.post(name: .themeChanged, object: nil)
         UserDefaults.standard.set(id, forKey: defaultsKey)
         themeVersion &+= 1
     }
+}
+
+extension Notification.Name {
+    /// Posted by `ThemeStore` when the active theme changes.
+    static let themeChanged = Notification.Name("themeChanged")
 }

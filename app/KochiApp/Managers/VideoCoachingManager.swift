@@ -124,6 +124,14 @@ class VideoCoachingManager: ObservableObject {
             name: .recordingStopped,
             object: nil
         )
+
+        // Reload the coach clip when the theme changes (new video folder/prefix)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleThemeChanged),
+            name: .themeChanged,
+            object: nil
+        )
     }
 
     private func preloadVideos() {
@@ -286,13 +294,20 @@ class VideoCoachingManager: ObservableObject {
         // Videos are named like: general-idle-1.mp4, zen-goal-2.mp4, etc.
 
         // Use configured theme (general or zen)
-        let theme = videoTheme
+        let prefix = ActiveThemeVideo.prefix
+        let subdir = ActiveThemeVideo.subdirectory
 
         // Use the requested variation, or randomly select one (1-4 available).
         let variation = variation ?? Int.random(in: 1...4)
-        let videoName = "\(theme)-\(label.rawValue)-\(variation)"
+        let videoName = "\(prefix)-\(label.rawValue)-\(variation)"
 
         print("🎬 Looking for video: \(videoName).mp4")
+
+        // Theme subdirectory lookup: Themes/<id>/videos/<name>.mp4
+        if let url = Bundle.main.url(forResource: videoName, withExtension: "mp4", subdirectory: subdir) {
+            print("✅ Found video in theme subdirectory (\(subdir)): \(videoName).mp4")
+            return AVPlayerItem(url: url)
+        }
 
         // Method 1: Try Bundle.main.url (most reliable for bundled resources)
         if let url = Bundle.main.url(forResource: videoName, withExtension: "mp4") {
@@ -353,7 +368,7 @@ class VideoCoachingManager: ObservableObject {
         }
 
         // Video not found - this is okay, app will show placeholder
-        print("❌ No video found for: \(videoName).mp4 (label: \(label.rawValue), theme: \(theme), variation: \(variation))")
+        print("❌ No video found for: \(videoName).mp4 (label: \(label.rawValue), prefix: \(prefix), variation: \(variation))")
         print("📂 Bundle path: \(Bundle.main.bundlePath)")
         return nil
     }
@@ -464,6 +479,14 @@ class VideoCoachingManager: ObservableObject {
     @objc private func handleRecordingStopped(_ notification: Notification) {
         print("🎬 Recording stopped - playing wrap video")
         playVideo(label: .wrap)
+    }
+
+    @objc private func handleThemeChanged() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.videoCache.removeAll()
+            self.playVideo(label: self.currentVideoLabel)
+        }
     }
 
     // MARK: - Public Methods

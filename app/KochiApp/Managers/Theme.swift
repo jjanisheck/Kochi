@@ -135,3 +135,12 @@ struct Theme: Identifiable {
 enum ActivePalette {
     nonisolated(unsafe) static var current: ThemePalette = .fallback
 }
+
+/// Nonisolated mirror of the active theme's video lookup info, so the
+/// (nonisolated) `VideoCoachingManager` can resolve clips without touching the
+/// `@MainActor` `ThemeStore`. `ThemeStore` is the sole writer (on the main
+/// actor), in `init` and `select`.
+enum ActiveThemeVideo {
+    nonisolated(unsafe) static var prefix: String = "general"
+    nonisolated(unsafe) static var subdirectory: String = "Themes/default/videos"
+}
