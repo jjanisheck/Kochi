@@ -27,11 +27,15 @@ struct ThemePalette {
     let orange, orangeDeep, ink, inkSoft, paper, win, panel, panel2: Color
     let line, lineSoft, muted, muted2, good, deck, deckBorder: Color
     let buttonHi, buttonLo: Color
+    /// Unachieved goal-row fill + its text/checkbox ink. Optional; default to
+    /// `paper`/`ink` (an achieved goal uses the `buttonHi`/`buttonLo` gradient).
+    let goalRestFill, goalRestInk: Color
 
     /// Ordered token names — used to decode/validate the `colors` map.
     static let tokenNames = ["orange","orangeDeep","ink","inkSoft","paper","win",
                              "panel","panel2","line","lineSoft","muted","muted2",
-                             "good","deck","deckBorder","buttonHi","buttonLo"]
+                             "good","deck","deckBorder","buttonHi","buttonLo",
+                             "goalRestFill","goalRestInk"]
 
     /// Today's exact palette — the safety net if discovery ever finds nothing.
     static let fallback = ThemePalette(
@@ -43,7 +47,8 @@ struct ThemePalette {
         muted: Color(themeHex: "#8D8C86")!, muted2: Color(themeHex: "#A9A8A2")!,
         good: Color(themeHex: "#1F8A4C")!, deck: Color(themeHex: "#34332C")!,
         deckBorder: Color(themeHex: "#26251F")!,
-        buttonHi: Color(themeHex: "#FF7A36")!, buttonLo: Color(themeHex: "#EC5000")!
+        buttonHi: Color(themeHex: "#FF7A36")!, buttonLo: Color(themeHex: "#EC5000")!,
+        goalRestFill: Color(themeHex: "#FFFFFF")!, goalRestInk: Color(themeHex: "#1C1B19")!
     )
 
     /// Build from a name→hex map. Returns nil if any required token is
@@ -64,19 +69,22 @@ struct ThemePalette {
         self.deckBorder = deckBorder
         self.buttonHi = c("buttonHi") ?? orange
         self.buttonLo = c("buttonLo") ?? orangeDeep
+        self.goalRestFill = c("goalRestFill") ?? paper
+        self.goalRestInk = c("goalRestInk") ?? ink
     }
 
     /// Memberwise init (used by `fallback`).
     init(orange: Color, orangeDeep: Color, ink: Color, inkSoft: Color, paper: Color,
          win: Color, panel: Color, panel2: Color, line: Color, lineSoft: Color,
          muted: Color, muted2: Color, good: Color, deck: Color, deckBorder: Color,
-         buttonHi: Color, buttonLo: Color) {
+         buttonHi: Color, buttonLo: Color, goalRestFill: Color, goalRestInk: Color) {
         self.orange = orange; self.orangeDeep = orangeDeep; self.ink = ink
         self.inkSoft = inkSoft; self.paper = paper; self.win = win; self.panel = panel
         self.panel2 = panel2; self.line = line; self.lineSoft = lineSoft
         self.muted = muted; self.muted2 = muted2; self.good = good; self.deck = deck
         self.deckBorder = deckBorder
         self.buttonHi = buttonHi; self.buttonLo = buttonLo
+        self.goalRestFill = goalRestFill; self.goalRestInk = goalRestInk
     }
 }
 

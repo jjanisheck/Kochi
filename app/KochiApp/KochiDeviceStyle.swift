@@ -32,6 +32,8 @@ enum KColor {
     static var deckBorder: Color { p.deckBorder }
     static var buttonHi: Color   { p.buttonHi }
     static var buttonLo: Color   { p.buttonLo }
+    static var goalRestFill: Color { p.goalRestFill }
+    static var goalRestInk: Color  { p.goalRestInk }
 }
 
 // MARK: - Bundled fonts

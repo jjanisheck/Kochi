@@ -386,7 +386,7 @@ private struct GoalRow: View {
                 RoundedRectangle(cornerRadius: 5, style: .continuous)
                     .fill(done ? Color.white : Color.clear)
                     .overlay(RoundedRectangle(cornerRadius: 5, style: .continuous)
-                        .strokeBorder(done ? Color.white : KColor.ink, lineWidth: 2))
+                        .strokeBorder(done ? Color.white : KColor.goalRestInk, lineWidth: 2))
                     .frame(width: 20, height: 20)
                 if done {
                     Image(systemName: "checkmark")
@@ -402,11 +402,11 @@ private struct GoalRow: View {
                 ))
                 .textFieldStyle(.plain)
                 .font(KFont.sans(13.5, .semibold))
-                .foregroundColor(KColor.ink)
+                .foregroundColor(KColor.goalRestInk)
             } else {
                 Text(goal.text)
                     .font(KFont.sans(13.5, .semibold))
-                    .foregroundColor(done ? .white : KColor.ink)
+                    .foregroundColor(done ? .white : KColor.goalRestInk)
                     .lineLimit(1)
                 Spacer(minLength: 6)
                 // A hit goal turns the whole bar orange; an unmet goal stays a
@@ -444,7 +444,7 @@ private struct GoalRow: View {
                                    startPoint: .top, endPoint: .bottom), lineWidth: 1))
         } else {
             shape
-                .fill(KColor.paper)
+                .fill(KColor.goalRestFill)
                 .overlay(shape.strokeBorder(KColor.line, lineWidth: 1))
         }
     }
