@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0AF10002000000000000DEFA /* KochiApp/Managers/Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AF10001000000000000DEFA /* KochiApp/Managers/Theme.swift */; };
 		04684A1E2EB6DAD8001E0449 /* CoachingVideoPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04684A1D2EB6DAD8001E0449 /* CoachingVideoPlayerView.swift */; };
 		04684A862EB6E1C8001E0449 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 04684A522EB6E1C8001E0449 /* README.md */; };
 		04684AE52EB81ACE001E0449 /* filmreel.png in Resources */ = {isa = PBXBuildFile; fileRef = 04684AE42EB81ACE001E0449 /* filmreel.png */; };
@@ -157,6 +158,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0AF10001000000000000DEFA /* KochiApp/Managers/Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Managers/Theme.swift; sourceTree = "<group>"; };
 		04684A1D2EB6DAD8001E0449 /* CoachingVideoPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoachingVideoPlayerView.swift; sourceTree = "<group>"; };
 		04684A522EB6E1C8001E0449 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		04684AE42EB81ACE001E0449 /* filmreel.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = filmreel.png; sourceTree = "<group>"; };
@@ -328,6 +330,7 @@
 		04684AE32EB6FD8B001E0449 /* Recovered References */ = {
 			isa = PBXGroup;
 			children = (
+				0AF10001000000000000DEFA /* KochiApp/Managers/Theme.swift */,
 				04VIDEO001 /* KochiApp/Managers/VideoCoachingManager.swift */,
 				04DUALENG002 /* KochiApp/Services/DualTranscriptionEngine.swift */,
 				04SYSAUD002 /* KochiApp/Services/SystemAudioCapture.swift */,
@@ -709,6 +712,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0AF10002000000000000DEFA /* KochiApp/Managers/Theme.swift in Sources */,
 				1A0000001 /* KochiApp.swift in Sources */,
 				04F1EB6F2E28C1170086D5BC /* CoachingView.swift in Sources */,
 				04C3F3F22E28D064000228D6 /* LLMManager.swift in Sources */,

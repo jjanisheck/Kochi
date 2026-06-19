@@ -2,7 +2,7 @@ import SwiftUI
 import Combine
 
 class ThemeManager: ObservableObject {
-    @Published var currentTheme: Theme = .ocean {
+    @Published var currentTheme: LegacyTheme = .ocean {
         didSet {
             saveTheme()
         }
@@ -42,7 +42,7 @@ class ThemeManager: ObservableObject {
     // MARK: - Theme Management
     func loadTheme() {
         if let themeRawValue = userDefaults.string(forKey: themeKey),
-           let theme = Theme(rawValue: themeRawValue) {
+           let theme = LegacyTheme(rawValue: themeRawValue) {
             currentTheme = theme
         }
     }
@@ -51,7 +51,7 @@ class ThemeManager: ObservableObject {
         userDefaults.set(currentTheme.rawValue, forKey: themeKey)
     }
     
-    func setTheme(_ theme: Theme) {
+    func setTheme(_ theme: LegacyTheme) {
         withAnimation(.easeInOut(duration: 0.3)) {
             currentTheme = theme
         }
@@ -59,7 +59,7 @@ class ThemeManager: ObservableObject {
 }
 
 // MARK: - Theme Definition
-enum Theme: String, CaseIterable {
+enum LegacyTheme: String, CaseIterable {
     case ocean = "Ocean"
     case forest = "Forest"
     case sunset = "Sunset"
