@@ -105,8 +105,8 @@ under `Resources/Themes/<theme-id>/videos/`, named `<label>-<variation>.mp4`
 prompt, mute, focus, check, steady, wrap — with up to 4 variations each.
 
 To author or add clips for a theme, see
-[`Resources/Themes/CREATING-VIDEOS.md`](Resources/Themes/CREATING-VIDEOS.md),
-which covers the naming convention, clip specs, and generation prompts.
+[`docs/creating-coach-videos.md`](../../docs/creating-coach-videos.md), which
+covers the naming convention, clip specs, and generation prompts.
 
 The app works without videos — it falls back to the `idle` clip, and shows a
 placeholder if that's missing too.

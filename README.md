@@ -195,6 +195,9 @@ Apple frameworks only (no Swift Package or CocoaPods). Match the surrounding
 SwiftUI style, and keep both platforms compiling: cross-platform code is gated
 with `#if os(macOS)` / `#if os(iOS)`.
 
+Want to add a theme or swap the coach clips? See
+[Creating coach videos](docs/creating-coach-videos.md).
+
 ### Build & test
 
 ```bash

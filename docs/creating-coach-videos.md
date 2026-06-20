@@ -1,8 +1,9 @@
 # Creating Coach Videos for a Theme
 
 The coach hero at the top of the app plays short, silent, looping video clips.
-Each theme ships its own set under `Themes/<theme-id>/videos/`. This guide
-explains how to author and name them.
+Each theme ships its own set under
+`app/KochiApp/Resources/Themes/<theme-id>/videos/`. This guide explains how to
+author and name them.
 
 ## Naming convention
 
@@ -71,7 +72,7 @@ That's `11 labels × 4 variations = 44` clips for a complete coach set.
 Drop the files in your theme's `videos/` folder:
 
 ```
-Themes/<theme-id>/
+app/KochiApp/Resources/Themes/<theme-id>/
   theme.json
   videos/
     idle-1.mp4
@@ -80,8 +81,8 @@ Themes/<theme-id>/
     wrap-4.mp4
 ```
 
-Because `Themes/` is a single Xcode folder reference, adding the folder + clips
-and rebuilding is all that's needed — no project or code changes.
+Because `Resources/Themes/` is a single Xcode folder reference, adding the folder
++ clips and rebuilding is all that's needed — no project or code changes.
 
 ## Generation prompts
 
