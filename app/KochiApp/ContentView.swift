@@ -46,7 +46,9 @@ struct ContentView: View {
         // inflate the content's intrinsic height (the panel sizes to the layout).
         .background(
             ThemeImage("BackgroundImage")
-                .aspectRatio(contentMode: .fill)
+                .scaledToFill()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .clipped()
                 .ignoresSafeArea()
         )
         // Settings sheet as an overlay so it's clamped to the card's bounds
@@ -418,6 +420,9 @@ private struct GoalRow: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(goalBackground)
         .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
+        // Make the WHOLE row a reliable tap target (the trailing Spacer would
+        // otherwise leave a dead zone, so a row could feel unclickable).
+        .contentShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
         .shadow(color: done ? Color(red: 140/255, green: 55/255, blue: 0).opacity(0.35) : .clear,
                 radius: 4, x: 0, y: 2)
 
@@ -478,8 +483,8 @@ private struct TapeDeck: View {
                 ThemeImage("FilmReel")
                     .scaledToFit()
                     .frame(width: geo.size.width, height: geo.size.width)
-                    .grayscale(1)
-                    .brightness(-0.15) // dim so the transcript text stays readable over it
+                    .grayscale(ActiveDeck.reelGrayscale)
+                    .brightness(ActiveDeck.reelBrightness) // dim so transcript text stays readable (themeable)
                     .rotationEffect(.degrees(rotation))
                     .position(x: geo.size.width / 2, y: geo.size.height)
             }
@@ -490,8 +495,7 @@ private struct TapeDeck: View {
             ThemeImage("BackgroundPlainImage")
                 .scaledToFill()
                 .overlay(
-                    LinearGradient(colors: [Color.black.opacity(0.45),
-                                            Color.black.opacity(0.7)],
+                    LinearGradient(colors: [KColor.deckScrimTop, KColor.deckScrimBottom],
                                    startPoint: .top, endPoint: .bottom)
                 )
         )
@@ -541,9 +545,12 @@ private struct TapeDeck: View {
             ForEach(0..<14, id: \.self) { i in
                 let filled = tapeFilled
                 RoundedRectangle(cornerRadius: 2)
-                    .fill(i < filled ? KColor.orange : Color.black.opacity(0.18))
+                    .fill(i < filled
+                          ? AnyShapeStyle(LinearGradient(colors: [KColor.buttonHi, KColor.buttonLo],
+                                                         startPoint: .top, endPoint: .bottom))
+                          : AnyShapeStyle(Color.black.opacity(0.18)))
                     .frame(height: 9)
-                    .shadow(color: (i == filled - 1 && phase == .live) ? KColor.orange.opacity(0.85) : .clear,
+                    .shadow(color: (i == filled - 1 && phase == .live) ? KColor.buttonHi.opacity(0.85) : .clear,
                             radius: 4)
             }
         }

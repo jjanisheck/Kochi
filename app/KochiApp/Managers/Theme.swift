@@ -7,16 +7,28 @@
 import SwiftUI
 
 extension Color {
-    /// Parse a `#RRGGBB` hex string into a Color. Returns nil if malformed.
+    /// Parse a `#RRGGBB` or `#RRGGBBAA` hex string into a Color. Returns nil if
+    /// malformed. The 8-digit form carries an alpha channel (for scrims/overlays).
     init?(themeHex raw: String) {
         var s = raw.trimmingCharacters(in: .whitespaces)
         if s.hasPrefix("#") { s.removeFirst() }
-        guard s.count == 6, let v = UInt32(s, radix: 16) else { return nil }
-        self = Color(
-            red:   Double((v >> 16) & 0xFF) / 255,
-            green: Double((v >> 8) & 0xFF) / 255,
-            blue:  Double(v & 0xFF) / 255
-        )
+        guard let v = UInt32(s, radix: 16) else { return nil }
+        if s.count == 6 {
+            self = Color(
+                red:   Double((v >> 16) & 0xFF) / 255,
+                green: Double((v >> 8) & 0xFF) / 255,
+                blue:  Double(v & 0xFF) / 255
+            )
+        } else if s.count == 8 {
+            self = Color(.sRGB,
+                red:     Double((v >> 24) & 0xFF) / 255,
+                green:   Double((v >> 16) & 0xFF) / 255,
+                blue:    Double((v >> 8) & 0xFF) / 255,
+                opacity: Double(v & 0xFF) / 255
+            )
+        } else {
+            return nil
+        }
     }
 }
 
@@ -34,12 +46,18 @@ struct ThemePalette {
     /// section headers) + their fainter secondary variant (counts, status).
     /// Optional; default to `inkSoft`/`muted`.
     let onBg, onBgFaint: Color
+    /// Gradient scrim over the tape-deck background image (top→bottom). Use
+    /// 8-digit `#RRGGBBAA` hex to control opacity. Optional; default to the
+    /// black 0.45 → 0.7 deck darkening. A near-clear scrim lets the image's
+    /// real colors show through.
+    let deckScrimTop, deckScrimBottom: Color
 
     /// Ordered token names — used to decode/validate the `colors` map.
     static let tokenNames = ["orange","orangeDeep","ink","inkSoft","paper","win",
                              "panel","panel2","line","lineSoft","muted","muted2",
                              "good","deck","deckBorder","buttonHi","buttonLo",
-                             "goalRestFill","goalRestInk","onBg","onBgFaint"]
+                             "goalRestFill","goalRestInk","onBg","onBgFaint",
+                             "deckScrimTop","deckScrimBottom"]
 
     /// Today's exact palette — the safety net if discovery ever finds nothing.
     static let fallback = ThemePalette(
@@ -53,7 +71,8 @@ struct ThemePalette {
         deckBorder: Color(themeHex: "#26251F")!,
         buttonHi: Color(themeHex: "#FF7A36")!, buttonLo: Color(themeHex: "#EC5000")!,
         goalRestFill: Color(themeHex: "#FFFFFF")!, goalRestInk: Color(themeHex: "#1C1B19")!,
-        onBg: Color(themeHex: "#3B3A37")!, onBgFaint: Color(themeHex: "#8D8C86")!
+        onBg: Color(themeHex: "#3B3A37")!, onBgFaint: Color(themeHex: "#8D8C86")!,
+        deckScrimTop: Color.black.opacity(0.45), deckScrimBottom: Color.black.opacity(0.7)
     )
 
     /// Build from a name→hex map. Returns nil if any required token is
@@ -78,6 +97,8 @@ struct ThemePalette {
         self.goalRestInk = c("goalRestInk") ?? ink
         self.onBg = c("onBg") ?? inkSoft
         self.onBgFaint = c("onBgFaint") ?? muted
+        self.deckScrimTop = c("deckScrimTop") ?? Color.black.opacity(0.45)
+        self.deckScrimBottom = c("deckScrimBottom") ?? Color.black.opacity(0.7)
     }
 
     /// Memberwise init (used by `fallback`).
@@ -85,7 +106,7 @@ struct ThemePalette {
          win: Color, panel: Color, panel2: Color, line: Color, lineSoft: Color,
          muted: Color, muted2: Color, good: Color, deck: Color, deckBorder: Color,
          buttonHi: Color, buttonLo: Color, goalRestFill: Color, goalRestInk: Color,
-         onBg: Color, onBgFaint: Color) {
+         onBg: Color, onBgFaint: Color, deckScrimTop: Color, deckScrimBottom: Color) {
         self.orange = orange; self.orangeDeep = orangeDeep; self.ink = ink
         self.inkSoft = inkSoft; self.paper = paper; self.win = win; self.panel = panel
         self.panel2 = panel2; self.line = line; self.lineSoft = lineSoft
@@ -94,6 +115,7 @@ struct ThemePalette {
         self.buttonHi = buttonHi; self.buttonLo = buttonLo
         self.goalRestFill = goalRestFill; self.goalRestInk = goalRestInk
         self.onBg = onBg; self.onBgFaint = onBgFaint
+        self.deckScrimTop = deckScrimTop; self.deckScrimBottom = deckScrimBottom
     }
 }
 
@@ -104,6 +126,11 @@ struct ThemeManifest: Decodable {
     let videoPrefix: String
     let colors: [String: String]
     let images: [String: String]?
+    /// Tape-deck reel treatment. `deckReelGrayscale` 0…1 (1 = fully gray),
+    /// `deckReelBrightness` -1…1. Optional; default to 1 / -0.15 (the original
+    /// dimmed-gray reel). Set grayscale 0 to show the reel's real colors.
+    let deckReelGrayscale: Double?
+    let deckReelBrightness: Double?
 }
 
 /// A resolved theme: palette + asset URLs + identity.
@@ -115,6 +142,8 @@ struct Theme: Identifiable {
     let palette: ThemePalette
     let images: [String: URL] // logical name -> file URL inside the theme folder
     let folderURL: URL
+    let deckReelGrayscale: Double
+    let deckReelBrightness: Double
 
     /// Subdirectory (relative to bundle resources) where this theme's videos live.
     var videoSubdirectory: String { "Themes/\(id)/videos" }
@@ -139,7 +168,9 @@ struct Theme: Identifiable {
         }
         return Theme(id: folderURL.lastPathComponent, displayName: m.displayName,
                      colorScheme: scheme, videoPrefix: m.videoPrefix,
-                     palette: palette, images: images, folderURL: folderURL)
+                     palette: palette, images: images, folderURL: folderURL,
+                     deckReelGrayscale: m.deckReelGrayscale ?? 1.0,
+                     deckReelBrightness: m.deckReelBrightness ?? -0.15)
     }
 
     /// Guaranteed-valid default, used before discovery or if nothing is found.
@@ -149,7 +180,7 @@ struct Theme: Identifiable {
             ?? URL(fileURLWithPath: "/dev/null")
         return Theme(id: "default", displayName: "DEFAULT", colorScheme: .light,
                      videoPrefix: "general", palette: .fallback, images: [:],
-                     folderURL: folder)
+                     folderURL: folder, deckReelGrayscale: 1.0, deckReelBrightness: -0.15)
     }()
 }
 
@@ -170,4 +201,11 @@ enum ActivePalette {
 enum ActiveThemeVideo {
     nonisolated(unsafe) static var prefix: String = "general"
     nonisolated(unsafe) static var subdirectory: String = "Themes/default/videos"
+}
+
+/// Nonisolated mirror of the active theme's tape-deck reel treatment, read by
+/// the deck view. Written by `ThemeStore` on the main actor.
+enum ActiveDeck {
+    nonisolated(unsafe) static var reelGrayscale: Double = 1.0
+    nonisolated(unsafe) static var reelBrightness: Double = -0.15
 }

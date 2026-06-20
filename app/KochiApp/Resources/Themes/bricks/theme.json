@@ -2,6 +2,8 @@
   "displayName": "BRICKS",
   "colorScheme": "light",
   "videoPrefix": "general",
+  "deckReelGrayscale": 0,
+  "deckReelBrightness": 0,
   "colors": {
     "orange": "#A8412B", "orangeDeep": "#7E2C1B",
     "ink": "#1C1B19", "inkSoft": "#3B3A37",
@@ -10,7 +12,10 @@
     "line": "#CDCCC6", "lineSoft": "#DAD9D3",
     "muted": "#8D8C86", "muted2": "#A9A8A2",
     "good": "#1F8A4C", "deck": "#34332C", "deckBorder": "#26251F",
-    "buttonHi": "#C25A3A", "buttonLo": "#8B3320"
+    "buttonHi": "#FF8C2B", "buttonLo": "#F25C00",
+    "onBg": "#FFFFFF", "onBgFaint": "#FFFFFF",
+    "goalRestFill": "#FFFFFF", "goalRestInk": "#EA5800",
+    "deckScrimTop": "#00000000", "deckScrimBottom": "#00000033"
   },
   "images": {
     "BackgroundImage": "images/BackgroundImage.png",

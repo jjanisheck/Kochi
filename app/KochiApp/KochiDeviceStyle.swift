@@ -36,6 +36,8 @@ enum KColor {
     static var goalRestInk: Color  { p.goalRestInk }
     static var onBg: Color         { p.onBg }
     static var onBgFaint: Color    { p.onBgFaint }
+    static var deckScrimTop: Color    { p.deckScrimTop }
+    static var deckScrimBottom: Color { p.deckScrimBottom }
 }
 
 // MARK: - Bundled fonts

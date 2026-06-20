@@ -95,7 +95,9 @@ struct SettingsView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(
             ThemeImage("BackgroundImage")
-                .aspectRatio(contentMode: .fill)
+                .scaledToFill()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .clipped()
                 .ignoresSafeArea()
         )
         .sheet(isPresented: $showGoals) {
