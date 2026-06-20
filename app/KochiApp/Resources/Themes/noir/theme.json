@@ -1,7 +1,6 @@
 {
   "displayName": "NOIR",
   "colorScheme": "light",
-  "videoPrefix": "general",
   "colors": {
     "orange": "#1A1A1A", "orangeDeep": "#000000",
     "ink": "#1C1B19", "inkSoft": "#3B3A37",

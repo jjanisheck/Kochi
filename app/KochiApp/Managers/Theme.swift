@@ -123,7 +123,6 @@ struct ThemePalette {
 struct ThemeManifest: Decodable {
     let displayName: String
     let colorScheme: String?
-    let videoPrefix: String
     let colors: [String: String]
     let images: [String: String]?
     /// Tape-deck reel treatment. `deckReelGrayscale` 0…1 (1 = fully gray),
@@ -138,7 +137,6 @@ struct Theme: Identifiable {
     let id: String            // folder name, e.g. "default"
     let displayName: String
     let colorScheme: ColorScheme?
-    let videoPrefix: String
     let palette: ThemePalette
     let images: [String: URL] // logical name -> file URL inside the theme folder
     let folderURL: URL
@@ -167,7 +165,7 @@ struct Theme: Identifiable {
         default: scheme = nil
         }
         return Theme(id: folderURL.lastPathComponent, displayName: m.displayName,
-                     colorScheme: scheme, videoPrefix: m.videoPrefix,
+                     colorScheme: scheme,
                      palette: palette, images: images, folderURL: folderURL,
                      deckReelGrayscale: m.deckReelGrayscale ?? 1.0,
                      deckReelBrightness: m.deckReelBrightness ?? -0.15)
@@ -179,7 +177,7 @@ struct Theme: Identifiable {
             .appendingPathComponent("default")
             ?? URL(fileURLWithPath: "/dev/null")
         return Theme(id: "default", displayName: "DEFAULT", colorScheme: .light,
-                     videoPrefix: "general", palette: .fallback, images: [:],
+                     palette: .fallback, images: [:],
                      folderURL: folder, deckReelGrayscale: 1.0, deckReelBrightness: -0.15)
     }()
 }
@@ -199,7 +197,6 @@ enum ActivePalette {
 /// `@MainActor` `ThemeStore`. `ThemeStore` is the sole writer (on the main
 /// actor), in `init` and `select`.
 enum ActiveThemeVideo {
-    nonisolated(unsafe) static var prefix: String = "general"
     nonisolated(unsafe) static var subdirectory: String = "Themes/default/videos"
 }
 

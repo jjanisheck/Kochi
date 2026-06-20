@@ -9,21 +9,19 @@ explains how to author and name them.
 Every clip filename follows this exact pattern:
 
 ```
-<prefix>-<label>-<variation>.mp4
+<label>-<variation>.mp4
 ```
 
-Example: `general-idle-1.mp4`, `zen-goal-3.mp4`
+Example: `idle-1.mp4`, `goal-3.mp4`
 
 | Part | What it is | Allowed values |
 |------|------------|----------------|
-| `<prefix>` | The theme's `videoPrefix` from its `theme.json`. Lets one folder hold more than one coach set. | lowercase, e.g. `general`, `zen` |
 | `<label>` | Which coaching moment the clip is for (see the table below). | one of the 11 labels |
 | `<variation>` | A numbered alternate so the coach doesn't look repetitive. | `1`, `2`, `3`, `4` |
 
-- The prefix **must match** the `"videoPrefix"` value in the same theme's
-  `theme.json`. If `theme.json` says `"videoPrefix": "zen"`, the loader only
-  looks for `zen-<label>-<n>.mp4`.
-- All lowercase. Separate the three parts with single hyphens. Extension is
+- The theme folder itself identifies which coach set the clip belongs to, so the
+  filename carries only the emotion and variation — no theme prefix.
+- All lowercase. Separate the two parts with a single hyphen. Extension is
   `.mp4`.
 
 ## Labels
@@ -74,12 +72,12 @@ Drop the files in your theme's `videos/` folder:
 
 ```
 Themes/<theme-id>/
-  theme.json          ← "videoPrefix": "<prefix>"
+  theme.json
   videos/
-    <prefix>-idle-1.mp4
-    <prefix>-idle-2.mp4
+    idle-1.mp4
+    idle-2.mp4
     …
-    <prefix>-wrap-4.mp4
+    wrap-4.mp4
 ```
 
 Because `Themes/` is a single Xcode folder reference, adding the folder + clips

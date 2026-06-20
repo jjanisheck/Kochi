@@ -1,7 +1,6 @@
 {
   "displayName": "HERO",
   "colorScheme": "light",
-  "videoPrefix": "general",
   "colors": {
     "orange": "#E03131", "orangeDeep": "#B02525",
     "ink": "#1C1B19", "inkSoft": "#3B3A37",

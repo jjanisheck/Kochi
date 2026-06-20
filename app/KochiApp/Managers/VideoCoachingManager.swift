@@ -289,16 +289,14 @@ class VideoCoachingManager: ObservableObject {
     }
 
     private func createPlayerItem(for label: VideoLabel, variation: Int? = nil) -> AVPlayerItem? {
-        // Try to find video in Resources/Videos folder
-        // Videos are named like: general-idle-1.mp4, zen-goal-2.mp4, etc.
-
-        // Use configured theme (general or zen)
-        let prefix = ActiveThemeVideo.prefix
+        // Videos live in the active theme's folder, named <label>-<variation>.mp4
+        // (e.g. idle-1.mp4, goal-2.mp4). The theme folder supplies the styling,
+        // so the filename carries only the emotion and which variation it is.
         let subdir = ActiveThemeVideo.subdirectory
 
         // Use the requested variation, or randomly select one (1-4 available).
         let variation = variation ?? Int.random(in: 1...4)
-        let videoName = "\(prefix)-\(label.rawValue)-\(variation)"
+        let videoName = "\(label.rawValue)-\(variation)"
 
         print("🎬 Looking for video: \(videoName).mp4")
 
@@ -367,7 +365,7 @@ class VideoCoachingManager: ObservableObject {
         }
 
         // Video not found - this is okay, app will show placeholder
-        print("❌ No video found for: \(videoName).mp4 (label: \(label.rawValue), prefix: \(prefix), variation: \(variation))")
+        print("❌ No video found for: \(videoName).mp4 (label: \(label.rawValue), variation: \(variation), subdir: \(subdir))")
         print("📂 Bundle path: \(Bundle.main.bundlePath)")
         return nil
     }

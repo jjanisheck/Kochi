@@ -28,7 +28,6 @@ final class ThemeStore: ObservableObject {
             ?? found.first(where: { $0.id == "default" })
             ?? found[0]   // discover() guarantees a non-empty array
         ActivePalette.current = current.palette
-        ActiveThemeVideo.prefix = current.videoPrefix
         ActiveThemeVideo.subdirectory = current.videoSubdirectory
         ActiveDeck.reelGrayscale = current.deckReelGrayscale
         ActiveDeck.reelBrightness = current.deckReelBrightness
@@ -62,7 +61,6 @@ final class ThemeStore: ObservableObject {
         guard id != current.id, let theme = available.first(where: { $0.id == id }) else { return }
         current = theme
         ActivePalette.current = theme.palette
-        ActiveThemeVideo.prefix = theme.videoPrefix
         ActiveThemeVideo.subdirectory = theme.videoSubdirectory
         ActiveDeck.reelGrayscale = theme.deckReelGrayscale
         ActiveDeck.reelBrightness = theme.deckReelBrightness

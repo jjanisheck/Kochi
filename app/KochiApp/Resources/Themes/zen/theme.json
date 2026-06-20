@@ -1,7 +1,6 @@
 {
   "displayName": "ZEN",
   "colorScheme": "light",
-  "videoPrefix": "zen",
   "colors": {
     "orange": "#2F8F5B", "orangeDeep": "#1F6B42",
     "ink": "#1C1B19", "inkSoft": "#3B3A37",
