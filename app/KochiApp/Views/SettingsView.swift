@@ -764,18 +764,40 @@ struct AboutTab: View {
     private var themesCard: some View {
         VStack(alignment: .leading, spacing: 10) {
             SlabLabel("Themes") { EmptyView() }
-            Picker("", selection: Binding(
-                get: { themeStore.current.id },
-                set: { themeStore.select($0) }
-            )) {
+            Menu {
                 ForEach(themeStore.available) { t in
-                    Text(t.displayName).tag(t.id)
+                    Button { themeStore.select(t.id) } label: {
+                        if t.id == themeStore.current.id {
+                            Label(t.displayName, systemImage: "checkmark")
+                        } else {
+                            Text(t.displayName)
+                        }
+                    }
                 }
+            } label: {
+                HStack(spacing: 8) {
+                    Text(themeStore.current.displayName)
+                        .font(KFont.sans(13, .medium))
+                        .foregroundColor(KColor.ink)
+                    Spacer(minLength: 6)
+                    Image(systemName: "chevron.up.chevron.down")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundColor(KColor.muted)
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 10)
+                .frame(maxWidth: .infinity)
+                .background(
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .fill(KColor.paper)
+                        .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous)
+                            .strokeBorder(KColor.line, lineWidth: 1))
+                )
+                .contentShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
             }
-            .pickerStyle(.menu)
-            .labelsHidden()
-            .font(KFont.sans(13, .medium))
-            .tint(KColor.orange)
+            .menuStyle(.borderlessButton)
+            .menuIndicator(.hidden)
+            .buttonStyle(.plain)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .kCard()
