@@ -39,13 +39,6 @@ extension View {
         self
     }
 
-    /// iOS uses a full-screen cover; macOS has no equivalent, so it falls back
-    /// to a sheet (which suits the locked phone-shaped window).
-    @ViewBuilder
-    func fullScreenCoverCompat<C: View>(isPresented: Binding<Bool>, @ViewBuilder content: @escaping () -> C) -> some View {
-        self.sheet(isPresented: isPresented, content: content)
-    }
-
     /// iOS: disables autocapitalization for text entry. macOS: no-op (macOS text
     /// fields do not auto-capitalize).
     @ViewBuilder

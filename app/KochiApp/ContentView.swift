@@ -10,7 +10,6 @@ struct ContentView: View {
     @EnvironmentObject var llmManager: LLMManager
     @StateObject private var videoManager = VideoCoachingManager()
     @State private var showSettings = false
-    @State private var showOnboarding = !UserDefaults.standard.bool(forKey: "HasCompletedOnboarding")
     @State private var evaluationTimer: Timer?
     /// Length (in characters) of the transcript at the last goal evaluation.
     @State private var lastEvaluatedTranscriptLength = 0
@@ -62,9 +61,6 @@ struct ContentView: View {
         .preferredColorScheme(.light)
         .onAppear {
             DispatchQueue.main.async { videoManager.playVideo(label: .idle) }
-        }
-        .fullScreenCoverCompat(isPresented: $showOnboarding) {
-            OnboardingView(isPresented: $showOnboarding)
         }
         .onReceive(audioManager.$transcriptionText) { newText in
             handleTranscriptUpdate(newText)

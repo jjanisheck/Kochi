@@ -41,7 +41,6 @@
 		04F1EB6F2E28C1170086D5BC /* CoachingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04F1EB692E28C1170086D5BC /* CoachingView.swift */; };
 		04F1EB702E28C1170086D5BC /* ModelSelectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04F1EB6A2E28C1170086D5BC /* ModelSelectorView.swift */; };
 		04F1EB722E28C1170086D5BC /* TranscriptionSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04F1EB6D2E28C1170086D5BC /* TranscriptionSettingsView.swift */; };
-		04F1EB732E28C1170086D5BC /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04F1EB6C2E28C1170086D5BC /* OnboardingView.swift */; };
 		04F1EB772E28C2850086D5BC /* TranscriptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04F1EB762E28C2850086D5BC /* TranscriptionManager.swift */; };
 		04GOALS002 /* GoalsManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04GOALS001 /* GoalsManagementView.swift */; };
 		04VIDEO002 /* KochiApp/Managers/VideoCoachingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04VIDEO001 /* KochiApp/Managers/VideoCoachingManager.swift */; };
@@ -109,7 +108,6 @@
 		04F1EB662E28AF330086D5BC /* TemporaryStubs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemporaryStubs.swift; sourceTree = "<group>"; };
 		04F1EB692E28C1170086D5BC /* CoachingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoachingView.swift; sourceTree = "<group>"; };
 		04F1EB6A2E28C1170086D5BC /* ModelSelectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelSelectorView.swift; sourceTree = "<group>"; };
-		04F1EB6C2E28C1170086D5BC /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		04F1EB6D2E28C1170086D5BC /* TranscriptionSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptionSettingsView.swift; sourceTree = "<group>"; };
 		04F1EB762E28C2850086D5BC /* TranscriptionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptionManager.swift; sourceTree = "<group>"; };
 		04GOALS001 /* GoalsManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalsManagementView.swift; sourceTree = "<group>"; };
@@ -243,7 +241,6 @@
 			children = (
 				04F1EB692E28C1170086D5BC /* CoachingView.swift */,
 				04F1EB6A2E28C1170086D5BC /* ModelSelectorView.swift */,
-				04F1EB6C2E28C1170086D5BC /* OnboardingView.swift */,
 				04F1EB6D2E28C1170086D5BC /* TranscriptionSettingsView.swift */,
 				1A0000006 /* RecordingView.swift */,
 				1A000000A /* SettingsView.swift */,
@@ -353,7 +350,6 @@
 				04C3F3F22E28D064000228D6 /* LLMManager.swift in Sources */,
 				04F1EB702E28C1170086D5BC /* ModelSelectorView.swift in Sources */,
 				04F1EB722E28C1170086D5BC /* TranscriptionSettingsView.swift in Sources */,
-				04F1EB732E28C1170086D5BC /* OnboardingView.swift in Sources */,
 				048F21A52E29677B001FA450 /* GoalEvaluation.swift in Sources */,
 				16FF74F26DE705B53B57EB3A /* FoundationModelsTypes.swift in Sources */,
 				048F21A72E29677B001FA450 /* KochiDataModel.xcdatamodeld in Sources */,
