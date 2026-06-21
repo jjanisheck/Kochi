@@ -75,18 +75,35 @@ The clips that ship in the repo are all normalized to the same compact spec
 ## Compressing source clips
 
 Freshly generated/exported clips are typically H.264, slightly oversized, and
-~4.5 Mbps — about **15× larger** than they need to be (a whole theme's raw set
-runs ~38 MB vs. ~9 MB compressed). Every shipped theme except a freshly-added one
-has been run through this pass; the `bricks` theme is the example of clips that
-have **not** yet been shrunk.
+~4.5 Mbps — about **15× larger** than they need to be. Always run new clips
+through the compression pass before committing; an un-shrunk theme folder can be
+100 MB+, versus a few MB compressed.
 
-Normalize each clip with `ffmpeg` (install via `brew install ffmpeg`):
+### The script (do this)
+
+Run [`scripts/compress-coach-videos.sh`](../scripts/compress-coach-videos.sh) on
+your theme folder (needs `ffmpeg` — `brew install ffmpeg`):
+
+```bash
+scripts/compress-coach-videos.sh app/KochiApp/Resources/Themes/<theme-id>
+```
+
+It re-encodes every `.mp4` in the theme's `videos/` folder **in place** to the
+spec above (HEVC · 664×540 · no audio · `hvc1`), printing a before→after size for
+each clip and a total. It's safe to re-run: clips already at the target are
+skipped, so you can compress just the newly-added ones. Tune quality or size with
+env vars — `CRF=33 scripts/compress-coach-videos.sh …` for higher quality,
+`FORCE=1 …` to re-encode everything regardless.
+
+`bricks` was compressed this way: **108 MB → 5.7 MB** across 44 clips.
+
+### What it does under the hood
+
+The script wraps one `ffmpeg` invocation per clip:
 
 ```bash
 ffmpeg -i in.mp4 -an -vf scale=664:540 -c:v libx265 -crf 34 -pix_fmt yuv420p -tag:v hvc1 out.mp4
 ```
-
-What each flag does:
 
 - `-an` — drop the audio track (clips play muted).
 - `-vf scale=664:540` — resize to the exact target frame size.
@@ -94,17 +111,6 @@ What each flag does:
 - `-pix_fmt yuv420p` — broad-compatibility chroma.
 - `-tag:v hvc1` — tag the HEVC track so AVFoundation/QuickTime will play it
   (without this, the clip can decode to black on Apple platforms).
-
-To shrink a whole theme folder **in place** (e.g. `bricks`):
-
-```bash
-cd app/KochiApp/Resources/Themes/bricks/videos
-for f in *.mp4; do
-  ffmpeg -y -loglevel error -i "$f" \
-    -an -vf scale=664:540 -c:v libx265 -crf 34 -pix_fmt yuv420p -tag:v hvc1 \
-    "tmp-$f" && mv "tmp-$f" "$f"
-done
-```
 
 ### Picking the CRF
 
@@ -116,11 +122,10 @@ bracket that target:
 |-----|------|---------|-------|
 | 31  | ~268 KB | ~417 kbps | sharper than the shipped clips |
 | 33  | ~199 KB | ~307 kbps | matches the upper end of the shipped set |
-| **34** | **~171 KB** | **~263 kbps** | **recommended — middle of the shipped band** |
+| **34** | **~171 KB** | **~263 kbps** | **recommended (the script's default) — middle of the band** |
 | 36  | ~126 KB | ~192 kbps | smaller, slightly softer |
 
-Exact bytes depend on how busy the clip is, so confirm the result rather than
-trusting the number:
+Exact bytes depend on how busy the clip is. To confirm a result by hand:
 
 ```bash
 # Per-clip codec / size / bitrate
@@ -128,8 +133,8 @@ ffprobe -v error -select_streams v \
   -show_entries stream=codec_name,width,height,bit_rate \
   -of default=noprint_wrappers=1 idle-1.mp4
 
-# Whole-folder weight — aim for ~9 MB
-du -sh app/KochiApp/Resources/Themes/bricks/videos
+# Whole-folder weight
+du -sh app/KochiApp/Resources/Themes/<theme-id>/videos
 ```
 
 ## Where they go
