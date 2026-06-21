@@ -22,7 +22,7 @@ struct SettingsView: View {
                             .foregroundColor(KColor.inkSoft)
                         Spacer()
                         Button(action: { isPresented = false }) {
-                            Text("Done")
+                            Text("done")
                                 .font(KFont.zilla(12.5, .bold))
                                 .padding(.horizontal, 16)
                                 .padding(.vertical, 7)
@@ -127,7 +127,7 @@ struct TabButton: View {
             VStack(spacing: 4) {
                 Image(systemName: icon)
                     .font(.system(size: 17, weight: .medium))
-                Text(title.uppercased())
+                Text(title.lowercased())
                     .font(KFont.mono(8.5))
                     .tracking(0.5)
                     .lineLimit(1)
@@ -540,13 +540,13 @@ struct GoalsTab: View {
                 HStack(spacing: 8) {
                     if isParsing {
                         ProgressView().controlSize(.small)
-                        Text("PARSING\u{2026}")
+                        Text("parsing\u{2026}")
                     } else if dictation.isListening {
                         Image(systemName: "stop.fill")
-                        Text("LISTENING\u{2026} TAP TO STOP")
+                        Text("listening\u{2026} tap to stop")
                     } else {
                         Image(systemName: "mic.fill")
-                        Text("SPEAK NEW GOALS")
+                        Text("speak new goals")
                     }
                 }
                 .font(KFont.zilla(12.5, .bold))
@@ -660,7 +660,7 @@ struct GoalSlotRow: View {
                     )
 
                 Button(action: commit) {
-                    Text("Save")
+                    Text("save")
                         .font(KFont.zilla(12.5, .bold))
                         .padding(.horizontal, 14)
                         .padding(.vertical, 7)
@@ -677,7 +677,7 @@ struct GoalSlotRow: View {
                     editText = text
                     isEditing = true
                 }) {
-                    Text("Edit")
+                    Text("edit")
                         .font(KFont.zilla(12.5, .bold))
                         .padding(.horizontal, 14)
                         .padding(.vertical, 7)
@@ -764,46 +764,87 @@ struct AboutTab: View {
     }
 
     private var themesCard: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 11) {
             SlabLabel("Themes") { EmptyView() }
-            Menu {
+            // Inline swatch row: every theme previews its own signature key
+            // gradient, so you pick by color instead of reading a dropdown.
+            HStack(alignment: .top, spacing: 8) {
                 ForEach(themeStore.available) { t in
-                    Button { themeStore.select(t.id) } label: {
-                        if t.id == themeStore.current.id {
-                            Label(t.displayName, systemImage: "checkmark")
-                        } else {
-                            Text(t.displayName)
-                        }
-                    }
+                    ThemeSwatch(theme: t,
+                                isSelected: t.id == themeStore.current.id,
+                                onTap: { themeStore.select(t.id) })
                 }
-            } label: {
-                HStack(spacing: 8) {
-                    Text(themeStore.current.displayName)
-                        .font(KFont.sans(13, .medium))
-                        .foregroundColor(KColor.ink)
-                    Spacer(minLength: 6)
-                    Image(systemName: "chevron.up.chevron.down")
-                        .font(.system(size: 11, weight: .semibold))
-                        .foregroundColor(KColor.muted)
-                }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 10)
-                .frame(maxWidth: .infinity)
-                .background(
-                    RoundedRectangle(cornerRadius: 10, style: .continuous)
-                        .fill(KColor.paper)
-                        .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous)
-                            .strokeBorder(KColor.line, lineWidth: 1))
-                )
-                .contentShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
             }
-            .menuStyle(.borderlessButton)
-            .menuIndicator(.hidden)
-            .buttonStyle(.plain)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .kCard()
         .padding(.horizontal)
+    }
+}
+
+// MARK: - Theme Swatch (Themes picker)
+/// One selectable theme chip — a glossy key-gradient preview with the theme's
+/// name beneath. The active theme gets an ink ring + checkmark badge.
+private struct ThemeSwatch: View {
+    let theme: Theme
+    let isSelected: Bool
+    let onTap: () -> Void
+
+    private let shape = RoundedRectangle(cornerRadius: 11, style: .continuous)
+
+    var body: some View {
+        Button(action: onTap) {
+            VStack(spacing: 6) {
+                swatchFill
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 54)
+                    .clipShape(shape)
+                    // Glossy bevel like the device keys.
+                    .overlay(
+                        shape.strokeBorder(
+                            LinearGradient(colors: [.white.opacity(0.55), .white.opacity(0.05), .black.opacity(0.20)],
+                                           startPoint: .top, endPoint: .bottom),
+                            lineWidth: 1)
+                    )
+                    // Selection ring.
+                    .overlay(shape.strokeBorder(KColor.ink, lineWidth: isSelected ? 2.5 : 0))
+                    .overlay(alignment: .topTrailing) {
+                        if isSelected {
+                            Image(systemName: "checkmark.circle.fill")
+                                .font(.system(size: 14, weight: .bold))
+                                .symbolRenderingMode(.palette)
+                                .foregroundStyle(.white, theme.palette.buttonLo)
+                                .padding(3)
+                        }
+                    }
+                    .shadow(color: .black.opacity(isSelected ? 0.22 : 0.10),
+                            radius: isSelected ? 4 : 2, x: 0, y: isSelected ? 2 : 1)
+
+                Text(theme.displayName.lowercased())
+                    .font(KFont.mono(8.5))
+                    .tracking(0.4)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+                    .foregroundColor(isSelected ? KColor.ink : KColor.muted)
+            }
+            .frame(maxWidth: .infinity)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .animation(.easeOut(duration: 0.15), value: isSelected)
+    }
+
+    /// The chip's face: the theme's `theme.png` portrait when present, otherwise
+    /// the theme's signature key gradient.
+    @ViewBuilder private var swatchFill: some View {
+        if let url = theme.swatchImageURL, let nsImage = NSImage(contentsOf: url) {
+            Image(nsImage: nsImage)
+                .resizable()
+                .scaledToFill()
+        } else {
+            LinearGradient(colors: [theme.palette.buttonHi, theme.palette.buttonLo],
+                           startPoint: .top, endPoint: .bottom)
+        }
     }
 }
 
@@ -816,16 +857,19 @@ struct TabHeader: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 9) {
+                // Title + its icon sit directly on the themed window background,
+                // so they use the theme's on-background ink (white on BRICKS/HERO,
+                // dark on the light themes) instead of a fixed orange/ink.
                 Image(systemName: icon)
                     .font(.system(size: 20, weight: .semibold))
-                    .foregroundColor(KColor.orange)
+                    .foregroundColor(KColor.onBg)
                 Text(title)
                     .font(KFont.zilla(22, .bold))
-                    .foregroundColor(KColor.ink)
+                    .foregroundColor(KColor.onBg)
             }
             Text(subtitle)
                 .font(KFont.mono(11))
-                .foregroundColor(KColor.muted)
+                .foregroundColor(KColor.onBgFaint)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal)
@@ -936,7 +980,7 @@ struct MeetingDetailView: View {
                     HStack(spacing: 4) {
                         Image(systemName: "chevron.left")
                             .font(.system(size: 11, weight: .bold))
-                        Text("Back")
+                        Text("back")
                             .font(KFont.zilla(12.5, .bold))
                     }
                     .padding(.horizontal, 12)
@@ -954,7 +998,7 @@ struct MeetingDetailView: View {
                         HStack(spacing: 4) {
                             Image(systemName: "square.and.arrow.up")
                                 .font(.system(size: 11, weight: .bold))
-                            Text("Share")
+                            Text("share")
                                 .font(KFont.zilla(12.5, .bold))
                         }
                         .padding(.horizontal, 12)
@@ -1896,7 +1940,7 @@ struct AITab: View {
 
             HStack(spacing: 8) {
                 Button(action: saveKey) {
-                    Text("Save")
+                    Text("save")
                         .font(KFont.zilla(12.5, .bold))
                         .padding(.horizontal, 16)
                         .padding(.vertical, 7)
@@ -1907,7 +1951,7 @@ struct AITab: View {
 
                 if cloudAnalysisManager.hasKey {
                     Button(action: { cloudAnalysisManager.removeKey(); keyInput = "" }) {
-                        Text("Remove key")
+                        Text("remove key")
                             .font(KFont.zilla(12.5, .bold))
                             .padding(.horizontal, 16)
                             .padding(.vertical, 7)

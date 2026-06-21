@@ -43,12 +43,20 @@ struct ContentView: View {
         }
         // Halftone "window" background — attached as a background so it doesn't
         // inflate the content's intrinsic height (the panel sizes to the layout).
+        // The GeometryReader hands the image a *definite* frame (the card's exact
+        // size) so scaledToFill always covers edge-to-edge. An indefinite
+        // maxWidth/maxHeight:.infinity frame only reliably fills when the image is
+        // far taller than the card; a near-square theme image (e.g. BRICKS, whose
+        // ratio nearly matches the card) could otherwise under-fill and leak the
+        // window's white base out the bottom.
         .background(
-            ThemeImage("BackgroundImage")
-                .scaledToFill()
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .clipped()
-                .ignoresSafeArea()
+            GeometryReader { geo in
+                ThemeImage("BackgroundImage")
+                    .scaledToFill()
+                    .frame(width: geo.size.width, height: geo.size.height)
+                    .clipped()
+            }
+            .ignoresSafeArea()
         )
         // Settings sheet as an overlay so it's clamped to the card's bounds
         // rather than expanding the panel.

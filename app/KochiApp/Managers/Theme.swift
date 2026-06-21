@@ -146,6 +146,14 @@ struct Theme: Identifiable {
     /// Subdirectory (relative to bundle resources) where this theme's videos live.
     var videoSubdirectory: String { "Themes/\(id)/videos" }
 
+    /// Optional `images/theme.png` used as this theme's chip in the Themes picker.
+    /// Resolved by convention (it need not be listed in theme.json's `images`);
+    /// nil when absent, so the picker falls back to the theme's key gradient.
+    var swatchImageURL: URL? {
+        let url = folderURL.appendingPathComponent("images/theme.png")
+        return FileManager.default.fileExists(atPath: url.path) ? url : nil
+    }
+
     /// Load a theme from a folder containing theme.json. Returns nil if the json
     /// is missing/unreadable or any color token is absent (surfaces authoring
     /// errors instead of shipping a half-themed look).
