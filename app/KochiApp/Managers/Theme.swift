@@ -41,7 +41,15 @@ struct ThemePalette {
     let buttonHi, buttonLo: Color
     /// Unachieved goal-row fill + its text/checkbox ink. Optional; default to
     /// `paper`/`ink` (an achieved goal uses the `buttonHi`/`buttonLo` gradient).
+    /// NOTE: these are *also* the live transcript bubble's fill/ink (KochiDeviceStyle),
+    /// so to recolor only the goal rows use `goalUnmetFill`/`goalUnmetInk` below.
     let goalRestFill, goalRestInk: Color
+    /// Fill + text/checkbox ink for an *unachieved goal row*, specifically (not the
+    /// transcript bubble). Optional; default to `goalRestFill`/`goalRestInk` so a
+    /// theme that doesn't set them looks unchanged. A theme overrides these to give
+    /// resting goals a distinct chip (e.g. BRICKS' orange) without touching the
+    /// transcript. Pair a saturated fill with a light ink for legibility.
+    let goalUnmetFill, goalUnmetInk: Color
     /// Border stroked around an unachieved goal row. Optional; defaults to clear
     /// (no visible border) so themes opt in. Use an 8-digit `#RRGGBBAA` hex to
     /// control opacity.
@@ -81,7 +89,8 @@ struct ThemePalette {
     static let tokenNames = ["orange","orangeDeep","ink","inkSoft","paper","win",
                              "panel","panel2","line","lineSoft","muted","muted2",
                              "good","deck","deckBorder","buttonHi","buttonLo",
-                             "goalRestFill","goalRestInk","goalRestBorder",
+                             "goalRestFill","goalRestInk",
+                             "goalUnmetFill","goalUnmetInk","goalRestBorder",
                              "goalDoneHi","goalDoneLo","meterHi","meterLo",
                              "neutralKeyFill","logoTint","slabRule","onBg","onBgFaint",
                              "deckScrimTop","deckScrimBottom"]
@@ -98,6 +107,7 @@ struct ThemePalette {
         deckBorder: Color(themeHex: "#26251F")!,
         buttonHi: Color(themeHex: "#FF7A36")!, buttonLo: Color(themeHex: "#EC5000")!,
         goalRestFill: Color(themeHex: "#FFFFFF")!, goalRestInk: Color(themeHex: "#1C1B19")!,
+        goalUnmetFill: Color(themeHex: "#FFFFFF")!, goalUnmetInk: Color(themeHex: "#1C1B19")!,
         goalRestBorder: .clear,
         goalDoneHi: Color(themeHex: "#FF7A36")!, goalDoneLo: Color(themeHex: "#EC5000")!,
         meterHi: Color(themeHex: "#FF7A36")!, meterLo: Color(themeHex: "#EC5000")!,
@@ -127,6 +137,8 @@ struct ThemePalette {
         self.buttonLo = c("buttonLo") ?? orangeDeep
         self.goalRestFill = c("goalRestFill") ?? paper
         self.goalRestInk = c("goalRestInk") ?? ink
+        self.goalUnmetFill = c("goalUnmetFill") ?? self.goalRestFill
+        self.goalUnmetInk = c("goalUnmetInk") ?? self.goalRestInk
         self.goalRestBorder = c("goalRestBorder") ?? .clear
         self.goalDoneHi = c("goalDoneHi") ?? self.buttonHi
         self.goalDoneLo = c("goalDoneLo") ?? self.buttonLo
@@ -146,6 +158,7 @@ struct ThemePalette {
          win: Color, panel: Color, panel2: Color, line: Color, lineSoft: Color,
          muted: Color, muted2: Color, good: Color, deck: Color, deckBorder: Color,
          buttonHi: Color, buttonLo: Color, goalRestFill: Color, goalRestInk: Color,
+         goalUnmetFill: Color, goalUnmetInk: Color,
          goalRestBorder: Color, goalDoneHi: Color, goalDoneLo: Color,
          meterHi: Color, meterLo: Color,
          neutralKeyFill: Color?, logoTint: Color?,
@@ -158,6 +171,7 @@ struct ThemePalette {
         self.deckBorder = deckBorder
         self.buttonHi = buttonHi; self.buttonLo = buttonLo
         self.goalRestFill = goalRestFill; self.goalRestInk = goalRestInk
+        self.goalUnmetFill = goalUnmetFill; self.goalUnmetInk = goalUnmetInk
         self.goalRestBorder = goalRestBorder
         self.goalDoneHi = goalDoneHi; self.goalDoneLo = goalDoneLo
         self.meterHi = meterHi; self.meterLo = meterLo
@@ -188,6 +202,12 @@ struct ThemeManifest: Decodable {
     /// behind its `goalRestFill` tint, so a translucent fill reads as glass over
     /// the themed background. Optional; default false.
     let goalRestBlur: Bool?
+    /// The MEETING DETAILS header floats on the themed background image and the
+    /// tab bar carries the theme's primary key gradient (`buttonHi`→`buttonLo`).
+    /// The header label reads with `onBg`; the tab labels read white (matching the
+    /// primary key's face text). Optional; default true. Set false to fall back to
+    /// the legacy gray "device chrome".
+    let chromeOnBackground: Bool?
 }
 
 /// A resolved theme: palette + asset URLs + identity.
@@ -204,6 +224,9 @@ struct Theme: Identifiable {
     let backgroundStretch: Bool
     /// Frost an unachieved goal row's fill with a blur material.
     let goalRestBlur: Bool
+    /// Settings header + tab bar float transparently on the themed background
+    /// (vs the default gray device chrome).
+    let chromeOnBackground: Bool
 
     /// Subdirectory (relative to bundle resources) where this theme's videos live.
     var videoSubdirectory: String { "Themes/\(id)/videos" }
@@ -240,7 +263,8 @@ struct Theme: Identifiable {
                      deckReelGrayscale: m.deckReelGrayscale ?? 1.0,
                      deckReelBrightness: m.deckReelBrightness ?? -0.15,
                      backgroundStretch: m.backgroundStretch ?? false,
-                     goalRestBlur: m.goalRestBlur ?? false)
+                     goalRestBlur: m.goalRestBlur ?? false,
+                     chromeOnBackground: m.chromeOnBackground ?? true)
     }
 
     /// Guaranteed-valid default, used before discovery or if nothing is found.
@@ -251,7 +275,8 @@ struct Theme: Identifiable {
         return Theme(id: "default", displayName: "DEFAULT", colorScheme: .light,
                      palette: .fallback, images: [:],
                      folderURL: folder, deckReelGrayscale: 1.0, deckReelBrightness: -0.15,
-                     backgroundStretch: false, goalRestBlur: false)
+                     backgroundStretch: false, goalRestBlur: false,
+                     chromeOnBackground: true)
     }()
 }
 

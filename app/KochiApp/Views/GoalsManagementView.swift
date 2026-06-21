@@ -136,7 +136,7 @@ struct SimpleGoalRow: View {
                     goalManager.deleteGoal(goal)
                 }) {
                     Image(systemName: "trash")
-                        .foregroundColor(.red.opacity(0.7))
+                        .foregroundColor(KColor.buttonHi)
                 }
             }
         }

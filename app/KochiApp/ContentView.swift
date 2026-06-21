@@ -387,7 +387,7 @@ private struct GoalRow: View {
                 RoundedRectangle(cornerRadius: 5, style: .continuous)
                     .fill(done ? Color.white : Color.clear)
                     .overlay(RoundedRectangle(cornerRadius: 5, style: .continuous)
-                        .strokeBorder(done ? Color.white : KColor.goalRestInk, lineWidth: 2))
+                        .strokeBorder(done ? Color.white : KColor.goalUnmetInk, lineWidth: 2))
                     .frame(width: 20, height: 20)
                 if done {
                     Image(systemName: "checkmark")
@@ -403,11 +403,11 @@ private struct GoalRow: View {
                 ))
                 .textFieldStyle(.plain)
                 .font(KFont.sans(13.5, .semibold))
-                .foregroundColor(KColor.goalRestInk)
+                .foregroundColor(KColor.goalUnmetInk)
             } else {
                 Text(goal.text)
                     .font(KFont.sans(13.5, .semibold))
-                    .foregroundColor(done ? .white : KColor.goalRestInk)
+                    .foregroundColor(done ? .white : KColor.goalUnmetInk)
                     .lineLimit(1)
                 Spacer(minLength: 6)
                 // A hit goal turns the whole bar orange; an unmet goal stays a
@@ -451,11 +451,11 @@ private struct GoalRow: View {
             // the (translucent) goalRestFill tint over it, then the border.
             shape
                 .fill(.ultraThinMaterial)
-                .overlay(shape.fill(KColor.goalRestFill))
+                .overlay(shape.fill(KColor.goalUnmetFill))
                 .overlay(shape.strokeBorder(KColor.goalRestBorder, lineWidth: 1))
         } else {
             shape
-                .fill(KColor.goalRestFill)
+                .fill(KColor.goalUnmetFill)
                 .overlay(shape.strokeBorder(KColor.goalRestBorder, lineWidth: 1))
         }
     }
@@ -497,13 +497,10 @@ private struct TapeDeck: View {
             .allowsHitTesting(false)
         )
         .background(
-            // Dark camo deck with a top-to-bottom gradient for depth.
+            // The themed deck plate — no scrim, so the background image shows at
+            // its true brightness behind the reel.
             ThemeImage("BackgroundPlainImage")
                 .scaledToFill()
-                .overlay(
-                    LinearGradient(colors: [KColor.deckScrimTop, KColor.deckScrimBottom],
-                                   startPoint: .top, endPoint: .bottom)
-                )
         )
         .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
         // No hard border — the liquid-glass white→gray bevel defines the edge.
@@ -619,9 +616,9 @@ private struct Toolbar: View {
                     title: phase == .ended ? "new" : "start",
                     variant: .primary, action: onStart)
             }
-            key(icon: "■", title: "end", variant: .primary, action: onEnd)
+            key(icon: "■", title: "end", variant: .goal, action: onEnd)
                 .disabled(phase != .live)
-            key(icon: "ⓘ", title: "info", variant: .light, action: onInfo)
+            key(icon: "ⓘ", title: "info", variant: .goal, action: onInfo)
         }
         .padding(.horizontal, 11)
         .padding(.top, 9)

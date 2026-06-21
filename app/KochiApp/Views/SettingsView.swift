@@ -10,6 +10,7 @@ struct SettingsView: View {
     @EnvironmentObject var audioManager: AudioManager
     @EnvironmentObject var goalManager: GoalManager
     @EnvironmentObject var themeManager: ThemeManager
+    @EnvironmentObject var themeStore: ThemeStore
     @EnvironmentObject var cloudAnalysisManager: CloudAnalysisManager
 
     var body: some View {
@@ -19,7 +20,7 @@ struct SettingsView: View {
                         Text("MEETING DETAILS")
                             .font(KFont.mono(11))
                             .tracking(1.6)
-                            .foregroundColor(KColor.inkSoft)
+                            .foregroundColor(KColor.onBg)
                         Spacer()
                         Button(action: { isPresented = false }) {
                             Text("done")
@@ -34,12 +35,7 @@ struct SettingsView: View {
                     .padding(.vertical, 10)
                     // Snug under the macOS traffic lights / clear the iOS status bar.
                     .padding(.top, 8)
-                    .background(
-                        LinearGradient(colors: [Color(red: 243/255, green: 242/255, blue: 239/255),
-                                                Color(red: 233/255, green: 232/255, blue: 227/255)],
-                                       startPoint: .top, endPoint: .bottom)
-                    )
-                    .overlay(Rectangle().fill(KColor.line).frame(height: 1), alignment: .bottom)
+                    .background(headerChrome)
 
                     // Beveled tab bar — 5 tabs
                     HStack(spacing: 5) {
@@ -61,12 +57,7 @@ struct SettingsView: View {
                     }
                     .padding(.horizontal, 10)
                     .padding(.vertical, 8)
-                    .background(
-                        LinearGradient(colors: [Color(red: 220/255, green: 218/255, blue: 212/255),
-                                                Color(red: 205/255, green: 203/255, blue: 196/255)],
-                                       startPoint: .top, endPoint: .bottom)
-                    )
-                    .overlay(Rectangle().fill(Color(red: 184/255, green: 182/255, blue: 175/255)).frame(height: 1), alignment: .bottom)
+                    .background(tabBarChrome)
 
                     // Tab Content. Transcript → detail is presented as a
                     // full-panel overlay (see below), so no NavigationStack /
@@ -107,6 +98,36 @@ struct SettingsView: View {
         }
         .animation(.easeOut(duration: 0.22), value: selectedMeeting?.id)
     }
+
+    /// Header strip backing. Themes that opt into `chromeOnBackground` (e.g. BRICKS)
+    /// float the header transparently on the panel's themed background image; every
+    /// other theme keeps the default gray "device chrome" gradient + hairline.
+    @ViewBuilder private var headerChrome: some View {
+        if themeStore.current.chromeOnBackground {
+            Color.clear
+        } else {
+            LinearGradient(colors: [Color(red: 243/255, green: 242/255, blue: 239/255),
+                                    Color(red: 233/255, green: 232/255, blue: 227/255)],
+                           startPoint: .top, endPoint: .bottom)
+                .overlay(Rectangle().fill(KColor.line).frame(height: 1), alignment: .bottom)
+        }
+    }
+
+    /// Tab-bar backing — for `chromeOnBackground` themes it carries the theme's
+    /// primary "key" gradient (`buttonHi`→`buttonLo`, same as the main buttons) so
+    /// the tab row reads as a themed control strip rather than a gray slab; gray
+    /// device chrome otherwise. The selected tab keeps its own white chip either way.
+    @ViewBuilder private var tabBarChrome: some View {
+        if themeStore.current.chromeOnBackground {
+            LinearGradient(colors: [KColor.buttonHi, KColor.buttonLo],
+                           startPoint: .top, endPoint: .bottom)
+        } else {
+            LinearGradient(colors: [Color(red: 220/255, green: 218/255, blue: 212/255),
+                                    Color(red: 205/255, green: 203/255, blue: 196/255)],
+                           startPoint: .top, endPoint: .bottom)
+                .overlay(Rectangle().fill(Color(red: 184/255, green: 182/255, blue: 175/255)).frame(height: 1), alignment: .bottom)
+        }
+    }
 }
 
 // MARK: - Custom Tab Button
@@ -115,6 +136,13 @@ struct TabButton: View {
     let icon: String
     let isSelected: Bool
     let action: () -> Void
+    @EnvironmentObject var themeStore: ThemeStore
+
+    /// Unselected tabs read white on the button-gradient strip (matching the
+    /// primary key's face text); on the legacy gray chrome they use `onBgFaint`.
+    private var unselectedTint: Color {
+        themeStore.current.chromeOnBackground ? .white : KColor.onBgFaint
+    }
 
     var body: some View {
         Button(action: action) {
@@ -130,7 +158,7 @@ struct TabButton: View {
             .frame(maxWidth: .infinity)
             .padding(.vertical, 8)
             .padding(.horizontal, 2)
-            .foregroundColor(isSelected ? KColor.orangeDeep : KColor.muted)
+            .foregroundColor(isSelected ? KColor.orangeDeep : unselectedTint)
             .background(
                 Group {
                     if isSelected {
@@ -238,7 +266,7 @@ struct TranscriptRow: View {
                 // Delete button
                 Button(action: { showDeleteAlert = true }) {
                     Image(systemName: "trash.fill")
-                        .foregroundColor(Color(red: 249/255, green: 81/255, blue: 0))
+                        .foregroundColor(KColor.buttonHi)
                         .font(.system(size: 18))
                         .padding(8)
                 }
@@ -1866,16 +1894,7 @@ struct AITab: View {
     private var providerCard: some View {
         VStack(alignment: .leading, spacing: 10) {
             SlabLabel("Provider") { EmptyView() }
-            Picker("", selection: Binding(
-                get: { cloudAnalysisManager.provider },
-                set: { cloudAnalysisManager.selectProvider($0); keyInput = ""; saveError = nil }
-            )) {
-                ForEach(CloudProvider.allCases, id: \.self) { p in
-                    Text(p.displayName).tag(p)
-                }
-            }
-            .pickerStyle(.segmented)
-            .labelsHidden()
+            providerSegmented
 
             HStack(spacing: 9) {
                 Text("MODEL")
@@ -1902,6 +1921,41 @@ struct AITab: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .kCard()
+    }
+
+    /// Provider toggle — the selected segment carries the theme's primary key
+    /// gradient (`buttonHi`→`buttonLo`, matching the buttons) instead of the
+    /// stock gray segmented control.
+    private var providerSegmented: some View {
+        let shape = RoundedRectangle(cornerRadius: 8, style: .continuous)
+        return HStack(spacing: 0) {
+            ForEach(CloudProvider.allCases, id: \.self) { p in
+                let selected = cloudAnalysisManager.provider == p
+                Button(action: {
+                    cloudAnalysisManager.selectProvider(p); keyInput = ""; saveError = nil
+                }) {
+                    Text(p.displayName)
+                        .font(KFont.sans(13, .semibold))
+                        .foregroundColor(selected ? .white : KColor.inkSoft)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 7)
+                        .background {
+                            if selected {
+                                shape.fill(LinearGradient(colors: [KColor.buttonHi, KColor.buttonLo],
+                                                          startPoint: .top, endPoint: .bottom))
+                                    .overlay(shape.strokeBorder(
+                                        LinearGradient(colors: [.white.opacity(0.45), .white.opacity(0.04), .black.opacity(0.16)],
+                                                       startPoint: .top, endPoint: .bottom), lineWidth: 1))
+                            }
+                        }
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(3)
+        .background(shape.fill(KColor.panel2)
+            .overlay(shape.strokeBorder(KColor.line, lineWidth: 1)))
     }
 
     private var keyCard: some View {

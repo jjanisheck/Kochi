@@ -34,6 +34,8 @@ enum KColor {
     static var buttonLo: Color   { p.buttonLo }
     static var goalRestFill: Color { p.goalRestFill }
     static var goalRestInk: Color  { p.goalRestInk }
+    static var goalUnmetFill: Color { p.goalUnmetFill }
+    static var goalUnmetInk: Color  { p.goalUnmetInk }
     static var goalRestBorder: Color { p.goalRestBorder }
     static var goalDoneHi: Color { p.goalDoneHi }
     static var goalDoneLo: Color { p.goalDoneLo }
@@ -86,7 +88,7 @@ enum KFont {
 
 // MARK: - Beveled physical key (toolbar + Done key)
 
-enum KeyVariant { case primary, light }
+enum KeyVariant { case primary, light, goal }
 
 /// A pressable hardware-style key: raised gradient face, top highlight, drop
 /// shadow, and a 2px pressed-down inset state. Mirrors the design's `.btn`.
@@ -116,13 +118,19 @@ struct BeveledKeyStyle: ButtonStyle {
                     ZStack {
                         RoundedRectangle(cornerRadius: radius, style: .continuous)
                             .fill(faceGradient)
-                        // top highlight
-                        RoundedRectangle(cornerRadius: radius, style: .continuous)
-                            .strokeBorder(
-                                LinearGradient(colors: [Color.white.opacity(variant == .primary ? 0.45 : 0.9),
-                                                        Color.clear],
-                                               startPoint: .top, endPoint: .bottom),
-                                lineWidth: 1)
+                        // Border: the `.goal` key mirrors the unfinished-goal row's
+                        // `goalRestBorder`; other keys get the raised top highlight.
+                        if variant == .goal {
+                            RoundedRectangle(cornerRadius: radius, style: .continuous)
+                                .strokeBorder(KColor.goalRestBorder, lineWidth: 1)
+                        } else {
+                            RoundedRectangle(cornerRadius: radius, style: .continuous)
+                                .strokeBorder(
+                                    LinearGradient(colors: [Color.white.opacity(variant == .primary ? 0.45 : 0.9),
+                                                            Color.clear],
+                                                   startPoint: .top, endPoint: .bottom),
+                                    lineWidth: 1)
+                        }
                         if pressed {
                             RoundedRectangle(cornerRadius: radius, style: .continuous)
                                 .fill(Color.black.opacity(0.18))
@@ -138,6 +146,13 @@ struct BeveledKeyStyle: ButtonStyle {
         }
 
         private var faceGradient: LinearGradient {
+            // The `.goal` key always wears the unfinished-goal color (even when
+            // disabled). The goal fill carries an alpha for the rows; the keys
+            // want it SOLID, so clamp the opacity to 1 (×100 saturates any alpha).
+            if variant == .goal {
+                let solid = KColor.goalUnmetFill.opacity(100)
+                return LinearGradient(colors: [solid, solid], startPoint: .top, endPoint: .bottom)
+            }
             // A theme may tint the neutral keys (light variant + any disabled key)
             // with a single fill; the bevel still reads via the highlight + shadow.
             if let tint = KColor.neutralKeyFill, !isEnabled || variant == .light {
@@ -152,17 +167,20 @@ struct BeveledKeyStyle: ButtonStyle {
             case .primary:
                 return LinearGradient(colors: [KColor.buttonHi, KColor.buttonLo],
                                       startPoint: .top, endPoint: .bottom)
-            case .light:
+            case .light, .goal:
                 return LinearGradient(colors: [Color(red: 251/255, green: 250/255, blue: 248/255),
                                                Color(red: 222/255, green: 220/255, blue: 213/255)],
                                       startPoint: .top, endPoint: .bottom)
             }
         }
         private var faceText: Color {
+            if variant == .goal { return KColor.goalUnmetInk }
             if !isEnabled { return KColor.muted2 }
             return variant == .primary ? .white : KColor.inkSoft
         }
         private var shadowColor: Color {
+            // The goal key reads flat like the goal rows — no raised key shadow.
+            if variant == .goal { return .clear }
             guard isEnabled else { return .clear }
             return variant == .primary ? Color(red: 140/255, green: 55/255, blue: 0).opacity(0.4)
                                        : Color.black.opacity(0.22)
@@ -369,10 +387,8 @@ struct ChatTranscriptView: View {
         onDark ? KColor.goalRestInk : KColor.ink
     }
     private func labelColor(_ s: TranscriptSpeaker) -> Color {
-        switch s {
-        case .them: return themHue
-        default:    return onDark ? meHue : KColor.orangeDeep
-        }
+        // Both "ME" and "THEM" labels use the theme's primary key color.
+        KColor.buttonHi
     }
     private func bubbleColor(_ s: TranscriptSpeaker) -> Color {
         if s == .other { return onDark ? Color.white.opacity(0.06) : Color.black.opacity(0.04) }

@@ -1,6 +1,7 @@
 {
   "displayName": "BRICKS",
   "colorScheme": "light",
+  "chromeOnBackground": true,
   "deckReelGrayscale": 0,
   "deckReelBrightness": 0,
   "colors": {
@@ -14,6 +15,7 @@
     "buttonHi": "#FF8C2B", "buttonLo": "#F25C00",
     "onBg": "#FFFFFF", "onBgFaint": "#FFFFFF",
     "goalRestFill": "#FFFFFF", "goalRestInk": "#EA5800",
+    "goalUnmetFill": "#F7A402CC", "goalUnmetInk": "#FFFFFF", "goalRestBorder": "#FFFFFF",
     "deckScrimTop": "#00000000", "deckScrimBottom": "#00000033"
   },
   "images": {
