@@ -34,6 +34,14 @@ enum KColor {
     static var buttonLo: Color   { p.buttonLo }
     static var goalRestFill: Color { p.goalRestFill }
     static var goalRestInk: Color  { p.goalRestInk }
+    static var goalRestBorder: Color { p.goalRestBorder }
+    static var goalDoneHi: Color { p.goalDoneHi }
+    static var goalDoneLo: Color { p.goalDoneLo }
+    static var meterHi: Color { p.meterHi }
+    static var meterLo: Color { p.meterLo }
+    static var neutralKeyFill: Color? { p.neutralKeyFill }
+    static var logoTint: Color? { p.logoTint }
+    static var slabRule: Color { p.slabRule }
     static var onBg: Color         { p.onBg }
     static var onBgFaint: Color    { p.onBgFaint }
     static var deckScrimTop: Color    { p.deckScrimTop }
@@ -130,6 +138,11 @@ struct BeveledKeyStyle: ButtonStyle {
         }
 
         private var faceGradient: LinearGradient {
+            // A theme may tint the neutral keys (light variant + any disabled key)
+            // with a single fill; the bevel still reads via the highlight + shadow.
+            if let tint = KColor.neutralKeyFill, !isEnabled || variant == .light {
+                return LinearGradient(colors: [tint, tint], startPoint: .top, endPoint: .bottom)
+            }
             if !isEnabled {
                 return LinearGradient(colors: [Color(red: 231/255, green: 229/255, blue: 223/255),
                                                Color(red: 220/255, green: 218/255, blue: 211/255)],
@@ -178,7 +191,7 @@ struct SlabLabel<Trailing: View>: View {
                 .font(KFont.mono(10, .medium))
                 .tracking(1.3)
                 .foregroundColor(tint)
-            Rectangle().fill(KColor.line).frame(height: 1)
+            Rectangle().fill(KColor.slabRule).frame(height: 1)
             trailing
         }
     }
@@ -325,12 +338,25 @@ struct ChatTranscriptView: View {
         }
         .padding(.horizontal, 9)
         .padding(.vertical, 6)
-        .background(
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                .fill(bubbleColor(turn.speaker))
-                .overlay(RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .strokeBorder(strokeColor(turn.speaker), lineWidth: 1))
-        )
+        .background(bubbleBackground(turn.speaker))
+    }
+
+    @ViewBuilder private func bubbleBackground(_ s: TranscriptSpeaker) -> some View {
+        let shape = RoundedRectangle(cornerRadius: 8, style: .continuous)
+        if onDark {
+            // Over the spinning reel a faint tint is unreadable, so the live
+            // transcript mirrors the goal rows: a frosted blur of the deck behind
+            // the themed `goalRestFill`, read with the dark goal ink. The blur is
+            // what obscures the reel enough for the text to pop.
+            shape
+                .fill(.ultraThinMaterial)
+                .overlay(shape.fill(KColor.goalRestFill))
+                .overlay(shape.strokeBorder(strokeColor(s), lineWidth: 1))
+        } else {
+            shape
+                .fill(bubbleColor(s))
+                .overlay(shape.strokeBorder(strokeColor(s), lineWidth: 1))
+        }
     }
 
     // Mic ("Me") = orange, System ("Them") = steel blue. Tuned per background.
@@ -338,7 +364,9 @@ struct ChatTranscriptView: View {
     private var themHue: Color { Color(red: 120/255, green: 158/255, blue: 200/255) }
 
     private var textColor: Color {
-        onDark ? Color(red: 230/255, green: 228/255, blue: 220/255) : KColor.ink
+        // The live (onDark) transcript sits on the frosted `goalRestFill` bubble,
+        // so it reads with that fill's paired ink — guaranteed-legible per theme.
+        onDark ? KColor.goalRestInk : KColor.ink
     }
     private func labelColor(_ s: TranscriptSpeaker) -> Color {
         switch s {

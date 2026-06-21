@@ -49,15 +49,7 @@ struct ContentView: View {
         // far taller than the card; a near-square theme image (e.g. BRICKS, whose
         // ratio nearly matches the card) could otherwise under-fill and leak the
         // window's white base out the bottom.
-        .background(
-            GeometryReader { geo in
-                ThemeImage("BackgroundImage")
-                    .scaledToFill()
-                    .frame(width: geo.size.width, height: geo.size.height)
-                    .clipped()
-            }
-            .ignoresSafeArea()
-        )
+        .background(ThemeBackground("BackgroundImage"))
         // Settings sheet as an overlay so it's clamped to the card's bounds
         // rather than expanding the panel.
         .overlay {
@@ -269,6 +261,9 @@ private struct BrandRow: View {
             ThemeImage("KochiLogo")
                 .scaledToFit()
                 .frame(height: 30)
+                // The wordmark art is solid white on transparent; a theme can
+                // recolor it by multiply (white × tint = tint). nil → .white = no-op.
+                .colorMultiply(KColor.logoTint ?? .white)
             Text("MEETING COACH")
                 .font(KFont.mono(9.5))
                 .tracking(1.5)
@@ -446,15 +441,22 @@ private struct GoalRow: View {
         let shape = RoundedRectangle(cornerRadius: 7, style: .continuous)
         if done {
             shape
-                .fill(LinearGradient(colors: [KColor.buttonHi, KColor.buttonLo],
+                .fill(LinearGradient(colors: [KColor.goalDoneHi, KColor.goalDoneLo],
                                      startPoint: .top, endPoint: .bottom))
                 .overlay(shape.strokeBorder(
                     LinearGradient(colors: [.white.opacity(0.5), .white.opacity(0.05), .black.opacity(0.18)],
                                    startPoint: .top, endPoint: .bottom), lineWidth: 1))
+        } else if ActiveGoal.restBlur {
+            // Frosted glass: blur the themed background behind the row, then lay
+            // the (translucent) goalRestFill tint over it, then the border.
+            shape
+                .fill(.ultraThinMaterial)
+                .overlay(shape.fill(KColor.goalRestFill))
+                .overlay(shape.strokeBorder(KColor.goalRestBorder, lineWidth: 1))
         } else {
             shape
                 .fill(KColor.goalRestFill)
-                .overlay(shape.strokeBorder(KColor.line, lineWidth: 1))
+                .overlay(shape.strokeBorder(KColor.goalRestBorder, lineWidth: 1))
         }
     }
 
@@ -550,7 +552,7 @@ private struct TapeDeck: View {
                 let filled = tapeFilled
                 RoundedRectangle(cornerRadius: 2)
                     .fill(i < filled
-                          ? AnyShapeStyle(LinearGradient(colors: [KColor.buttonHi, KColor.buttonLo],
+                          ? AnyShapeStyle(LinearGradient(colors: [KColor.meterHi, KColor.meterLo],
                                                          startPoint: .top, endPoint: .bottom))
                           : AnyShapeStyle(Color.black.opacity(0.18)))
                     .frame(height: 9)

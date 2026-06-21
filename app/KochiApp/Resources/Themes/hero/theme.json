@@ -1,6 +1,10 @@
 {
   "displayName": "HERO",
   "colorScheme": "light",
+  "backgroundStretch": true,
+  "goalRestBlur": true,
+  "deckReelGrayscale": 0,
+  "deckReelBrightness": 0,
   "colors": {
     "orange": "#E03131", "orangeDeep": "#B02525",
     "ink": "#1C1B19", "inkSoft": "#3B3A37",
@@ -9,8 +13,14 @@
     "line": "#CDCCC6", "lineSoft": "#DAD9D3",
     "muted": "#8D8C86", "muted2": "#A9A8A2",
     "good": "#1F8A4C", "deck": "#34332C", "deckBorder": "#26251F",
-    "buttonHi": "#E84855", "buttonLo": "#1E66F0",
-    "onBg": "#FFFFFF", "onBgFaint": "#E8EAED"
+    "buttonHi": "#D32F2F", "buttonLo": "#9E1B1B",
+    "goalRestFill": "#FFFFFF40", "goalRestInk": "#4A3013",
+    "goalRestBorder": "#6E4518",
+    "goalDoneHi": "#D32F2F", "goalDoneLo": "#9E1B1B",
+    "meterHi": "#2E5BD4", "meterLo": "#17317D",
+    "onBg": "#4A3013", "onBgFaint": "#7A5526",
+    "logoTint": "#4A3013", "slabRule": "#6E4518",
+    "deckScrimTop": "#00000033", "deckScrimBottom": "#00000066"
   },
   "images": {
     "BackgroundImage": "images/BackgroundImage.png",

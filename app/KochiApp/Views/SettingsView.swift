@@ -93,13 +93,7 @@ struct SettingsView: View {
         // Fill the card top-aligned (no centering ZStack — that was clipping the
         // header), with the halftone as a non-inflating background.
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .background(
-            ThemeImage("BackgroundImage")
-                .scaledToFill()
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .clipped()
-                .ignoresSafeArea()
-        )
+        .background(ThemeBackground("BackgroundImage"))
         .sheet(isPresented: $showGoals) {
             GoalsManagementView(isPresented: $showGoals)
         }
@@ -1045,10 +1039,10 @@ struct MeetingDetailView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(
             // Uniform pixel-grid camo so the top bar matches the rest of the page
-            // (the gradient BackgroundImage read plainer up top).
-            ThemeImage("BackgroundPlainImage")
-                .aspectRatio(contentMode: .fill)
-                .ignoresSafeArea()
+            // (the gradient BackgroundImage read plainer up top). ThemeBackground
+            // gives a definite, full-window frame so the texture covers up under
+            // the traffic lights instead of leaking the window's gray base.
+            ThemeBackground("BackgroundPlainImage")
         )
         .sheet(isPresented: $showAudioShare) {
             ShareSheet(items: [audioURL].compactMap { $0 })

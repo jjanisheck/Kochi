@@ -42,6 +42,31 @@ struct ThemePalette {
     /// Unachieved goal-row fill + its text/checkbox ink. Optional; default to
     /// `paper`/`ink` (an achieved goal uses the `buttonHi`/`buttonLo` gradient).
     let goalRestFill, goalRestInk: Color
+    /// Border stroked around an unachieved goal row. Optional; defaults to clear
+    /// (no visible border) so themes opt in. Use an 8-digit `#RRGGBBAA` hex to
+    /// control opacity.
+    let goalRestBorder: Color
+    /// Gradient stops for a *hit* (done/selected) goal row. Optional; default to
+    /// `buttonHi`/`buttonLo` so a hit goal matches the primary key — themes that
+    /// want a distinct hit color (e.g. HERO's patriotic red) override these
+    /// without disturbing the buttons.
+    let goalDoneHi, goalDoneLo: Color
+    /// Gradient stops for the audio meter's filled volume bars. Optional; default
+    /// to `buttonHi`/`buttonLo` so the meter matches the primary key — themes can
+    /// override for a distinct meter color (e.g. HERO's patriotic blue).
+    let meterHi, meterLo: Color
+    /// Face fill for the neutral toolbar keys — the `.light` variant (info) and
+    /// any disabled key (end, when not live). Optional; `nil` keeps the default
+    /// light-gray bevel gradients, so themes opt in to a tinted key.
+    let neutralKeyFill: Color?
+    /// Multiply tint for the brand wordmark image. The logo art is a solid white
+    /// glyph on transparent, so `colorMultiply(logoTint)` recolors it (white ×
+    /// tint = tint) while leaving transparency intact. Optional; `nil` = no tint
+    /// (`colorMultiply(.white)`), preserving each theme's original logo.
+    let logoTint: Color?
+    /// Hairline rule drawn in a `SlabLabel` section header (the line across
+    /// "GOALS ——— set 3" / "TRANSCRIPT ——— ready"). Optional; defaults to `line`.
+    let slabRule: Color
     /// Text/labels that sit directly on the themed window background (brand row,
     /// section headers) + their fainter secondary variant (counts, status).
     /// Optional; default to `inkSoft`/`muted`.
@@ -56,7 +81,9 @@ struct ThemePalette {
     static let tokenNames = ["orange","orangeDeep","ink","inkSoft","paper","win",
                              "panel","panel2","line","lineSoft","muted","muted2",
                              "good","deck","deckBorder","buttonHi","buttonLo",
-                             "goalRestFill","goalRestInk","onBg","onBgFaint",
+                             "goalRestFill","goalRestInk","goalRestBorder",
+                             "goalDoneHi","goalDoneLo","meterHi","meterLo",
+                             "neutralKeyFill","logoTint","slabRule","onBg","onBgFaint",
                              "deckScrimTop","deckScrimBottom"]
 
     /// Today's exact palette — the safety net if discovery ever finds nothing.
@@ -71,6 +98,11 @@ struct ThemePalette {
         deckBorder: Color(themeHex: "#26251F")!,
         buttonHi: Color(themeHex: "#FF7A36")!, buttonLo: Color(themeHex: "#EC5000")!,
         goalRestFill: Color(themeHex: "#FFFFFF")!, goalRestInk: Color(themeHex: "#1C1B19")!,
+        goalRestBorder: .clear,
+        goalDoneHi: Color(themeHex: "#FF7A36")!, goalDoneLo: Color(themeHex: "#EC5000")!,
+        meterHi: Color(themeHex: "#FF7A36")!, meterLo: Color(themeHex: "#EC5000")!,
+        neutralKeyFill: nil, logoTint: nil,
+        slabRule: Color(themeHex: "#CDCCC6")!,
         onBg: Color(themeHex: "#3B3A37")!, onBgFaint: Color(themeHex: "#8D8C86")!,
         deckScrimTop: Color.black.opacity(0.45), deckScrimBottom: Color.black.opacity(0.7)
     )
@@ -95,6 +127,14 @@ struct ThemePalette {
         self.buttonLo = c("buttonLo") ?? orangeDeep
         self.goalRestFill = c("goalRestFill") ?? paper
         self.goalRestInk = c("goalRestInk") ?? ink
+        self.goalRestBorder = c("goalRestBorder") ?? .clear
+        self.goalDoneHi = c("goalDoneHi") ?? self.buttonHi
+        self.goalDoneLo = c("goalDoneLo") ?? self.buttonLo
+        self.meterHi = c("meterHi") ?? self.buttonHi
+        self.meterLo = c("meterLo") ?? self.buttonLo
+        self.neutralKeyFill = c("neutralKeyFill")
+        self.logoTint = c("logoTint")
+        self.slabRule = c("slabRule") ?? line
         self.onBg = c("onBg") ?? inkSoft
         self.onBgFaint = c("onBgFaint") ?? muted
         self.deckScrimTop = c("deckScrimTop") ?? Color.black.opacity(0.45)
@@ -106,6 +146,10 @@ struct ThemePalette {
          win: Color, panel: Color, panel2: Color, line: Color, lineSoft: Color,
          muted: Color, muted2: Color, good: Color, deck: Color, deckBorder: Color,
          buttonHi: Color, buttonLo: Color, goalRestFill: Color, goalRestInk: Color,
+         goalRestBorder: Color, goalDoneHi: Color, goalDoneLo: Color,
+         meterHi: Color, meterLo: Color,
+         neutralKeyFill: Color?, logoTint: Color?,
+         slabRule: Color,
          onBg: Color, onBgFaint: Color, deckScrimTop: Color, deckScrimBottom: Color) {
         self.orange = orange; self.orangeDeep = orangeDeep; self.ink = ink
         self.inkSoft = inkSoft; self.paper = paper; self.win = win; self.panel = panel
@@ -114,6 +158,11 @@ struct ThemePalette {
         self.deckBorder = deckBorder
         self.buttonHi = buttonHi; self.buttonLo = buttonLo
         self.goalRestFill = goalRestFill; self.goalRestInk = goalRestInk
+        self.goalRestBorder = goalRestBorder
+        self.goalDoneHi = goalDoneHi; self.goalDoneLo = goalDoneLo
+        self.meterHi = meterHi; self.meterLo = meterLo
+        self.neutralKeyFill = neutralKeyFill
+        self.logoTint = logoTint; self.slabRule = slabRule
         self.onBg = onBg; self.onBgFaint = onBgFaint
         self.deckScrimTop = deckScrimTop; self.deckScrimBottom = deckScrimBottom
     }
@@ -130,6 +179,15 @@ struct ThemeManifest: Decodable {
     /// dimmed-gray reel). Set grayscale 0 to show the reel's real colors.
     let deckReelGrayscale: Double?
     let deckReelBrightness: Double?
+    /// When true, the background image is scaled to fill the window exactly
+    /// (frame hugs all four edges) instead of the default `scaledToFill` crop.
+    /// Use for a decorative *framed* background that must be seen whole (e.g.
+    /// HERO's ornate 1776 page). Optional; default false.
+    let backgroundStretch: Bool?
+    /// When true, an unachieved goal row renders a frosted blur (ultraThinMaterial)
+    /// behind its `goalRestFill` tint, so a translucent fill reads as glass over
+    /// the themed background. Optional; default false.
+    let goalRestBlur: Bool?
 }
 
 /// A resolved theme: palette + asset URLs + identity.
@@ -142,6 +200,10 @@ struct Theme: Identifiable {
     let folderURL: URL
     let deckReelGrayscale: Double
     let deckReelBrightness: Double
+    /// Scale the background image to fill the window exactly (vs `scaledToFill`).
+    let backgroundStretch: Bool
+    /// Frost an unachieved goal row's fill with a blur material.
+    let goalRestBlur: Bool
 
     /// Subdirectory (relative to bundle resources) where this theme's videos live.
     var videoSubdirectory: String { "Themes/\(id)/videos" }
@@ -176,7 +238,9 @@ struct Theme: Identifiable {
                      colorScheme: scheme,
                      palette: palette, images: images, folderURL: folderURL,
                      deckReelGrayscale: m.deckReelGrayscale ?? 1.0,
-                     deckReelBrightness: m.deckReelBrightness ?? -0.15)
+                     deckReelBrightness: m.deckReelBrightness ?? -0.15,
+                     backgroundStretch: m.backgroundStretch ?? false,
+                     goalRestBlur: m.goalRestBlur ?? false)
     }
 
     /// Guaranteed-valid default, used before discovery or if nothing is found.
@@ -186,7 +250,8 @@ struct Theme: Identifiable {
             ?? URL(fileURLWithPath: "/dev/null")
         return Theme(id: "default", displayName: "DEFAULT", colorScheme: .light,
                      palette: .fallback, images: [:],
-                     folderURL: folder, deckReelGrayscale: 1.0, deckReelBrightness: -0.15)
+                     folderURL: folder, deckReelGrayscale: 1.0, deckReelBrightness: -0.15,
+                     backgroundStretch: false, goalRestBlur: false)
     }()
 }
 
@@ -213,4 +278,11 @@ enum ActiveThemeVideo {
 enum ActiveDeck {
     nonisolated(unsafe) static var reelGrayscale: Double = 1.0
     nonisolated(unsafe) static var reelBrightness: Double = -0.15
+}
+
+/// Nonisolated mirror of goal-row treatment flags, read by `GoalRow` (which uses
+/// the nonisolated `KColor`/mirror pattern rather than an `@EnvironmentObject`).
+/// Written by `ThemeStore` on the main actor.
+enum ActiveGoal {
+    nonisolated(unsafe) static var restBlur: Bool = false
 }

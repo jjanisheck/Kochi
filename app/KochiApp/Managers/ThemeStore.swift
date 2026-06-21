@@ -31,6 +31,7 @@ final class ThemeStore: ObservableObject {
         ActiveThemeVideo.subdirectory = current.videoSubdirectory
         ActiveDeck.reelGrayscale = current.deckReelGrayscale
         ActiveDeck.reelBrightness = current.deckReelBrightness
+        ActiveGoal.restBlur = current.goalRestBlur
     }
 
     /// Scan `baseURL` for subfolders that load as valid themes. `default` first,
@@ -64,6 +65,7 @@ final class ThemeStore: ObservableObject {
         ActiveThemeVideo.subdirectory = theme.videoSubdirectory
         ActiveDeck.reelGrayscale = theme.deckReelGrayscale
         ActiveDeck.reelBrightness = theme.deckReelBrightness
+        ActiveGoal.restBlur = theme.goalRestBlur
         NotificationCenter.default.post(name: .themeChanged, object: nil)
         UserDefaults.standard.set(id, forKey: defaultsKey)
         themeVersion &+= 1

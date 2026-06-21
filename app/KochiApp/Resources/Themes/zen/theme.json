@@ -11,7 +11,9 @@
     "line": "#CDCCC6", "lineSoft": "#DAD9D3",
     "muted": "#8D8C86", "muted2": "#A9A8A2",
     "good": "#1F8A4C", "deck": "#34332C", "deckBorder": "#26251F",
-    "buttonHi": "#46B883", "buttonLo": "#2E8B57"
+    "buttonHi": "#46B883", "buttonLo": "#2E8B57",
+    "goalRestFill": "#E5EAD2", "goalRestBorder": "#2E8B57",
+    "goalRestInk": "#2E8B57", "neutralKeyFill": "#E5EAD2"
   },
   "images": {
     "BackgroundImage": "images/BackgroundImage.png",
