@@ -11,17 +11,23 @@ off by default, and it sends only the text transcript (never your audio).
 
 <table>
   <tr>
-    <td width="25%" align="center"><img src="docs/screenshots/default.gif" width="100%" alt="DEFAULT theme"></td>
-    <td width="25%" align="center"><img src="docs/screenshots/bricks.gif" width="100%" alt="BRICKS theme"></td>
-    <td width="25%" align="center"><img src="docs/screenshots/hero.gif" width="100%" alt="HERO theme"></td>
-    <td width="25%" align="center"><img src="docs/screenshots/zen.gif" width="100%" alt="ZEN theme"></td>
+    <td width="33%" align="center"><img src="docs/screenshots/default.gif" width="100%" alt="DEFAULT theme"></td>
+    <td width="33%" align="center"><img src="docs/screenshots/bricks.gif" width="100%" alt="BRICKS theme"></td>
+    <td width="33%" align="center"><img src="docs/screenshots/hero.gif" width="100%" alt="HERO theme"></td>
   </tr>
   <tr>
     <td align="center"><b>default</b><br><sub>warm / orange</sub></td>
     <td align="center"><b>bricks</b><br><sub>terracotta</sub></td>
     <td align="center"><b>hero</b><br><sub>red·white·blue</sub></td>
-    <td align="center"><b>zen</b><br><sub>calm / green</sub></td>
   </tr>
+  <tr>
+    <td width="33%" align="center"><img src="docs/screenshots/noir.gif" width="100%" alt="NOIR theme"></td>
+    <td width="33%" align="center"><img src="docs/screenshots/zen.gif" width="100%" alt="ZEN theme"></td>
+  </tr>
+  <tr>
+    <td align="center"><b>noir</b><br><sub>dark / mono</sub></td>
+    <td align="center"><b>zen</b><br><sub>calm / green</sub></td>
+  </tr>  
 </table>
 
 It runs as a compact Mac app with a **menu-bar icon** you can click to bring it
