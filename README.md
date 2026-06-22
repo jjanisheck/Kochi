@@ -34,22 +34,22 @@ to the front whenever you need it. Built entirely in SwiftUI, native to macOS.
 > reaches public release, you'll need the beta OS (and a matching Xcode/SDK) to
 > build and run the app.
 
-<p align="center">
-  <img src="docs/screenshots/default.gif" alt="Kōchi in motion — the default theme" width="260">
-  &nbsp;
-  <img src="docs/screenshots/home.png" alt="Live meeting with goal tracking and a dual-channel transcript" width="260">
-  &nbsp;
-  <img src="docs/screenshots/meeting-detail.png" alt="Saved meeting detail with goals and full transcript" width="260">
-  &nbsp;
-  <img src="docs/screenshots/search.png" alt="Full-text search across saved transcripts" width="260">
-</p>
+<table>
+  <tr>
+    <td width="25%" align="center"><img src="docs/screenshots/default.gif" width="100%" alt="Kōchi in motion — the default theme"></td>
+    <td width="25%" align="center"><img src="docs/screenshots/home.png" width="100%" alt="Live meeting with goal tracking and a dual-channel transcript"></td>
+    <td width="25%" align="center"><img src="docs/screenshots/meeting-detail.png" width="100%" alt="Saved meeting detail with goals and full transcript"></td>
+    <td width="25%" align="center"><img src="docs/screenshots/search.png" width="100%" alt="Full-text search across saved transcripts"></td>
+  </tr>
+</table>
+
 <p align="center"><sub>Kōchi in motion · live coaching & goal tracking · saved meeting detail · search across transcripts</sub></p>
 
 ### Watch the tutorial
 
 <p align="center">
   <a href="https://youtube.com/shorts/eApAqi_FtKY">
-    <img src="https://img.youtube.com/vi/eApAqi_FtKY/hqdefault.jpg" alt="Watch the Kōchi tutorial on YouTube" width="320">
+    <img src="https://img.youtube.com/vi/eApAqi_FtKY/hqdefault.jpg" alt="Watch the Kōchi tutorial on YouTube" width="480">
   </a>
 </p>
 <p align="center"><sub>▶ <a href="https://youtube.com/shorts/eApAqi_FtKY">Watch the tutorial on YouTube</a></sub></p>
