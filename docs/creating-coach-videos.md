@@ -1,5 +1,9 @@
 # Creating Coach Videos for a Theme
 
+> Part of building a theme. For the full theme walkthrough (art, palette,
+> options), start with **[Creating a Kōchi theme](creating-a-theme.md)** — this
+> page is the deep-dive on just the coach clips.
+
 The coach hero at the top of the app plays short, silent, looping video clips.
 Each theme ships its own set under
 `app/KochiApp/Resources/Themes/<theme-id>/videos/`. This guide explains how to
