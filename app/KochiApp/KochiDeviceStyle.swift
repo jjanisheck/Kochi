@@ -36,6 +36,8 @@ enum KColor {
     static var goalRestInk: Color  { p.goalRestInk }
     static var goalUnmetFill: Color { p.goalUnmetFill }
     static var goalUnmetInk: Color  { p.goalUnmetInk }
+    static var goalKeyFill: Color   { p.goalKeyFill }
+    static var transcriptRowFill: Color { p.transcriptRowFill }
     static var goalRestBorder: Color { p.goalRestBorder }
     static var goalDoneHi: Color { p.goalDoneHi }
     static var goalDoneLo: Color { p.goalDoneLo }
@@ -147,10 +149,12 @@ struct BeveledKeyStyle: ButtonStyle {
 
         private var faceGradient: LinearGradient {
             // The `.goal` key always wears the unfinished-goal color (even when
-            // disabled). The goal fill carries an alpha for the rows; the keys
-            // want it SOLID, so clamp the opacity to 1 (×100 saturates any alpha).
+            // disabled). It uses `goalKeyFill` (defaults to goalUnmetFill) so a
+            // theme whose goal rows are translucent-over-background can give the
+            // opaque keys the solid tone the rows read as. Clamp opacity (×100) so
+            // any residual alpha saturates to a fully solid key.
             if variant == .goal {
-                let solid = KColor.goalUnmetFill.opacity(100)
+                let solid = KColor.goalKeyFill.opacity(100)
                 return LinearGradient(colors: [solid, solid], startPoint: .top, endPoint: .bottom)
             }
             // A theme may tint the neutral keys (light variant + any disabled key)
@@ -182,7 +186,9 @@ struct BeveledKeyStyle: ButtonStyle {
             // The goal key reads flat like the goal rows — no raised key shadow.
             if variant == .goal { return .clear }
             guard isEnabled else { return .clear }
-            return variant == .primary ? Color(red: 140/255, green: 55/255, blue: 0).opacity(0.4)
+            // Primary key glow derives from the theme's own deep button color
+            // (was a hardcoded orange that glowed orange on every theme).
+            return variant == .primary ? KColor.buttonLo.opacity(0.4)
                                        : Color.black.opacity(0.22)
         }
     }

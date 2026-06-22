@@ -16,6 +16,7 @@
     "buttonHi": "#D32F2F", "buttonLo": "#9E1B1B",
     "goalRestFill": "#FFFFFF40", "goalRestInk": "#4A3013",
     "goalRestBorder": "#6E4518",
+    "goalKeyFill": "#DCC08A",
     "goalDoneHi": "#D32F2F", "goalDoneLo": "#9E1B1B",
     "meterHi": "#2E5BD4", "meterLo": "#17317D",
     "onBg": "#4A3013", "onBgFaint": "#7A5526",

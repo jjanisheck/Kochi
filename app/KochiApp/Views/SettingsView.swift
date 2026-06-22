@@ -199,7 +199,7 @@ struct TranscriptsTab: View {
                 if goalManager.meetingHistory.isEmpty {
                     Text("No transcripts yet. Start a recording to see history here.")
                         .font(.body)
-                        .foregroundColor(.black.opacity(0.6))
+                        .foregroundColor(KColor.ink.opacity(0.6))
                         .padding()
                         .frame(maxWidth: .infinity)
                         .background(KColor.paper.opacity(0.92))
@@ -250,7 +250,7 @@ struct TranscriptRow: View {
                     Text("\(completedCount)/\(meeting.goals.count) goals")
                         .font(KFont.mono(10))
                         .tracking(0.5)
-                        .foregroundColor(completedCount == meeting.goals.count && completedCount > 0 ? KColor.good : KColor.orangeDeep)
+                        .foregroundColor(completedCount == meeting.goals.count && completedCount > 0 ? KColor.good : KColor.muted)
 
                     if !meeting.notes.isEmpty {
                         Text(meeting.notes)
@@ -273,7 +273,7 @@ struct TranscriptRow: View {
                 .buttonStyle(PlainButtonStyle())
             }
             .padding()
-            .background(KColor.paper.opacity(0.92))
+            .background(KColor.transcriptRowFill.opacity(0.92))
             .cornerRadius(10)
             .padding(.horizontal)
         }
@@ -676,7 +676,7 @@ struct GoalSlotRow: View {
                     .padding(.vertical, 7)
                     .background(
                         RoundedRectangle(cornerRadius: 6, style: .continuous)
-                            .fill(Color.white)
+                            .fill(KColor.paper)
                             .overlay(RoundedRectangle(cornerRadius: 6, style: .continuous)
                                 .strokeBorder(KColor.line, lineWidth: 1))
                     )
@@ -737,14 +737,14 @@ struct AboutTab: View {
                 VStack(alignment: .leading, spacing: 16) {
                     Text("Kochi transcribes your meetings entirely on-device with Apple Speech, and evaluates your goals and coaching using Apple's on-device Foundation model. Your audio never leaves your device.")
                         .font(.body)
-                        .foregroundColor(.black.opacity(0.8))
+                        .foregroundColor(KColor.ink.opacity(0.8))
 
                     Divider()
-                        .background(.black.opacity(0.3))
+                        .background(KColor.ink.opacity(0.25))
 
                     Text("How It Works")
                         .font(.headline)
-                        .foregroundColor(.black)
+                        .foregroundColor(KColor.ink)
 
                     VStack(alignment: .leading, spacing: 12) {
                         PrivacyFeatureRow(icon: "waveform", text: "Audio transcribed on-device with Apple Speech")
@@ -753,11 +753,11 @@ struct AboutTab: View {
                     }
 
                     Divider()
-                        .background(.black.opacity(0.3))
+                        .background(KColor.ink.opacity(0.25))
 
                     Text("Private by Design")
                         .font(.headline)
-                        .foregroundColor(.black)
+                        .foregroundColor(KColor.ink)
 
                     VStack(alignment: .leading, spacing: 12) {
                         PrivacyFeatureRow(icon: "wifi.slash", text: "Works without an internet connection")
@@ -766,15 +766,15 @@ struct AboutTab: View {
                     }
 
                     Divider()
-                        .background(.black.opacity(0.3))
+                        .background(KColor.ink.opacity(0.25))
 
                     Text("Privacy Note")
                         .font(.headline)
-                        .foregroundColor(.black)
+                        .foregroundColor(KColor.ink)
 
                     Text("K\u{014D}chi runs entirely on your device by default \u{2014} audio, transcription, and coaching all happen locally with no account or API key. The optional AI Analysis feature (Settings \u{2192} AI) is the one exception: if you add your own API key and tap Run AI Analysis on a meeting, that meeting\u{2019}s transcript is sent to your chosen provider. Your audio, transcripts, and goals stay stored locally on your device.")
                         .font(.body)
-                        .foregroundColor(.black.opacity(0.8))
+                        .foregroundColor(KColor.ink.opacity(0.8))
                 }
                 .padding()
                 .background(KColor.paper.opacity(0.92))
@@ -907,11 +907,11 @@ struct PrivacyFeatureRow: View {
     var body: some View {
         HStack(spacing: 12) {
             Image(systemName: icon)
-                .foregroundColor(Color(red: 249/255, green: 81/255, blue: 0))
+                .foregroundColor(KColor.buttonHi)
                 .frame(width: 24)
             Text(text)
                 .font(.subheadline)
-                .foregroundColor(.black)
+                .foregroundColor(KColor.ink)
         }
     }
 }
@@ -926,21 +926,21 @@ struct MeetingHistoryCompactRow: View {
             HStack {
                 Text(formatDate(meeting.startTime))
                     .font(.headline)
-                    .foregroundColor(Color.black)
+                    .foregroundColor(KColor.ink)
                 Spacer()
                 let completedCount = meeting.goals.filter { $0.isCompleted }.count
                 Text("\(completedCount)/\(meeting.goals.count) goals")
                     .font(.caption)
-                    .foregroundColor(Color(red: 249/255, green: 81/255, blue: 0))
+                    .foregroundColor(KColor.buttonHi)
                 Image(systemName: "chevron.right")
                     .font(.caption)
-                    .foregroundColor(Color.black.opacity(0.3))
+                    .foregroundColor(KColor.ink.opacity(0.3))
             }
 
             if !meeting.notes.isEmpty {
                 Text(meeting.notes)
                     .font(.caption)
-                    .foregroundColor(Color.black.opacity(0.7))
+                    .foregroundColor(KColor.ink.opacity(0.7))
                     .lineLimit(2)
             }
         }
@@ -1514,7 +1514,7 @@ private struct MeetingGoalRow: View {
         .frame(minHeight: 42)
         .background(goalBackground)
         .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
-        .shadow(color: done ? Color(red: 140/255, green: 55/255, blue: 0).opacity(0.30) : .clear,
+        .shadow(color: done ? KColor.goalDoneLo.opacity(0.30) : .clear,
                 radius: 4, x: 0, y: 2)
     }
 
@@ -1599,16 +1599,16 @@ struct RecordingRow: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(formatDate(recording.date))
                         .font(.headline)
-                        .foregroundColor(Color.black)
+                        .foregroundColor(KColor.ink)
 
                     Text("Duration: \(formatDuration(recording.duration))")
                         .font(.caption)
-                        .foregroundColor(Color.black.opacity(0.7))
+                        .foregroundColor(KColor.ink.opacity(0.7))
                     
                     if !recording.transcription.isEmpty {
                         Text(recording.transcription)
                             .font(.caption)
-                            .foregroundColor(Color.black.opacity(0.6))
+                            .foregroundColor(KColor.ink.opacity(0.6))
                             .lineLimit(2)
                     }
                 }
@@ -1617,7 +1617,7 @@ struct RecordingRow: View {
                 
                 Image(systemName: "play.circle.fill")
                     .font(.title2)
-                    .foregroundColor(Color(red: 249/255, green: 81/255, blue: 0))
+                    .foregroundColor(KColor.buttonHi)
             }
             .padding()
             .background(KColor.paper.opacity(0.92))
@@ -1653,17 +1653,17 @@ struct AboutAITab: View {
                     HStack {
                         Image(systemName: "apple.logo")
                             .font(.title)
-                            .foregroundColor(Color(red: 249/255, green: 81/255, blue: 0))
+                            .foregroundColor(KColor.buttonHi)
 
                         Text("Apple Foundation Models")
                             .font(.title2)
                             .fontWeight(.bold)
-                            .foregroundColor(Color.black)
+                            .foregroundColor(KColor.ink)
                     }
 
                     Text("100% On-Device AI • No Downloads Required")
                         .font(.subheadline)
-                        .foregroundColor(Color(red: 249/255, green: 81/255, blue: 0))
+                        .foregroundColor(KColor.buttonHi)
                 }
                 .padding()
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -1675,7 +1675,7 @@ struct AboutAITab: View {
                 VStack(alignment: .leading, spacing: 12) {
                     Text("AI Capabilities")
                         .font(.headline)
-                        .foregroundColor(Color.black)
+                        .foregroundColor(KColor.ink)
                         .padding(.horizontal)
 
                     AICapabilityCard(
@@ -1711,7 +1711,7 @@ struct AboutAITab: View {
                 VStack(alignment: .leading, spacing: 12) {
                     Text("Privacy & Security")
                         .font(.headline)
-                        .foregroundColor(Color.black)
+                        .foregroundColor(KColor.ink)
                         .padding(.horizontal)
 
                     PrivacyBenefitRow(
@@ -1743,33 +1743,33 @@ struct AboutAITab: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("System Requirements")
                         .font(.headline)
-                        .foregroundColor(Color.black)
+                        .foregroundColor(KColor.ink)
 
                     HStack {
                         Text("macOS Version")
-                            .foregroundColor(Color.black.opacity(0.7))
+                            .foregroundColor(KColor.ink.opacity(0.7))
                         Spacer()
                         Text("27.0+")
                             .fontWeight(.medium)
-                            .foregroundColor(Color.black)
+                            .foregroundColor(KColor.ink)
                         Image(systemName: "checkmark.circle.fill")
                             .foregroundColor(.green)
                     }
 
                     HStack {
                         Text("Storage Required")
-                            .foregroundColor(Color.black.opacity(0.7))
+                            .foregroundColor(KColor.ink.opacity(0.7))
                         Spacer()
                         Text("0 MB (built-in)")
                             .fontWeight(.medium)
-                            .foregroundColor(Color.black)
+                            .foregroundColor(KColor.ink)
                         Image(systemName: "checkmark.circle.fill")
                             .foregroundColor(.green)
                     }
 
                     HStack {
                         Text("Status")
-                            .foregroundColor(Color.black.opacity(0.7))
+                            .foregroundColor(KColor.ink.opacity(0.7))
                         Spacer()
                         Text("Active & Ready")
                             .fontWeight(.medium)
@@ -1789,7 +1789,7 @@ struct AboutAITab: View {
                         .foregroundColor(.yellow)
                     Text("No downloads, no setup, always ready!")
                         .font(.caption)
-                        .foregroundColor(Color.black.opacity(0.6))
+                        .foregroundColor(KColor.ink.opacity(0.6))
                 }
                 .padding()
                 .frame(maxWidth: .infinity)
@@ -1811,22 +1811,22 @@ struct AICapabilityCard: View {
         HStack(spacing: 12) {
             Image(systemName: icon)
                 .font(.title2)
-                .foregroundColor(Color(red: 249/255, green: 81/255, blue: 0))
+                .foregroundColor(KColor.buttonHi)
                 .frame(width: 40)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
                     .font(.subheadline)
                     .fontWeight(.medium)
-                    .foregroundColor(Color.black)
+                    .foregroundColor(KColor.ink)
 
                 Text(description)
                     .font(.caption)
-                    .foregroundColor(Color.black.opacity(0.6))
+                    .foregroundColor(KColor.ink.opacity(0.6))
 
                 Text(framework)
                     .font(.caption2)
-                    .foregroundColor(Color(red: 249/255, green: 81/255, blue: 0).opacity(0.7))
+                    .foregroundColor(KColor.buttonHi.opacity(0.7))
             }
 
             Spacer()
@@ -1850,12 +1850,12 @@ struct PrivacyBenefitRow: View {
     var body: some View {
         HStack(spacing: 10) {
             Image(systemName: icon)
-                .foregroundColor(Color(red: 249/255, green: 81/255, blue: 0))
+                .foregroundColor(KColor.buttonHi)
                 .frame(width: 20)
 
             Text(text)
                 .font(.subheadline)
-                .foregroundColor(Color.black)
+                .foregroundColor(KColor.ink)
 
             Spacer()
         }

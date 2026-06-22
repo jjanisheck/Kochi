@@ -50,6 +50,15 @@ struct ThemePalette {
     /// resting goals a distinct chip (e.g. BRICKS' orange) without touching the
     /// transcript. Pair a saturated fill with a light ink for legibility.
     let goalUnmetFill, goalUnmetInk: Color
+    /// Solid face fill for goal-styled toolbar keys (end/info). Optional; defaults
+    /// to `goalUnmetFill`. The keys are always opaque, so when a theme's goal rows
+    /// are translucent-over-background (e.g. HERO's frosted parchment), set this to
+    /// the solid tone the rows read as, so the keys match without flattening the rows.
+    let goalKeyFill: Color
+    /// Background fill for a saved-transcript list row. Optional; defaults to
+    /// `paper`. A dark theme can set this (e.g. NOIR's black) so the transcript
+    /// rows read distinct from the other (lighter) cards.
+    let transcriptRowFill: Color
     /// Border stroked around an unachieved goal row. Optional; defaults to clear
     /// (no visible border) so themes opt in. Use an 8-digit `#RRGGBBAA` hex to
     /// control opacity.
@@ -90,7 +99,7 @@ struct ThemePalette {
                              "panel","panel2","line","lineSoft","muted","muted2",
                              "good","deck","deckBorder","buttonHi","buttonLo",
                              "goalRestFill","goalRestInk",
-                             "goalUnmetFill","goalUnmetInk","goalRestBorder",
+                             "goalUnmetFill","goalUnmetInk","goalKeyFill","transcriptRowFill","goalRestBorder",
                              "goalDoneHi","goalDoneLo","meterHi","meterLo",
                              "neutralKeyFill","logoTint","slabRule","onBg","onBgFaint",
                              "deckScrimTop","deckScrimBottom"]
@@ -108,6 +117,8 @@ struct ThemePalette {
         buttonHi: Color(themeHex: "#FF7A36")!, buttonLo: Color(themeHex: "#EC5000")!,
         goalRestFill: Color(themeHex: "#FFFFFF")!, goalRestInk: Color(themeHex: "#1C1B19")!,
         goalUnmetFill: Color(themeHex: "#FFFFFF")!, goalUnmetInk: Color(themeHex: "#1C1B19")!,
+        goalKeyFill: Color(themeHex: "#FFFFFF")!,
+        transcriptRowFill: Color(themeHex: "#FFFFFF")!,
         goalRestBorder: .clear,
         goalDoneHi: Color(themeHex: "#FF7A36")!, goalDoneLo: Color(themeHex: "#EC5000")!,
         meterHi: Color(themeHex: "#FF7A36")!, meterLo: Color(themeHex: "#EC5000")!,
@@ -139,6 +150,8 @@ struct ThemePalette {
         self.goalRestInk = c("goalRestInk") ?? ink
         self.goalUnmetFill = c("goalUnmetFill") ?? self.goalRestFill
         self.goalUnmetInk = c("goalUnmetInk") ?? self.goalRestInk
+        self.goalKeyFill = c("goalKeyFill") ?? self.goalUnmetFill
+        self.transcriptRowFill = c("transcriptRowFill") ?? self.paper
         self.goalRestBorder = c("goalRestBorder") ?? .clear
         self.goalDoneHi = c("goalDoneHi") ?? self.buttonHi
         self.goalDoneLo = c("goalDoneLo") ?? self.buttonLo
@@ -158,7 +171,8 @@ struct ThemePalette {
          win: Color, panel: Color, panel2: Color, line: Color, lineSoft: Color,
          muted: Color, muted2: Color, good: Color, deck: Color, deckBorder: Color,
          buttonHi: Color, buttonLo: Color, goalRestFill: Color, goalRestInk: Color,
-         goalUnmetFill: Color, goalUnmetInk: Color,
+         goalUnmetFill: Color, goalUnmetInk: Color, goalKeyFill: Color,
+         transcriptRowFill: Color,
          goalRestBorder: Color, goalDoneHi: Color, goalDoneLo: Color,
          meterHi: Color, meterLo: Color,
          neutralKeyFill: Color?, logoTint: Color?,
@@ -172,6 +186,8 @@ struct ThemePalette {
         self.buttonHi = buttonHi; self.buttonLo = buttonLo
         self.goalRestFill = goalRestFill; self.goalRestInk = goalRestInk
         self.goalUnmetFill = goalUnmetFill; self.goalUnmetInk = goalUnmetInk
+        self.goalKeyFill = goalKeyFill
+        self.transcriptRowFill = transcriptRowFill
         self.goalRestBorder = goalRestBorder
         self.goalDoneHi = goalDoneHi; self.goalDoneLo = goalDoneLo
         self.meterHi = meterHi; self.meterLo = meterLo

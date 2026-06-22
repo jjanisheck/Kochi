@@ -422,7 +422,7 @@ private struct GoalRow: View {
         // Make the WHOLE row a reliable tap target (the trailing Spacer would
         // otherwise leave a dead zone, so a row could feel unclickable).
         .contentShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
-        .shadow(color: done ? Color(red: 140/255, green: 55/255, blue: 0).opacity(0.35) : .clear,
+        .shadow(color: done ? KColor.goalDoneLo.opacity(0.35) : .clear,
                 radius: 4, x: 0, y: 2)
 
         // Manual override: once a meeting is underway, tap a goal to mark it hit
