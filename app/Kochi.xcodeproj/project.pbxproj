@@ -7,103 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0AF00002000000000000DEFA /* Themes in Resources */ = {isa = PBXBuildFile; fileRef = 0AF00001000000000000DEFA /* Themes */; };
+		0AF10002000000000000DEFA /* KochiApp/Managers/Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AF10001000000000000DEFA /* KochiApp/Managers/Theme.swift */; };
+		0AF10004000000000000DEFA /* KochiApp/Managers/ThemeStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AF10003000000000000DEFA /* KochiApp/Managers/ThemeStore.swift */; };
+		0AF10006000000000000DEFA /* KochiApp/Views/ThemeImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AF10005000000000000DEFA /* KochiApp/Views/ThemeImage.swift */; };
 		04684A1E2EB6DAD8001E0449 /* CoachingVideoPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04684A1D2EB6DAD8001E0449 /* CoachingVideoPlayerView.swift */; };
 		04684A862EB6E1C8001E0449 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 04684A522EB6E1C8001E0449 /* README.md */; };
 		04684AE52EB81ACE001E0449 /* filmreel.png in Resources */ = {isa = PBXBuildFile; fileRef = 04684AE42EB81ACE001E0449 /* filmreel.png */; };
-		0478D9492ECD54E400F0A979 /* zen-listen-3.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D92C2ECD54E400F0A979 /* zen-listen-3.mp4 */; };
-		0478D94A2ECD54E400F0A979 /* zen-mute-1.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D92E2ECD54E400F0A979 /* zen-mute-1.mp4 */; };
-		0478D94B2ECD54E400F0A979 /* general-focus-1.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D8EF2ECD54E400F0A979 /* general-focus-1.mp4 */; };
-		0478D94C2ECD54E400F0A979 /* zen-listen-2.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D92B2ECD54E400F0A979 /* zen-listen-2.mp4 */; };
-		0478D94D2ECD54E400F0A979 /* zen-timing-3.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D9402ECD54E400F0A979 /* zen-timing-3.mp4 */; };
-		0478D94E2ECD54E400F0A979 /* general-goal-2.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D8F42ECD54E400F0A979 /* general-goal-2.mp4 */; };
-		0478D94F2ECD54E400F0A979 /* general-goal-3.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D8F52ECD54E400F0A979 /* general-goal-3.mp4 */; };
-		0478D9502ECD54E400F0A979 /* general-pause-3.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D9052ECD54E400F0A979 /* general-pause-3.mp4 */; };
-		0478D9512ECD54E400F0A979 /* zen-listen-4.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D92D2ECD54E400F0A979 /* zen-listen-4.mp4 */; };
-		0478D9522ECD54E400F0A979 /* general-idle-4.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D8FA2ECD54E400F0A979 /* general-idle-4.mp4 */; };
-		0478D9532ECD54E400F0A979 /* general-wrap-4.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D9192ECD54E400F0A979 /* general-wrap-4.mp4 */; };
-		0478D9542ECD54E400F0A979 /* zen-goal-3.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D9242ECD54E400F0A979 /* zen-goal-3.mp4 */; };
-		0478D9552ECD54E400F0A979 /* general-mute-4.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D9022ECD54E400F0A979 /* general-mute-4.mp4 */; };
-		0478D9562ECD54E400F0A979 /* general-idle-2.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D8F82ECD54E400F0A979 /* general-idle-2.mp4 */; };
-		0478D9572ECD54E400F0A979 /* general-prompt-2.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D9082ECD54E400F0A979 /* general-prompt-2.mp4 */; };
-		0478D9582ECD54E400F0A979 /* zen-check-1.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D91A2ECD54E400F0A979 /* zen-check-1.mp4 */; };
-		0478D9592ECD54E400F0A979 /* zen-idle-2.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D9272ECD54E400F0A979 /* zen-idle-2.mp4 */; };
-		0478D95A2ECD54E400F0A979 /* zen-listen-1.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D92A2ECD54E400F0A979 /* zen-listen-1.mp4 */; };
-		0478D95B2ECD54E400F0A979 /* zen-check-4.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D91D2ECD54E400F0A979 /* zen-check-4.mp4 */; };
-		0478D95C2ECD54E400F0A979 /* zen-prompt-2.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D9372ECD54E400F0A979 /* zen-prompt-2.mp4 */; };
-		0478D95D2ECD54E400F0A979 /* zen-steady-3.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D93C2ECD54E400F0A979 /* zen-steady-3.mp4 */; };
-		0478D95E2ECD54E400F0A979 /* zen-steady-4.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D93D2ECD54E400F0A979 /* zen-steady-4.mp4 */; };
-		0478D95F2ECD54E400F0A979 /* general-steady-4.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D90E2ECD54E400F0A979 /* general-steady-4.mp4 */; };
-		0478D9602ECD54E400F0A979 /* general-waiting-1.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D9132ECD54E400F0A979 /* general-waiting-1.mp4 */; };
-		0478D9612ECD54E400F0A979 /* zen-wrap-3.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D9472ECD54E400F0A979 /* zen-wrap-3.mp4 */; };
-		0478D9622ECD54E400F0A979 /* general-check-4.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D8EE2ECD54E400F0A979 /* general-check-4.mp4 */; };
-		0478D9632ECD54E400F0A979 /* zen-pause-3.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D9342ECD54E400F0A979 /* zen-pause-3.mp4 */; };
-		0478D9642ECD54E400F0A979 /* zen-wrap-4.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D9482ECD54E400F0A979 /* zen-wrap-4.mp4 */; };
-		0478D9652ECD54E400F0A979 /* general-check-1.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D8EB2ECD54E400F0A979 /* general-check-1.mp4 */; };
-		0478D9662ECD54E400F0A979 /* general-listen-1.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D8FB2ECD54E400F0A979 /* general-listen-1.mp4 */; };
-		0478D9672ECD54E400F0A979 /* general-focus-2.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D8F02ECD54E400F0A979 /* general-focus-2.mp4 */; };
-		0478D9682ECD54E400F0A979 /* general-goal-4.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D8F62ECD54E400F0A979 /* general-goal-4.mp4 */; };
-		0478D9692ECD54E400F0A979 /* general-idle-1.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D8F72ECD54E400F0A979 /* general-idle-1.mp4 */; };
-		0478D96A2ECD54E400F0A979 /* zen-prompt-1.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D9362ECD54E400F0A979 /* zen-prompt-1.mp4 */; };
-		0478D96B2ECD54E400F0A979 /* zen-mute-4.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D9312ECD54E400F0A979 /* zen-mute-4.mp4 */; };
-		0478D96C2ECD54E400F0A979 /* general-mute-3.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D9012ECD54E400F0A979 /* general-mute-3.mp4 */; };
-		0478D96D2ECD54E400F0A979 /* zen-timing-4.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D9412ECD54E400F0A979 /* zen-timing-4.mp4 */; };
-		0478D96E2ECD54E400F0A979 /* general-focus-3.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D8F12ECD54E400F0A979 /* general-focus-3.mp4 */; };
-		0478D96F2ECD54E400F0A979 /* zen-focus-3.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D9202ECD54E400F0A979 /* zen-focus-3.mp4 */; };
-		0478D9702ECD54E400F0A979 /* zen-idle-4.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D9292ECD54E400F0A979 /* zen-idle-4.mp4 */; };
-		0478D9712ECD54E400F0A979 /* zen-idle-1.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D9262ECD54E400F0A979 /* zen-idle-1.mp4 */; };
-		0478D9722ECD54E400F0A979 /* zen-waiting-3.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D9442ECD54E400F0A979 /* zen-waiting-3.mp4 */; };
-		0478D9732ECD54E400F0A979 /* zen-timing-1.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D93E2ECD54E400F0A979 /* zen-timing-1.mp4 */; };
-		0478D9742ECD54E400F0A979 /* general-waiting-2.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D9142ECD54E400F0A979 /* general-waiting-2.mp4 */; };
-		0478D9752ECD54E400F0A979 /* general-wrap-2.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D9172ECD54E400F0A979 /* general-wrap-2.mp4 */; };
-		0478D9762ECD54E400F0A979 /* zen-mute-3.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D9302ECD54E400F0A979 /* zen-mute-3.mp4 */; };
-		0478D9772ECD54E400F0A979 /* general-pause-4.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D9062ECD54E400F0A979 /* general-pause-4.mp4 */; };
-		0478D9782ECD54E400F0A979 /* zen-idle-3.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D9282ECD54E400F0A979 /* zen-idle-3.mp4 */; };
-		0478D9792ECD54E400F0A979 /* zen-check-2.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D91B2ECD54E400F0A979 /* zen-check-2.mp4 */; };
-		0478D97A2ECD54E400F0A979 /* general-pause-1.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D9032ECD54E400F0A979 /* general-pause-1.mp4 */; };
-		0478D97B2ECD54E400F0A979 /* general-wrap-1.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D9162ECD54E400F0A979 /* general-wrap-1.mp4 */; };
-		0478D97C2ECD54E400F0A979 /* zen-waiting-1.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D9422ECD54E400F0A979 /* zen-waiting-1.mp4 */; };
-		0478D97D2ECD54E400F0A979 /* general-idle-3.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D8F92ECD54E400F0A979 /* general-idle-3.mp4 */; };
-		0478D97E2ECD54E400F0A979 /* general-steady-2.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D90C2ECD54E400F0A979 /* general-steady-2.mp4 */; };
-		0478D97F2ECD54E400F0A979 /* zen-focus-2.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D91F2ECD54E400F0A979 /* zen-focus-2.mp4 */; };
-		0478D9802ECD54E400F0A979 /* zen-steady-2.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D93B2ECD54E400F0A979 /* zen-steady-2.mp4 */; };
-		0478D9812ECD54E400F0A979 /* general-prompt-4.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D90A2ECD54E400F0A979 /* general-prompt-4.mp4 */; };
-		0478D9822ECD54E400F0A979 /* general-steady-3.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D90D2ECD54E400F0A979 /* general-steady-3.mp4 */; };
-		0478D9832ECD54E400F0A979 /* general-timing-1.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D90F2ECD54E400F0A979 /* general-timing-1.mp4 */; };
-		0478D9842ECD54E400F0A979 /* zen-focus-1.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D91E2ECD54E400F0A979 /* zen-focus-1.mp4 */; };
-		0478D9852ECD54E400F0A979 /* zen-wrap-1.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D9452ECD54E400F0A979 /* zen-wrap-1.mp4 */; };
-		0478D9862ECD54E400F0A979 /* zen-mute-2.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D92F2ECD54E400F0A979 /* zen-mute-2.mp4 */; };
-		0478D9872ECD54E400F0A979 /* general-wrap-3.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D9182ECD54E400F0A979 /* general-wrap-3.mp4 */; };
-		0478D9882ECD54E400F0A979 /* zen-timing-2.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D93F2ECD54E400F0A979 /* zen-timing-2.mp4 */; };
-		0478D9892ECD54E400F0A979 /* general-prompt-3.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D9092ECD54E400F0A979 /* general-prompt-3.mp4 */; };
-		0478D98A2ECD54E400F0A979 /* general-timing-4.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D9122ECD54E400F0A979 /* general-timing-4.mp4 */; };
-		0478D98B2ECD54E400F0A979 /* general-steady-1.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D90B2ECD54E400F0A979 /* general-steady-1.mp4 */; };
-		0478D98C2ECD54E400F0A979 /* general-goal-1.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D8F32ECD54E400F0A979 /* general-goal-1.mp4 */; };
-		0478D98D2ECD54E400F0A979 /* zen-pause-1.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D9322ECD54E400F0A979 /* zen-pause-1.mp4 */; };
-		0478D98E2ECD54E400F0A979 /* general-mute-2.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D9002ECD54E400F0A979 /* general-mute-2.mp4 */; };
-		0478D98F2ECD54E400F0A979 /* general-listen-3.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D8FD2ECD54E400F0A979 /* general-listen-3.mp4 */; };
-		0478D9902ECD54E400F0A979 /* general-prompt-1.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D9072ECD54E400F0A979 /* general-prompt-1.mp4 */; };
-		0478D9912ECD54E400F0A979 /* general-listen-4.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D8FE2ECD54E400F0A979 /* general-listen-4.mp4 */; };
-		0478D9922ECD54E400F0A979 /* general-timing-3.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D9112ECD54E400F0A979 /* general-timing-3.mp4 */; };
-		0478D9932ECD54E400F0A979 /* general-timing-2.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D9102ECD54E400F0A979 /* general-timing-2.mp4 */; };
-		0478D9942ECD54E400F0A979 /* zen-pause-2.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D9332ECD54E400F0A979 /* zen-pause-2.mp4 */; };
-		0478D9952ECD54E400F0A979 /* zen-pause-4.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D9352ECD54E400F0A979 /* zen-pause-4.mp4 */; };
-		0478D9962ECD54E400F0A979 /* zen-waiting-2.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D9432ECD54E400F0A979 /* zen-waiting-2.mp4 */; };
-		0478D9972ECD54E400F0A979 /* general-mute-1.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D8FF2ECD54E400F0A979 /* general-mute-1.mp4 */; };
-		0478D9982ECD54E400F0A979 /* zen-prompt-4.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D9392ECD54E400F0A979 /* zen-prompt-4.mp4 */; };
-		0478D9992ECD54E400F0A979 /* general-check-3.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D8ED2ECD54E400F0A979 /* general-check-3.mp4 */; };
-		0478D99A2ECD54E400F0A979 /* zen-check-3.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D91C2ECD54E400F0A979 /* zen-check-3.mp4 */; };
-		0478D99B2ECD54E400F0A979 /* zen-wrap-2.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D9462ECD54E400F0A979 /* zen-wrap-2.mp4 */; };
-		0478D99C2ECD54E400F0A979 /* zen-goal-1.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D9222ECD54E400F0A979 /* zen-goal-1.mp4 */; };
-		0478D99D2ECD54E400F0A979 /* zen-goal-2.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D9232ECD54E400F0A979 /* zen-goal-2.mp4 */; };
-		0478D99E2ECD54E400F0A979 /* zen-steady-1.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D93A2ECD54E400F0A979 /* zen-steady-1.mp4 */; };
-		0478D99F2ECD54E400F0A979 /* general-focus-4.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D8F22ECD54E400F0A979 /* general-focus-4.mp4 */; };
-		0478D9A02ECD54E400F0A979 /* general-check-2.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D8EC2ECD54E400F0A979 /* general-check-2.mp4 */; };
-		0478D9A12ECD54E400F0A979 /* general-listen-2.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D8FC2ECD54E400F0A979 /* general-listen-2.mp4 */; };
-		0478D9A22ECD54E400F0A979 /* zen-prompt-3.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D9382ECD54E400F0A979 /* zen-prompt-3.mp4 */; };
-		0478D9A32ECD54E400F0A979 /* zen-goal-4.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D9252ECD54E400F0A979 /* zen-goal-4.mp4 */; };
-		0478D9A42ECD54E400F0A979 /* general-pause-2.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D9042ECD54E400F0A979 /* general-pause-2.mp4 */; };
-		0478D9A52ECD54E400F0A979 /* general-waiting-3.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D9152ECD54E400F0A979 /* general-waiting-3.mp4 */; };
-		0478D9A62ECD54E400F0A979 /* zen-focus-4.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0478D9212ECD54E400F0A979 /* zen-focus-4.mp4 */; };
 		048F21A52E29677B001FA450 /* GoalEvaluation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 048F21A02E29677B001FA450 /* GoalEvaluation.swift */; };
 		16FF74F26DE705B53B57EB3A /* FoundationModelsTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9998351DC542016612CB10 /* FoundationModelsTypes.swift */; };
 		048F21A72E29677B001FA450 /* KochiDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 048F21A12E29677B001FA450 /* KochiDataModel.xcdatamodeld */; };
@@ -131,7 +41,6 @@
 		04F1EB6F2E28C1170086D5BC /* CoachingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04F1EB692E28C1170086D5BC /* CoachingView.swift */; };
 		04F1EB702E28C1170086D5BC /* ModelSelectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04F1EB6A2E28C1170086D5BC /* ModelSelectorView.swift */; };
 		04F1EB722E28C1170086D5BC /* TranscriptionSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04F1EB6D2E28C1170086D5BC /* TranscriptionSettingsView.swift */; };
-		04F1EB732E28C1170086D5BC /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04F1EB6C2E28C1170086D5BC /* OnboardingView.swift */; };
 		04F1EB772E28C2850086D5BC /* TranscriptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04F1EB762E28C2850086D5BC /* TranscriptionManager.swift */; };
 		04GOALS002 /* GoalsManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04GOALS001 /* GoalsManagementView.swift */; };
 		04VIDEO002 /* KochiApp/Managers/VideoCoachingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04VIDEO001 /* KochiApp/Managers/VideoCoachingManager.swift */; };
@@ -157,6 +66,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0AF00001000000000000DEFA /* Themes */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Resources/Themes; sourceTree = "<group>"; };
+		0AF10001000000000000DEFA /* KochiApp/Managers/Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Managers/Theme.swift; sourceTree = "<group>"; };
+		0AF10003000000000000DEFA /* KochiApp/Managers/ThemeStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Managers/ThemeStore.swift; sourceTree = "<group>"; };
+		0AF10005000000000000DEFA /* KochiApp/Views/ThemeImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeImage.swift; sourceTree = "<group>"; };
 		04684A1D2EB6DAD8001E0449 /* CoachingVideoPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoachingVideoPlayerView.swift; sourceTree = "<group>"; };
 		04684A522EB6E1C8001E0449 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		04684AE42EB81ACE001E0449 /* filmreel.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = filmreel.png; sourceTree = "<group>"; };
@@ -167,100 +80,6 @@
 		0FONTR04 /* ZillaSlab-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Fonts/ZillaSlab-Bold.ttf"; sourceTree = "<group>"; };
 		0FONTR05 /* JetBrainsMono.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Fonts/JetBrainsMono.ttf"; sourceTree = "<group>"; };
 		0FONTR06 /* HankenGrotesk.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Fonts/HankenGrotesk.ttf"; sourceTree = "<group>"; };
-		0478D8EB2ECD54E400F0A979 /* general-check-1.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "general-check-1.mp4"; sourceTree = "<group>"; };
-		0478D8EC2ECD54E400F0A979 /* general-check-2.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "general-check-2.mp4"; sourceTree = "<group>"; };
-		0478D8ED2ECD54E400F0A979 /* general-check-3.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "general-check-3.mp4"; sourceTree = "<group>"; };
-		0478D8EE2ECD54E400F0A979 /* general-check-4.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "general-check-4.mp4"; sourceTree = "<group>"; };
-		0478D8EF2ECD54E400F0A979 /* general-focus-1.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "general-focus-1.mp4"; sourceTree = "<group>"; };
-		0478D8F02ECD54E400F0A979 /* general-focus-2.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "general-focus-2.mp4"; sourceTree = "<group>"; };
-		0478D8F12ECD54E400F0A979 /* general-focus-3.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "general-focus-3.mp4"; sourceTree = "<group>"; };
-		0478D8F22ECD54E400F0A979 /* general-focus-4.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "general-focus-4.mp4"; sourceTree = "<group>"; };
-		0478D8F32ECD54E400F0A979 /* general-goal-1.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "general-goal-1.mp4"; sourceTree = "<group>"; };
-		0478D8F42ECD54E400F0A979 /* general-goal-2.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "general-goal-2.mp4"; sourceTree = "<group>"; };
-		0478D8F52ECD54E400F0A979 /* general-goal-3.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "general-goal-3.mp4"; sourceTree = "<group>"; };
-		0478D8F62ECD54E400F0A979 /* general-goal-4.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "general-goal-4.mp4"; sourceTree = "<group>"; };
-		0478D8F72ECD54E400F0A979 /* general-idle-1.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "general-idle-1.mp4"; sourceTree = "<group>"; };
-		0478D8F82ECD54E400F0A979 /* general-idle-2.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "general-idle-2.mp4"; sourceTree = "<group>"; };
-		0478D8F92ECD54E400F0A979 /* general-idle-3.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "general-idle-3.mp4"; sourceTree = "<group>"; };
-		0478D8FA2ECD54E400F0A979 /* general-idle-4.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "general-idle-4.mp4"; sourceTree = "<group>"; };
-		0478D8FB2ECD54E400F0A979 /* general-listen-1.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "general-listen-1.mp4"; sourceTree = "<group>"; };
-		0478D8FC2ECD54E400F0A979 /* general-listen-2.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "general-listen-2.mp4"; sourceTree = "<group>"; };
-		0478D8FD2ECD54E400F0A979 /* general-listen-3.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "general-listen-3.mp4"; sourceTree = "<group>"; };
-		0478D8FE2ECD54E400F0A979 /* general-listen-4.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "general-listen-4.mp4"; sourceTree = "<group>"; };
-		0478D8FF2ECD54E400F0A979 /* general-mute-1.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "general-mute-1.mp4"; sourceTree = "<group>"; };
-		0478D9002ECD54E400F0A979 /* general-mute-2.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "general-mute-2.mp4"; sourceTree = "<group>"; };
-		0478D9012ECD54E400F0A979 /* general-mute-3.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "general-mute-3.mp4"; sourceTree = "<group>"; };
-		0478D9022ECD54E400F0A979 /* general-mute-4.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "general-mute-4.mp4"; sourceTree = "<group>"; };
-		0478D9032ECD54E400F0A979 /* general-pause-1.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "general-pause-1.mp4"; sourceTree = "<group>"; };
-		0478D9042ECD54E400F0A979 /* general-pause-2.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "general-pause-2.mp4"; sourceTree = "<group>"; };
-		0478D9052ECD54E400F0A979 /* general-pause-3.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "general-pause-3.mp4"; sourceTree = "<group>"; };
-		0478D9062ECD54E400F0A979 /* general-pause-4.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "general-pause-4.mp4"; sourceTree = "<group>"; };
-		0478D9072ECD54E400F0A979 /* general-prompt-1.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "general-prompt-1.mp4"; sourceTree = "<group>"; };
-		0478D9082ECD54E400F0A979 /* general-prompt-2.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "general-prompt-2.mp4"; sourceTree = "<group>"; };
-		0478D9092ECD54E400F0A979 /* general-prompt-3.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "general-prompt-3.mp4"; sourceTree = "<group>"; };
-		0478D90A2ECD54E400F0A979 /* general-prompt-4.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "general-prompt-4.mp4"; sourceTree = "<group>"; };
-		0478D90B2ECD54E400F0A979 /* general-steady-1.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "general-steady-1.mp4"; sourceTree = "<group>"; };
-		0478D90C2ECD54E400F0A979 /* general-steady-2.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "general-steady-2.mp4"; sourceTree = "<group>"; };
-		0478D90D2ECD54E400F0A979 /* general-steady-3.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "general-steady-3.mp4"; sourceTree = "<group>"; };
-		0478D90E2ECD54E400F0A979 /* general-steady-4.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "general-steady-4.mp4"; sourceTree = "<group>"; };
-		0478D90F2ECD54E400F0A979 /* general-timing-1.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "general-timing-1.mp4"; sourceTree = "<group>"; };
-		0478D9102ECD54E400F0A979 /* general-timing-2.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "general-timing-2.mp4"; sourceTree = "<group>"; };
-		0478D9112ECD54E400F0A979 /* general-timing-3.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "general-timing-3.mp4"; sourceTree = "<group>"; };
-		0478D9122ECD54E400F0A979 /* general-timing-4.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "general-timing-4.mp4"; sourceTree = "<group>"; };
-		0478D9132ECD54E400F0A979 /* general-waiting-1.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "general-waiting-1.mp4"; sourceTree = "<group>"; };
-		0478D9142ECD54E400F0A979 /* general-waiting-2.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "general-waiting-2.mp4"; sourceTree = "<group>"; };
-		0478D9152ECD54E400F0A979 /* general-waiting-3.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "general-waiting-3.mp4"; sourceTree = "<group>"; };
-		0478D9162ECD54E400F0A979 /* general-wrap-1.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "general-wrap-1.mp4"; sourceTree = "<group>"; };
-		0478D9172ECD54E400F0A979 /* general-wrap-2.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "general-wrap-2.mp4"; sourceTree = "<group>"; };
-		0478D9182ECD54E400F0A979 /* general-wrap-3.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "general-wrap-3.mp4"; sourceTree = "<group>"; };
-		0478D9192ECD54E400F0A979 /* general-wrap-4.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "general-wrap-4.mp4"; sourceTree = "<group>"; };
-		0478D91A2ECD54E400F0A979 /* zen-check-1.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "zen-check-1.mp4"; sourceTree = "<group>"; };
-		0478D91B2ECD54E400F0A979 /* zen-check-2.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "zen-check-2.mp4"; sourceTree = "<group>"; };
-		0478D91C2ECD54E400F0A979 /* zen-check-3.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "zen-check-3.mp4"; sourceTree = "<group>"; };
-		0478D91D2ECD54E400F0A979 /* zen-check-4.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "zen-check-4.mp4"; sourceTree = "<group>"; };
-		0478D91E2ECD54E400F0A979 /* zen-focus-1.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "zen-focus-1.mp4"; sourceTree = "<group>"; };
-		0478D91F2ECD54E400F0A979 /* zen-focus-2.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "zen-focus-2.mp4"; sourceTree = "<group>"; };
-		0478D9202ECD54E400F0A979 /* zen-focus-3.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "zen-focus-3.mp4"; sourceTree = "<group>"; };
-		0478D9212ECD54E400F0A979 /* zen-focus-4.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "zen-focus-4.mp4"; sourceTree = "<group>"; };
-		0478D9222ECD54E400F0A979 /* zen-goal-1.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "zen-goal-1.mp4"; sourceTree = "<group>"; };
-		0478D9232ECD54E400F0A979 /* zen-goal-2.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "zen-goal-2.mp4"; sourceTree = "<group>"; };
-		0478D9242ECD54E400F0A979 /* zen-goal-3.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "zen-goal-3.mp4"; sourceTree = "<group>"; };
-		0478D9252ECD54E400F0A979 /* zen-goal-4.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "zen-goal-4.mp4"; sourceTree = "<group>"; };
-		0478D9262ECD54E400F0A979 /* zen-idle-1.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "zen-idle-1.mp4"; sourceTree = "<group>"; };
-		0478D9272ECD54E400F0A979 /* zen-idle-2.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "zen-idle-2.mp4"; sourceTree = "<group>"; };
-		0478D9282ECD54E400F0A979 /* zen-idle-3.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "zen-idle-3.mp4"; sourceTree = "<group>"; };
-		0478D9292ECD54E400F0A979 /* zen-idle-4.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "zen-idle-4.mp4"; sourceTree = "<group>"; };
-		0478D92A2ECD54E400F0A979 /* zen-listen-1.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "zen-listen-1.mp4"; sourceTree = "<group>"; };
-		0478D92B2ECD54E400F0A979 /* zen-listen-2.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "zen-listen-2.mp4"; sourceTree = "<group>"; };
-		0478D92C2ECD54E400F0A979 /* zen-listen-3.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "zen-listen-3.mp4"; sourceTree = "<group>"; };
-		0478D92D2ECD54E400F0A979 /* zen-listen-4.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "zen-listen-4.mp4"; sourceTree = "<group>"; };
-		0478D92E2ECD54E400F0A979 /* zen-mute-1.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "zen-mute-1.mp4"; sourceTree = "<group>"; };
-		0478D92F2ECD54E400F0A979 /* zen-mute-2.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "zen-mute-2.mp4"; sourceTree = "<group>"; };
-		0478D9302ECD54E400F0A979 /* zen-mute-3.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "zen-mute-3.mp4"; sourceTree = "<group>"; };
-		0478D9312ECD54E400F0A979 /* zen-mute-4.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "zen-mute-4.mp4"; sourceTree = "<group>"; };
-		0478D9322ECD54E400F0A979 /* zen-pause-1.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "zen-pause-1.mp4"; sourceTree = "<group>"; };
-		0478D9332ECD54E400F0A979 /* zen-pause-2.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "zen-pause-2.mp4"; sourceTree = "<group>"; };
-		0478D9342ECD54E400F0A979 /* zen-pause-3.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "zen-pause-3.mp4"; sourceTree = "<group>"; };
-		0478D9352ECD54E400F0A979 /* zen-pause-4.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "zen-pause-4.mp4"; sourceTree = "<group>"; };
-		0478D9362ECD54E400F0A979 /* zen-prompt-1.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "zen-prompt-1.mp4"; sourceTree = "<group>"; };
-		0478D9372ECD54E400F0A979 /* zen-prompt-2.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "zen-prompt-2.mp4"; sourceTree = "<group>"; };
-		0478D9382ECD54E400F0A979 /* zen-prompt-3.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "zen-prompt-3.mp4"; sourceTree = "<group>"; };
-		0478D9392ECD54E400F0A979 /* zen-prompt-4.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "zen-prompt-4.mp4"; sourceTree = "<group>"; };
-		0478D93A2ECD54E400F0A979 /* zen-steady-1.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "zen-steady-1.mp4"; sourceTree = "<group>"; };
-		0478D93B2ECD54E400F0A979 /* zen-steady-2.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "zen-steady-2.mp4"; sourceTree = "<group>"; };
-		0478D93C2ECD54E400F0A979 /* zen-steady-3.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "zen-steady-3.mp4"; sourceTree = "<group>"; };
-		0478D93D2ECD54E400F0A979 /* zen-steady-4.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "zen-steady-4.mp4"; sourceTree = "<group>"; };
-		0478D93E2ECD54E400F0A979 /* zen-timing-1.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "zen-timing-1.mp4"; sourceTree = "<group>"; };
-		0478D93F2ECD54E400F0A979 /* zen-timing-2.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "zen-timing-2.mp4"; sourceTree = "<group>"; };
-		0478D9402ECD54E400F0A979 /* zen-timing-3.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "zen-timing-3.mp4"; sourceTree = "<group>"; };
-		0478D9412ECD54E400F0A979 /* zen-timing-4.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "zen-timing-4.mp4"; sourceTree = "<group>"; };
-		0478D9422ECD54E400F0A979 /* zen-waiting-1.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "zen-waiting-1.mp4"; sourceTree = "<group>"; };
-		0478D9432ECD54E400F0A979 /* zen-waiting-2.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "zen-waiting-2.mp4"; sourceTree = "<group>"; };
-		0478D9442ECD54E400F0A979 /* zen-waiting-3.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "zen-waiting-3.mp4"; sourceTree = "<group>"; };
-		0478D9452ECD54E400F0A979 /* zen-wrap-1.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "zen-wrap-1.mp4"; sourceTree = "<group>"; };
-		0478D9462ECD54E400F0A979 /* zen-wrap-2.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "zen-wrap-2.mp4"; sourceTree = "<group>"; };
-		0478D9472ECD54E400F0A979 /* zen-wrap-3.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "zen-wrap-3.mp4"; sourceTree = "<group>"; };
-		0478D9482ECD54E400F0A979 /* zen-wrap-4.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "zen-wrap-4.mp4"; sourceTree = "<group>"; };
 		048F219F2E29677B001FA450 /* CoreDataModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataModels.swift; sourceTree = "<group>"; };
 		048F21A02E29677B001FA450 /* GoalEvaluation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalEvaluation.swift; sourceTree = "<group>"; };
 		9F9998351DC542016612CB10 /* FoundationModelsTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoundationModelsTypes.swift; sourceTree = "<group>"; };
@@ -289,7 +108,6 @@
 		04F1EB662E28AF330086D5BC /* TemporaryStubs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemporaryStubs.swift; sourceTree = "<group>"; };
 		04F1EB692E28C1170086D5BC /* CoachingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoachingView.swift; sourceTree = "<group>"; };
 		04F1EB6A2E28C1170086D5BC /* ModelSelectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelSelectorView.swift; sourceTree = "<group>"; };
-		04F1EB6C2E28C1170086D5BC /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		04F1EB6D2E28C1170086D5BC /* TranscriptionSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptionSettingsView.swift; sourceTree = "<group>"; };
 		04F1EB762E28C2850086D5BC /* TranscriptionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptionManager.swift; sourceTree = "<group>"; };
 		04GOALS001 /* GoalsManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalsManagementView.swift; sourceTree = "<group>"; };
@@ -328,6 +146,8 @@
 		04684AE32EB6FD8B001E0449 /* Recovered References */ = {
 			isa = PBXGroup;
 			children = (
+				0AF10001000000000000DEFA /* KochiApp/Managers/Theme.swift */,
+				0AF10003000000000000DEFA /* KochiApp/Managers/ThemeStore.swift */,
 				04VIDEO001 /* KochiApp/Managers/VideoCoachingManager.swift */,
 				04DUALENG002 /* KochiApp/Services/DualTranscriptionEngine.swift */,
 				04SYSAUD002 /* KochiApp/Services/SystemAudioCapture.swift */,
@@ -374,100 +194,7 @@
 		1A000001B /* KochiApp */ = {
 			isa = PBXGroup;
 			children = (
-				0478D8EB2ECD54E400F0A979 /* general-check-1.mp4 */,
-				0478D8EC2ECD54E400F0A979 /* general-check-2.mp4 */,
-				0478D8ED2ECD54E400F0A979 /* general-check-3.mp4 */,
-				0478D8EE2ECD54E400F0A979 /* general-check-4.mp4 */,
-				0478D8EF2ECD54E400F0A979 /* general-focus-1.mp4 */,
-				0478D8F02ECD54E400F0A979 /* general-focus-2.mp4 */,
-				0478D8F12ECD54E400F0A979 /* general-focus-3.mp4 */,
-				0478D8F22ECD54E400F0A979 /* general-focus-4.mp4 */,
-				0478D8F32ECD54E400F0A979 /* general-goal-1.mp4 */,
-				0478D8F42ECD54E400F0A979 /* general-goal-2.mp4 */,
-				0478D8F52ECD54E400F0A979 /* general-goal-3.mp4 */,
-				0478D8F62ECD54E400F0A979 /* general-goal-4.mp4 */,
-				0478D8F72ECD54E400F0A979 /* general-idle-1.mp4 */,
-				0478D8F82ECD54E400F0A979 /* general-idle-2.mp4 */,
-				0478D8F92ECD54E400F0A979 /* general-idle-3.mp4 */,
-				0478D8FA2ECD54E400F0A979 /* general-idle-4.mp4 */,
-				0478D8FB2ECD54E400F0A979 /* general-listen-1.mp4 */,
-				0478D8FC2ECD54E400F0A979 /* general-listen-2.mp4 */,
-				0478D8FD2ECD54E400F0A979 /* general-listen-3.mp4 */,
-				0478D8FE2ECD54E400F0A979 /* general-listen-4.mp4 */,
-				0478D8FF2ECD54E400F0A979 /* general-mute-1.mp4 */,
-				0478D9002ECD54E400F0A979 /* general-mute-2.mp4 */,
-				0478D9012ECD54E400F0A979 /* general-mute-3.mp4 */,
-				0478D9022ECD54E400F0A979 /* general-mute-4.mp4 */,
-				0478D9032ECD54E400F0A979 /* general-pause-1.mp4 */,
-				0478D9042ECD54E400F0A979 /* general-pause-2.mp4 */,
-				0478D9052ECD54E400F0A979 /* general-pause-3.mp4 */,
-				0478D9062ECD54E400F0A979 /* general-pause-4.mp4 */,
-				0478D9072ECD54E400F0A979 /* general-prompt-1.mp4 */,
-				0478D9082ECD54E400F0A979 /* general-prompt-2.mp4 */,
-				0478D9092ECD54E400F0A979 /* general-prompt-3.mp4 */,
-				0478D90A2ECD54E400F0A979 /* general-prompt-4.mp4 */,
-				0478D90B2ECD54E400F0A979 /* general-steady-1.mp4 */,
-				0478D90C2ECD54E400F0A979 /* general-steady-2.mp4 */,
-				0478D90D2ECD54E400F0A979 /* general-steady-3.mp4 */,
-				0478D90E2ECD54E400F0A979 /* general-steady-4.mp4 */,
-				0478D90F2ECD54E400F0A979 /* general-timing-1.mp4 */,
-				0478D9102ECD54E400F0A979 /* general-timing-2.mp4 */,
-				0478D9112ECD54E400F0A979 /* general-timing-3.mp4 */,
-				0478D9122ECD54E400F0A979 /* general-timing-4.mp4 */,
-				0478D9132ECD54E400F0A979 /* general-waiting-1.mp4 */,
-				0478D9142ECD54E400F0A979 /* general-waiting-2.mp4 */,
-				0478D9152ECD54E400F0A979 /* general-waiting-3.mp4 */,
-				0478D9162ECD54E400F0A979 /* general-wrap-1.mp4 */,
-				0478D9172ECD54E400F0A979 /* general-wrap-2.mp4 */,
-				0478D9182ECD54E400F0A979 /* general-wrap-3.mp4 */,
-				0478D9192ECD54E400F0A979 /* general-wrap-4.mp4 */,
-				0478D91A2ECD54E400F0A979 /* zen-check-1.mp4 */,
-				0478D91B2ECD54E400F0A979 /* zen-check-2.mp4 */,
-				0478D91C2ECD54E400F0A979 /* zen-check-3.mp4 */,
-				0478D91D2ECD54E400F0A979 /* zen-check-4.mp4 */,
-				0478D91E2ECD54E400F0A979 /* zen-focus-1.mp4 */,
-				0478D91F2ECD54E400F0A979 /* zen-focus-2.mp4 */,
-				0478D9202ECD54E400F0A979 /* zen-focus-3.mp4 */,
-				0478D9212ECD54E400F0A979 /* zen-focus-4.mp4 */,
-				0478D9222ECD54E400F0A979 /* zen-goal-1.mp4 */,
-				0478D9232ECD54E400F0A979 /* zen-goal-2.mp4 */,
-				0478D9242ECD54E400F0A979 /* zen-goal-3.mp4 */,
-				0478D9252ECD54E400F0A979 /* zen-goal-4.mp4 */,
-				0478D9262ECD54E400F0A979 /* zen-idle-1.mp4 */,
-				0478D9272ECD54E400F0A979 /* zen-idle-2.mp4 */,
-				0478D9282ECD54E400F0A979 /* zen-idle-3.mp4 */,
-				0478D9292ECD54E400F0A979 /* zen-idle-4.mp4 */,
-				0478D92A2ECD54E400F0A979 /* zen-listen-1.mp4 */,
-				0478D92B2ECD54E400F0A979 /* zen-listen-2.mp4 */,
-				0478D92C2ECD54E400F0A979 /* zen-listen-3.mp4 */,
-				0478D92D2ECD54E400F0A979 /* zen-listen-4.mp4 */,
-				0478D92E2ECD54E400F0A979 /* zen-mute-1.mp4 */,
-				0478D92F2ECD54E400F0A979 /* zen-mute-2.mp4 */,
-				0478D9302ECD54E400F0A979 /* zen-mute-3.mp4 */,
-				0478D9312ECD54E400F0A979 /* zen-mute-4.mp4 */,
-				0478D9322ECD54E400F0A979 /* zen-pause-1.mp4 */,
-				0478D9332ECD54E400F0A979 /* zen-pause-2.mp4 */,
-				0478D9342ECD54E400F0A979 /* zen-pause-3.mp4 */,
-				0478D9352ECD54E400F0A979 /* zen-pause-4.mp4 */,
-				0478D9362ECD54E400F0A979 /* zen-prompt-1.mp4 */,
-				0478D9372ECD54E400F0A979 /* zen-prompt-2.mp4 */,
-				0478D9382ECD54E400F0A979 /* zen-prompt-3.mp4 */,
-				0478D9392ECD54E400F0A979 /* zen-prompt-4.mp4 */,
-				0478D93A2ECD54E400F0A979 /* zen-steady-1.mp4 */,
-				0478D93B2ECD54E400F0A979 /* zen-steady-2.mp4 */,
-				0478D93C2ECD54E400F0A979 /* zen-steady-3.mp4 */,
-				0478D93D2ECD54E400F0A979 /* zen-steady-4.mp4 */,
-				0478D93E2ECD54E400F0A979 /* zen-timing-1.mp4 */,
-				0478D93F2ECD54E400F0A979 /* zen-timing-2.mp4 */,
-				0478D9402ECD54E400F0A979 /* zen-timing-3.mp4 */,
-				0478D9412ECD54E400F0A979 /* zen-timing-4.mp4 */,
-				0478D9422ECD54E400F0A979 /* zen-waiting-1.mp4 */,
-				0478D9432ECD54E400F0A979 /* zen-waiting-2.mp4 */,
-				0478D9442ECD54E400F0A979 /* zen-waiting-3.mp4 */,
-				0478D9452ECD54E400F0A979 /* zen-wrap-1.mp4 */,
-				0478D9462ECD54E400F0A979 /* zen-wrap-2.mp4 */,
-				0478D9472ECD54E400F0A979 /* zen-wrap-3.mp4 */,
-				0478D9482ECD54E400F0A979 /* zen-wrap-4.mp4 */,
+				0AF00001000000000000DEFA /* Themes */,
 				04684AE42EB81ACE001E0449 /* filmreel.png */,
 				0KSTYLE02 /* KochiDeviceStyle.swift */,
 				0FONTR01 /* ZillaSlab-Regular.ttf */,
@@ -514,11 +241,11 @@
 			children = (
 				04F1EB692E28C1170086D5BC /* CoachingView.swift */,
 				04F1EB6A2E28C1170086D5BC /* ModelSelectorView.swift */,
-				04F1EB6C2E28C1170086D5BC /* OnboardingView.swift */,
 				04F1EB6D2E28C1170086D5BC /* TranscriptionSettingsView.swift */,
 				1A0000006 /* RecordingView.swift */,
 				1A000000A /* SettingsView.swift */,
 				04GOALS001 /* GoalsManagementView.swift */,
+				0AF10005000000000000DEFA /* KochiApp/Views/ThemeImage.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -596,6 +323,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0AF00002000000000000DEFA /* Themes in Resources */,
 				048F21AA2E2990B0001FA450 /* Assets.xcassets in Resources */,
 				04684A862EB6E1C8001E0449 /* README.md in Resources */,
 				04684AE52EB81ACE001E0449 /* filmreel.png in Resources */,
@@ -605,100 +333,6 @@
 				0FONTB04 /* ZillaSlab-Bold.ttf in Resources */,
 				0FONTB05 /* JetBrainsMono.ttf in Resources */,
 				0FONTB06 /* HankenGrotesk.ttf in Resources */,
-				0478D9492ECD54E400F0A979 /* zen-listen-3.mp4 in Resources */,
-				0478D94A2ECD54E400F0A979 /* zen-mute-1.mp4 in Resources */,
-				0478D94B2ECD54E400F0A979 /* general-focus-1.mp4 in Resources */,
-				0478D94C2ECD54E400F0A979 /* zen-listen-2.mp4 in Resources */,
-				0478D94D2ECD54E400F0A979 /* zen-timing-3.mp4 in Resources */,
-				0478D94E2ECD54E400F0A979 /* general-goal-2.mp4 in Resources */,
-				0478D94F2ECD54E400F0A979 /* general-goal-3.mp4 in Resources */,
-				0478D9502ECD54E400F0A979 /* general-pause-3.mp4 in Resources */,
-				0478D9512ECD54E400F0A979 /* zen-listen-4.mp4 in Resources */,
-				0478D9522ECD54E400F0A979 /* general-idle-4.mp4 in Resources */,
-				0478D9532ECD54E400F0A979 /* general-wrap-4.mp4 in Resources */,
-				0478D9542ECD54E400F0A979 /* zen-goal-3.mp4 in Resources */,
-				0478D9552ECD54E400F0A979 /* general-mute-4.mp4 in Resources */,
-				0478D9562ECD54E400F0A979 /* general-idle-2.mp4 in Resources */,
-				0478D9572ECD54E400F0A979 /* general-prompt-2.mp4 in Resources */,
-				0478D9582ECD54E400F0A979 /* zen-check-1.mp4 in Resources */,
-				0478D9592ECD54E400F0A979 /* zen-idle-2.mp4 in Resources */,
-				0478D95A2ECD54E400F0A979 /* zen-listen-1.mp4 in Resources */,
-				0478D95B2ECD54E400F0A979 /* zen-check-4.mp4 in Resources */,
-				0478D95C2ECD54E400F0A979 /* zen-prompt-2.mp4 in Resources */,
-				0478D95D2ECD54E400F0A979 /* zen-steady-3.mp4 in Resources */,
-				0478D95E2ECD54E400F0A979 /* zen-steady-4.mp4 in Resources */,
-				0478D95F2ECD54E400F0A979 /* general-steady-4.mp4 in Resources */,
-				0478D9602ECD54E400F0A979 /* general-waiting-1.mp4 in Resources */,
-				0478D9612ECD54E400F0A979 /* zen-wrap-3.mp4 in Resources */,
-				0478D9622ECD54E400F0A979 /* general-check-4.mp4 in Resources */,
-				0478D9632ECD54E400F0A979 /* zen-pause-3.mp4 in Resources */,
-				0478D9642ECD54E400F0A979 /* zen-wrap-4.mp4 in Resources */,
-				0478D9652ECD54E400F0A979 /* general-check-1.mp4 in Resources */,
-				0478D9662ECD54E400F0A979 /* general-listen-1.mp4 in Resources */,
-				0478D9672ECD54E400F0A979 /* general-focus-2.mp4 in Resources */,
-				0478D9682ECD54E400F0A979 /* general-goal-4.mp4 in Resources */,
-				0478D9692ECD54E400F0A979 /* general-idle-1.mp4 in Resources */,
-				0478D96A2ECD54E400F0A979 /* zen-prompt-1.mp4 in Resources */,
-				0478D96B2ECD54E400F0A979 /* zen-mute-4.mp4 in Resources */,
-				0478D96C2ECD54E400F0A979 /* general-mute-3.mp4 in Resources */,
-				0478D96D2ECD54E400F0A979 /* zen-timing-4.mp4 in Resources */,
-				0478D96E2ECD54E400F0A979 /* general-focus-3.mp4 in Resources */,
-				0478D96F2ECD54E400F0A979 /* zen-focus-3.mp4 in Resources */,
-				0478D9702ECD54E400F0A979 /* zen-idle-4.mp4 in Resources */,
-				0478D9712ECD54E400F0A979 /* zen-idle-1.mp4 in Resources */,
-				0478D9722ECD54E400F0A979 /* zen-waiting-3.mp4 in Resources */,
-				0478D9732ECD54E400F0A979 /* zen-timing-1.mp4 in Resources */,
-				0478D9742ECD54E400F0A979 /* general-waiting-2.mp4 in Resources */,
-				0478D9752ECD54E400F0A979 /* general-wrap-2.mp4 in Resources */,
-				0478D9762ECD54E400F0A979 /* zen-mute-3.mp4 in Resources */,
-				0478D9772ECD54E400F0A979 /* general-pause-4.mp4 in Resources */,
-				0478D9782ECD54E400F0A979 /* zen-idle-3.mp4 in Resources */,
-				0478D9792ECD54E400F0A979 /* zen-check-2.mp4 in Resources */,
-				0478D97A2ECD54E400F0A979 /* general-pause-1.mp4 in Resources */,
-				0478D97B2ECD54E400F0A979 /* general-wrap-1.mp4 in Resources */,
-				0478D97C2ECD54E400F0A979 /* zen-waiting-1.mp4 in Resources */,
-				0478D97D2ECD54E400F0A979 /* general-idle-3.mp4 in Resources */,
-				0478D97E2ECD54E400F0A979 /* general-steady-2.mp4 in Resources */,
-				0478D97F2ECD54E400F0A979 /* zen-focus-2.mp4 in Resources */,
-				0478D9802ECD54E400F0A979 /* zen-steady-2.mp4 in Resources */,
-				0478D9812ECD54E400F0A979 /* general-prompt-4.mp4 in Resources */,
-				0478D9822ECD54E400F0A979 /* general-steady-3.mp4 in Resources */,
-				0478D9832ECD54E400F0A979 /* general-timing-1.mp4 in Resources */,
-				0478D9842ECD54E400F0A979 /* zen-focus-1.mp4 in Resources */,
-				0478D9852ECD54E400F0A979 /* zen-wrap-1.mp4 in Resources */,
-				0478D9862ECD54E400F0A979 /* zen-mute-2.mp4 in Resources */,
-				0478D9872ECD54E400F0A979 /* general-wrap-3.mp4 in Resources */,
-				0478D9882ECD54E400F0A979 /* zen-timing-2.mp4 in Resources */,
-				0478D9892ECD54E400F0A979 /* general-prompt-3.mp4 in Resources */,
-				0478D98A2ECD54E400F0A979 /* general-timing-4.mp4 in Resources */,
-				0478D98B2ECD54E400F0A979 /* general-steady-1.mp4 in Resources */,
-				0478D98C2ECD54E400F0A979 /* general-goal-1.mp4 in Resources */,
-				0478D98D2ECD54E400F0A979 /* zen-pause-1.mp4 in Resources */,
-				0478D98E2ECD54E400F0A979 /* general-mute-2.mp4 in Resources */,
-				0478D98F2ECD54E400F0A979 /* general-listen-3.mp4 in Resources */,
-				0478D9902ECD54E400F0A979 /* general-prompt-1.mp4 in Resources */,
-				0478D9912ECD54E400F0A979 /* general-listen-4.mp4 in Resources */,
-				0478D9922ECD54E400F0A979 /* general-timing-3.mp4 in Resources */,
-				0478D9932ECD54E400F0A979 /* general-timing-2.mp4 in Resources */,
-				0478D9942ECD54E400F0A979 /* zen-pause-2.mp4 in Resources */,
-				0478D9952ECD54E400F0A979 /* zen-pause-4.mp4 in Resources */,
-				0478D9962ECD54E400F0A979 /* zen-waiting-2.mp4 in Resources */,
-				0478D9972ECD54E400F0A979 /* general-mute-1.mp4 in Resources */,
-				0478D9982ECD54E400F0A979 /* zen-prompt-4.mp4 in Resources */,
-				0478D9992ECD54E400F0A979 /* general-check-3.mp4 in Resources */,
-				0478D99A2ECD54E400F0A979 /* zen-check-3.mp4 in Resources */,
-				0478D99B2ECD54E400F0A979 /* zen-wrap-2.mp4 in Resources */,
-				0478D99C2ECD54E400F0A979 /* zen-goal-1.mp4 in Resources */,
-				0478D99D2ECD54E400F0A979 /* zen-goal-2.mp4 in Resources */,
-				0478D99E2ECD54E400F0A979 /* zen-steady-1.mp4 in Resources */,
-				0478D99F2ECD54E400F0A979 /* general-focus-4.mp4 in Resources */,
-				0478D9A02ECD54E400F0A979 /* general-check-2.mp4 in Resources */,
-				0478D9A12ECD54E400F0A979 /* general-listen-2.mp4 in Resources */,
-				0478D9A22ECD54E400F0A979 /* zen-prompt-3.mp4 in Resources */,
-				0478D9A32ECD54E400F0A979 /* zen-goal-4.mp4 in Resources */,
-				0478D9A42ECD54E400F0A979 /* general-pause-2.mp4 in Resources */,
-				0478D9A52ECD54E400F0A979 /* general-waiting-3.mp4 in Resources */,
-				0478D9A62ECD54E400F0A979 /* zen-focus-4.mp4 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -709,12 +343,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0AF10002000000000000DEFA /* KochiApp/Managers/Theme.swift in Sources */,
+				0AF10004000000000000DEFA /* KochiApp/Managers/ThemeStore.swift in Sources */,
 				1A0000001 /* KochiApp.swift in Sources */,
 				04F1EB6F2E28C1170086D5BC /* CoachingView.swift in Sources */,
 				04C3F3F22E28D064000228D6 /* LLMManager.swift in Sources */,
 				04F1EB702E28C1170086D5BC /* ModelSelectorView.swift in Sources */,
 				04F1EB722E28C1170086D5BC /* TranscriptionSettingsView.swift in Sources */,
-				04F1EB732E28C1170086D5BC /* OnboardingView.swift in Sources */,
 				048F21A52E29677B001FA450 /* GoalEvaluation.swift in Sources */,
 				16FF74F26DE705B53B57EB3A /* FoundationModelsTypes.swift in Sources */,
 				048F21A72E29677B001FA450 /* KochiDataModel.xcdatamodeld in Sources */,
@@ -749,6 +384,7 @@
 				04F1EB672E28AF330086D5BC /* TemporaryStubs.swift in Sources */,
 				04VIDEO002 /* KochiApp/Managers/VideoCoachingManager.swift in Sources */,
 				47C9718F353F438DB95A0329 /* FoundationModelsService.swift in Sources */,
+				0AF10006000000000000DEFA /* KochiApp/Views/ThemeImage.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

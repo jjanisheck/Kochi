@@ -14,24 +14,42 @@ import CoreText
 // MARK: - Palette (from the design's :root custom properties)
 
 enum KColor {
-    private static func c(_ r: Double, _ g: Double, _ b: Double) -> Color {
-        Color(red: r / 255, green: g / 255, blue: b / 255)
-    }
-    static let orange     = c(249, 88, 0)    // --orange   #F95800
-    static let orangeDeep = c(225, 78, 0)    // --orange-deep #E14E00
-    static let ink        = c(28, 27, 25)    // --ink      #1c1b19
-    static let inkSoft    = c(59, 58, 55)    // --ink-soft #3b3a37
-    static let paper      = c(255, 255, 255) // --paper
-    static let win        = c(233, 232, 228) // --win      #e9e8e4
-    static let panel      = c(239, 238, 234) // --panel
-    static let panel2     = c(228, 227, 222) // --panel-2
-    static let line       = c(205, 204, 198) // --line     #cdccc6
-    static let lineSoft   = c(218, 217, 211) // --line-soft
-    static let muted      = c(141, 140, 134) // --muted    #8d8c86
-    static let muted2     = c(169, 168, 162) // --muted-2
-    static let good       = c(31, 138, 76)   // --good     #1f8a4c
-    static let deck       = c(52, 51, 44)    // tape-deck window #34332c
-    static let deckBorder = c(38, 37, 31)    // #26251f
+    private static var p: ThemePalette { ActivePalette.current }
+    static var orange: Color     { p.orange }
+    static var orangeDeep: Color { p.orangeDeep }
+    static var ink: Color        { p.ink }
+    static var inkSoft: Color     { p.inkSoft }
+    static var paper: Color      { p.paper }
+    static var win: Color        { p.win }
+    static var panel: Color      { p.panel }
+    static var panel2: Color     { p.panel2 }
+    static var line: Color       { p.line }
+    static var lineSoft: Color   { p.lineSoft }
+    static var muted: Color      { p.muted }
+    static var muted2: Color     { p.muted2 }
+    static var good: Color       { p.good }
+    static var deck: Color       { p.deck }
+    static var deckBorder: Color { p.deckBorder }
+    static var buttonHi: Color   { p.buttonHi }
+    static var buttonLo: Color   { p.buttonLo }
+    static var goalRestFill: Color { p.goalRestFill }
+    static var goalRestInk: Color  { p.goalRestInk }
+    static var goalUnmetFill: Color { p.goalUnmetFill }
+    static var goalUnmetInk: Color  { p.goalUnmetInk }
+    static var goalKeyFill: Color   { p.goalKeyFill }
+    static var transcriptRowFill: Color { p.transcriptRowFill }
+    static var goalRestBorder: Color { p.goalRestBorder }
+    static var goalDoneHi: Color { p.goalDoneHi }
+    static var goalDoneLo: Color { p.goalDoneLo }
+    static var meterHi: Color { p.meterHi }
+    static var meterLo: Color { p.meterLo }
+    static var neutralKeyFill: Color? { p.neutralKeyFill }
+    static var logoTint: Color? { p.logoTint }
+    static var slabRule: Color { p.slabRule }
+    static var onBg: Color         { p.onBg }
+    static var onBgFaint: Color    { p.onBgFaint }
+    static var deckScrimTop: Color    { p.deckScrimTop }
+    static var deckScrimBottom: Color { p.deckScrimBottom }
 }
 
 // MARK: - Bundled fonts
@@ -72,7 +90,7 @@ enum KFont {
 
 // MARK: - Beveled physical key (toolbar + Done key)
 
-enum KeyVariant { case primary, light }
+enum KeyVariant { case primary, light, goal }
 
 /// A pressable hardware-style key: raised gradient face, top highlight, drop
 /// shadow, and a 2px pressed-down inset state. Mirrors the design's `.btn`.
@@ -102,13 +120,19 @@ struct BeveledKeyStyle: ButtonStyle {
                     ZStack {
                         RoundedRectangle(cornerRadius: radius, style: .continuous)
                             .fill(faceGradient)
-                        // top highlight
-                        RoundedRectangle(cornerRadius: radius, style: .continuous)
-                            .strokeBorder(
-                                LinearGradient(colors: [Color.white.opacity(variant == .primary ? 0.45 : 0.9),
-                                                        Color.clear],
-                                               startPoint: .top, endPoint: .bottom),
-                                lineWidth: 1)
+                        // Border: the `.goal` key mirrors the unfinished-goal row's
+                        // `goalRestBorder`; other keys get the raised top highlight.
+                        if variant == .goal {
+                            RoundedRectangle(cornerRadius: radius, style: .continuous)
+                                .strokeBorder(KColor.goalRestBorder, lineWidth: 1)
+                        } else {
+                            RoundedRectangle(cornerRadius: radius, style: .continuous)
+                                .strokeBorder(
+                                    LinearGradient(colors: [Color.white.opacity(variant == .primary ? 0.45 : 0.9),
+                                                            Color.clear],
+                                                   startPoint: .top, endPoint: .bottom),
+                                    lineWidth: 1)
+                        }
                         if pressed {
                             RoundedRectangle(cornerRadius: radius, style: .continuous)
                                 .fill(Color.black.opacity(0.18))
@@ -124,6 +148,20 @@ struct BeveledKeyStyle: ButtonStyle {
         }
 
         private var faceGradient: LinearGradient {
+            // The `.goal` key always wears the unfinished-goal color (even when
+            // disabled). It uses `goalKeyFill` (defaults to goalUnmetFill) so a
+            // theme whose goal rows are translucent-over-background can give the
+            // opaque keys the solid tone the rows read as. Clamp opacity (×100) so
+            // any residual alpha saturates to a fully solid key.
+            if variant == .goal {
+                let solid = KColor.goalKeyFill.opacity(100)
+                return LinearGradient(colors: [solid, solid], startPoint: .top, endPoint: .bottom)
+            }
+            // A theme may tint the neutral keys (light variant + any disabled key)
+            // with a single fill; the bevel still reads via the highlight + shadow.
+            if let tint = KColor.neutralKeyFill, !isEnabled || variant == .light {
+                return LinearGradient(colors: [tint, tint], startPoint: .top, endPoint: .bottom)
+            }
             if !isEnabled {
                 return LinearGradient(colors: [Color(red: 231/255, green: 229/255, blue: 223/255),
                                                Color(red: 220/255, green: 218/255, blue: 211/255)],
@@ -131,22 +169,26 @@ struct BeveledKeyStyle: ButtonStyle {
             }
             switch variant {
             case .primary:
-                return LinearGradient(colors: [Color(red: 255/255, green: 122/255, blue: 54/255),
-                                               Color(red: 236/255, green: 80/255, blue: 0/255)],
+                return LinearGradient(colors: [KColor.buttonHi, KColor.buttonLo],
                                       startPoint: .top, endPoint: .bottom)
-            case .light:
+            case .light, .goal:
                 return LinearGradient(colors: [Color(red: 251/255, green: 250/255, blue: 248/255),
                                                Color(red: 222/255, green: 220/255, blue: 213/255)],
                                       startPoint: .top, endPoint: .bottom)
             }
         }
         private var faceText: Color {
+            if variant == .goal { return KColor.goalUnmetInk }
             if !isEnabled { return KColor.muted2 }
             return variant == .primary ? .white : KColor.inkSoft
         }
         private var shadowColor: Color {
+            // The goal key reads flat like the goal rows — no raised key shadow.
+            if variant == .goal { return .clear }
             guard isEnabled else { return .clear }
-            return variant == .primary ? Color(red: 140/255, green: 55/255, blue: 0).opacity(0.4)
+            // Primary key glow derives from the theme's own deep button color
+            // (was a hardcoded orange that glowed orange on every theme).
+            return variant == .primary ? KColor.buttonLo.opacity(0.4)
                                        : Color.black.opacity(0.22)
         }
     }
@@ -158,10 +200,12 @@ struct BeveledKeyStyle: ButtonStyle {
 /// an optional trailing accessory (count / status / timer).
 struct SlabLabel<Trailing: View>: View {
     let title: String
+    let tint: Color
     @ViewBuilder var trailing: Trailing
 
-    init(_ title: String, @ViewBuilder trailing: () -> Trailing) {
+    init(_ title: String, tint: Color = KColor.inkSoft, @ViewBuilder trailing: () -> Trailing) {
         self.title = title
+        self.tint = tint
         self.trailing = trailing()
     }
 
@@ -170,15 +214,15 @@ struct SlabLabel<Trailing: View>: View {
             Text(title.uppercased())
                 .font(KFont.mono(10, .medium))
                 .tracking(1.3)
-                .foregroundColor(KColor.inkSoft)
-            Rectangle().fill(KColor.line).frame(height: 1)
+                .foregroundColor(tint)
+            Rectangle().fill(KColor.slabRule).frame(height: 1)
             trailing
         }
     }
 }
 
 extension SlabLabel where Trailing == EmptyView {
-    init(_ title: String) { self.init(title) { EmptyView() } }
+    init(_ title: String, tint: Color = KColor.inkSoft) { self.init(title, tint: tint) { EmptyView() } }
 }
 
 // MARK: - Liquid-glass bevel
@@ -318,12 +362,25 @@ struct ChatTranscriptView: View {
         }
         .padding(.horizontal, 9)
         .padding(.vertical, 6)
-        .background(
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                .fill(bubbleColor(turn.speaker))
-                .overlay(RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .strokeBorder(strokeColor(turn.speaker), lineWidth: 1))
-        )
+        .background(bubbleBackground(turn.speaker))
+    }
+
+    @ViewBuilder private func bubbleBackground(_ s: TranscriptSpeaker) -> some View {
+        let shape = RoundedRectangle(cornerRadius: 8, style: .continuous)
+        if onDark {
+            // Over the spinning reel a faint tint is unreadable, so the live
+            // transcript mirrors the goal rows: a frosted blur of the deck behind
+            // the themed `goalRestFill`, read with the dark goal ink. The blur is
+            // what obscures the reel enough for the text to pop.
+            shape
+                .fill(.ultraThinMaterial)
+                .overlay(shape.fill(KColor.goalRestFill))
+                .overlay(shape.strokeBorder(strokeColor(s), lineWidth: 1))
+        } else {
+            shape
+                .fill(bubbleColor(s))
+                .overlay(shape.strokeBorder(strokeColor(s), lineWidth: 1))
+        }
     }
 
     // Mic ("Me") = orange, System ("Them") = steel blue. Tuned per background.
@@ -331,13 +388,13 @@ struct ChatTranscriptView: View {
     private var themHue: Color { Color(red: 120/255, green: 158/255, blue: 200/255) }
 
     private var textColor: Color {
-        onDark ? Color(red: 230/255, green: 228/255, blue: 220/255) : KColor.ink
+        // The live (onDark) transcript sits on the frosted `goalRestFill` bubble,
+        // so it reads with that fill's paired ink — guaranteed-legible per theme.
+        onDark ? KColor.goalRestInk : KColor.ink
     }
     private func labelColor(_ s: TranscriptSpeaker) -> Color {
-        switch s {
-        case .them: return themHue
-        default:    return onDark ? meHue : KColor.orangeDeep
-        }
+        // Both "ME" and "THEM" labels use the theme's primary key color.
+        KColor.buttonHi
     }
     private func bubbleColor(_ s: TranscriptSpeaker) -> Color {
         if s == .other { return onDark ? Color.white.opacity(0.06) : Color.black.opacity(0.04) }
@@ -350,3 +407,4 @@ struct ChatTranscriptView: View {
         return onDark ? hue.opacity(0.30) : hue.opacity(0.25)
     }
 }
+

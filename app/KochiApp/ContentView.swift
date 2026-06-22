@@ -10,7 +10,6 @@ struct ContentView: View {
     @EnvironmentObject var llmManager: LLMManager
     @StateObject private var videoManager = VideoCoachingManager()
     @State private var showSettings = false
-    @State private var showOnboarding = !UserDefaults.standard.bool(forKey: "HasCompletedOnboarding")
     @State private var evaluationTimer: Timer?
     /// Length (in characters) of the transcript at the last goal evaluation.
     @State private var lastEvaluatedTranscriptLength = 0
@@ -24,7 +23,10 @@ struct ContentView: View {
     var body: some View {
         VStack(spacing: 0) {
             VStack(spacing: 12) {
+                // Hidden (not removed) so the row still reserves its height and
+                // the layout below doesn't shift up.
                 BrandRow(phase: phase)
+                    .opacity(ActiveChrome.hideBrandRow ? 0 : 1)
                 CoachHero(videoManager: videoManager, captionText: coachLine)
                     .frame(height: 166)
                 goalsSection
@@ -44,12 +46,13 @@ struct ContentView: View {
         }
         // Halftone "window" background — attached as a background so it doesn't
         // inflate the content's intrinsic height (the panel sizes to the layout).
-        .background(
-            Image("BackgroundImage")
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .ignoresSafeArea()
-        )
+        // The GeometryReader hands the image a *definite* frame (the card's exact
+        // size) so scaledToFill always covers edge-to-edge. An indefinite
+        // maxWidth/maxHeight:.infinity frame only reliably fills when the image is
+        // far taller than the card; a near-square theme image (e.g. BRICKS, whose
+        // ratio nearly matches the card) could otherwise under-fill and leak the
+        // window's white base out the bottom.
+        .background(ThemeBackground("BackgroundImage"))
         // Settings sheet as an overlay so it's clamped to the card's bounds
         // rather than expanding the panel.
         .overlay {
@@ -62,9 +65,6 @@ struct ContentView: View {
         .onAppear {
             DispatchQueue.main.async { videoManager.playVideo(label: .idle) }
         }
-        .fullScreenCoverCompat(isPresented: $showOnboarding) {
-            OnboardingView(isPresented: $showOnboarding)
-        }
         .onReceive(audioManager.$transcriptionText) { newText in
             handleTranscriptUpdate(newText)
         }
@@ -74,10 +74,10 @@ struct ContentView: View {
 
     private var goalsSection: some View {
         VStack(spacing: 7) {
-            SlabLabel("Goals") {
+            SlabLabel("Goals", tint: KColor.onBg) {
                 Text(phase == .pre ? "set 3" : "\(goalsHit)/3 hit")
                     .font(KFont.mono(10))
-                    .foregroundColor(KColor.muted)
+                    .foregroundColor(KColor.onBgFaint)
             }
             ForEach(Array(goalManager.goals.prefix(3).enumerated()), id: \.element.id) { index, goal in
                 GoalRow(goal: goal, phase: phase, index: index)
@@ -87,14 +87,14 @@ struct ContentView: View {
 
     private var transcriptSection: some View {
         VStack(spacing: 7) {
-            SlabLabel("Transcript") {
+            SlabLabel("Transcript", tint: KColor.onBg) {
                 HStack(spacing: 8) {
                     Text(phase == .live ? "live" : phase == .ended ? "final" : "ready")
                         .font(KFont.mono(10))
-                        .foregroundColor(KColor.muted)
+                        .foregroundColor(KColor.onBgFaint)
                     Text(fmtTime(audioManager.recordingTime))
                         .font(KFont.mono(11, .medium))
-                        .foregroundColor(KColor.inkSoft)
+                        .foregroundColor(KColor.onBg)
                 }
             }
             TapeDeck(
@@ -261,14 +261,16 @@ private struct BrandRow: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            Image("KochiLogo")
-                .resizable()
+            ThemeImage("KochiLogo")
                 .scaledToFit()
                 .frame(height: 30)
+                // The wordmark art is solid white on transparent; a theme can
+                // recolor it by multiply (white × tint = tint). nil → .white = no-op.
+                .colorMultiply(KColor.logoTint ?? .white)
             Text("MEETING COACH")
                 .font(KFont.mono(9.5))
                 .tracking(1.5)
-                .foregroundColor(KColor.muted)
+                .foregroundColor(KColor.onBgFaint)
             Spacer()
             // READY / REC / ENDED sits on the far right of the logo row.
             HStack(spacing: 6) {
@@ -287,7 +289,7 @@ private struct BrandRow: View {
                 Text(statusText)
                     .font(KFont.mono(10))
                     .tracking(0.8)
-                    .foregroundColor(KColor.muted)
+                    .foregroundColor(KColor.onBgFaint)
             }
         }
     }
@@ -388,7 +390,7 @@ private struct GoalRow: View {
                 RoundedRectangle(cornerRadius: 5, style: .continuous)
                     .fill(done ? Color.white : Color.clear)
                     .overlay(RoundedRectangle(cornerRadius: 5, style: .continuous)
-                        .strokeBorder(done ? Color.white : KColor.ink, lineWidth: 2))
+                        .strokeBorder(done ? Color.white : KColor.goalUnmetInk, lineWidth: 2))
                     .frame(width: 20, height: 20)
                 if done {
                     Image(systemName: "checkmark")
@@ -404,11 +406,11 @@ private struct GoalRow: View {
                 ))
                 .textFieldStyle(.plain)
                 .font(KFont.sans(13.5, .semibold))
-                .foregroundColor(KColor.ink)
+                .foregroundColor(KColor.goalUnmetInk)
             } else {
                 Text(goal.text)
                     .font(KFont.sans(13.5, .semibold))
-                    .foregroundColor(done ? .white : KColor.ink)
+                    .foregroundColor(done ? .white : KColor.goalUnmetInk)
                     .lineLimit(1)
                 Spacer(minLength: 6)
                 // A hit goal turns the whole bar orange; an unmet goal stays a
@@ -420,7 +422,10 @@ private struct GoalRow: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(goalBackground)
         .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
-        .shadow(color: done ? Color(red: 140/255, green: 55/255, blue: 0).opacity(0.35) : .clear,
+        // Make the WHOLE row a reliable tap target (the trailing Spacer would
+        // otherwise leave a dead zone, so a row could feel unclickable).
+        .contentShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
+        .shadow(color: done ? KColor.goalDoneLo.opacity(0.35) : .clear,
                 radius: 4, x: 0, y: 2)
 
         // Manual override: once a meeting is underway, tap a goal to mark it hit
@@ -439,16 +444,22 @@ private struct GoalRow: View {
         let shape = RoundedRectangle(cornerRadius: 7, style: .continuous)
         if done {
             shape
-                .fill(LinearGradient(colors: [Color(red: 255/255, green: 122/255, blue: 54/255),
-                                              Color(red: 236/255, green: 80/255, blue: 0/255)],
+                .fill(LinearGradient(colors: [KColor.goalDoneHi, KColor.goalDoneLo],
                                      startPoint: .top, endPoint: .bottom))
                 .overlay(shape.strokeBorder(
                     LinearGradient(colors: [.white.opacity(0.5), .white.opacity(0.05), .black.opacity(0.18)],
                                    startPoint: .top, endPoint: .bottom), lineWidth: 1))
+        } else if ActiveGoal.restBlur {
+            // Frosted glass: blur the themed background behind the row, then lay
+            // the (translucent) goalRestFill tint over it, then the border.
+            shape
+                .fill(.ultraThinMaterial)
+                .overlay(shape.fill(KColor.goalUnmetFill))
+                .overlay(shape.strokeBorder(KColor.goalRestBorder, lineWidth: 1))
         } else {
             shape
-                .fill(KColor.paper)
-                .overlay(shape.strokeBorder(KColor.line, lineWidth: 1))
+                .fill(KColor.goalUnmetFill)
+                .overlay(shape.strokeBorder(KColor.goalRestBorder, lineWidth: 1))
         }
     }
 
@@ -478,27 +489,21 @@ private struct TapeDeck: View {
         // through the gaps between the volume bars.
         .background(
             GeometryReader { geo in
-                Image("FilmReel")
-                    .resizable()
+                ThemeImage("FilmReel")
                     .scaledToFit()
                     .frame(width: geo.size.width, height: geo.size.width)
-                    .grayscale(1)
-                    .brightness(-0.15) // dim so the transcript text stays readable over it
+                    .grayscale(ActiveDeck.reelGrayscale)
+                    .brightness(ActiveDeck.reelBrightness) // dim so transcript text stays readable (themeable)
                     .rotationEffect(.degrees(rotation))
                     .position(x: geo.size.width / 2, y: geo.size.height)
             }
             .allowsHitTesting(false)
         )
         .background(
-            // Dark camo deck with a top-to-bottom gradient for depth.
-            Image("BackgroundPlainImage")
-                .resizable()
+            // The themed deck plate — no scrim, so the background image shows at
+            // its true brightness behind the reel.
+            ThemeImage("BackgroundPlainImage")
                 .scaledToFill()
-                .overlay(
-                    LinearGradient(colors: [Color.black.opacity(0.45),
-                                            Color.black.opacity(0.7)],
-                                   startPoint: .top, endPoint: .bottom)
-                )
         )
         .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
         // No hard border — the liquid-glass white→gray bevel defines the edge.
@@ -546,9 +551,12 @@ private struct TapeDeck: View {
             ForEach(0..<14, id: \.self) { i in
                 let filled = tapeFilled
                 RoundedRectangle(cornerRadius: 2)
-                    .fill(i < filled ? KColor.orange : Color.black.opacity(0.18))
+                    .fill(i < filled
+                          ? AnyShapeStyle(LinearGradient(colors: [KColor.meterHi, KColor.meterLo],
+                                                         startPoint: .top, endPoint: .bottom))
+                          : AnyShapeStyle(Color.black.opacity(0.18)))
                     .frame(height: 9)
-                    .shadow(color: (i == filled - 1 && phase == .live) ? KColor.orange.opacity(0.85) : .clear,
+                    .shadow(color: (i == filled - 1 && phase == .live) ? KColor.buttonHi.opacity(0.85) : .clear,
                             radius: 4)
             }
         }
@@ -611,9 +619,9 @@ private struct Toolbar: View {
                     title: phase == .ended ? "new" : "start",
                     variant: .primary, action: onStart)
             }
-            key(icon: "■", title: "end", variant: .primary, action: onEnd)
+            key(icon: "■", title: "end", variant: .goal, action: onEnd)
                 .disabled(phase != .live)
-            key(icon: "ⓘ", title: "info", variant: .light, action: onInfo)
+            key(icon: "ⓘ", title: "info", variant: .goal, action: onInfo)
         }
         .padding(.horizontal, 11)
         .padding(.top, 9)

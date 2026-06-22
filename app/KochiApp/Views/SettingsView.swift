@@ -10,6 +10,7 @@ struct SettingsView: View {
     @EnvironmentObject var audioManager: AudioManager
     @EnvironmentObject var goalManager: GoalManager
     @EnvironmentObject var themeManager: ThemeManager
+    @EnvironmentObject var themeStore: ThemeStore
     @EnvironmentObject var cloudAnalysisManager: CloudAnalysisManager
 
     var body: some View {
@@ -19,10 +20,10 @@ struct SettingsView: View {
                         Text("MEETING DETAILS")
                             .font(KFont.mono(11))
                             .tracking(1.6)
-                            .foregroundColor(KColor.inkSoft)
+                            .foregroundColor(KColor.onBg)
                         Spacer()
                         Button(action: { isPresented = false }) {
-                            Text("Done")
+                            Text("done")
                                 .font(KFont.zilla(12.5, .bold))
                                 .padding(.horizontal, 16)
                                 .padding(.vertical, 7)
@@ -34,12 +35,7 @@ struct SettingsView: View {
                     .padding(.vertical, 10)
                     // Snug under the macOS traffic lights / clear the iOS status bar.
                     .padding(.top, 8)
-                    .background(
-                        LinearGradient(colors: [Color(red: 243/255, green: 242/255, blue: 239/255),
-                                                Color(red: 233/255, green: 232/255, blue: 227/255)],
-                                       startPoint: .top, endPoint: .bottom)
-                    )
-                    .overlay(Rectangle().fill(KColor.line).frame(height: 1), alignment: .bottom)
+                    .background(headerChrome)
 
                     // Beveled tab bar — 5 tabs
                     HStack(spacing: 5) {
@@ -61,12 +57,7 @@ struct SettingsView: View {
                     }
                     .padding(.horizontal, 10)
                     .padding(.vertical, 8)
-                    .background(
-                        LinearGradient(colors: [Color(red: 220/255, green: 218/255, blue: 212/255),
-                                                Color(red: 205/255, green: 203/255, blue: 196/255)],
-                                       startPoint: .top, endPoint: .bottom)
-                    )
-                    .overlay(Rectangle().fill(Color(red: 184/255, green: 182/255, blue: 175/255)).frame(height: 1), alignment: .bottom)
+                    .background(tabBarChrome)
 
                     // Tab Content. Transcript → detail is presented as a
                     // full-panel overlay (see below), so no NavigationStack /
@@ -93,12 +84,7 @@ struct SettingsView: View {
         // Fill the card top-aligned (no centering ZStack — that was clipping the
         // header), with the halftone as a non-inflating background.
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .background(
-            Image("BackgroundImage")
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .ignoresSafeArea()
-        )
+        .background(ThemeBackground("BackgroundImage"))
         .sheet(isPresented: $showGoals) {
             GoalsManagementView(isPresented: $showGoals)
         }
@@ -112,6 +98,36 @@ struct SettingsView: View {
         }
         .animation(.easeOut(duration: 0.22), value: selectedMeeting?.id)
     }
+
+    /// Header strip backing. Themes that opt into `chromeOnBackground` (e.g. BRICKS)
+    /// float the header transparently on the panel's themed background image; every
+    /// other theme keeps the default gray "device chrome" gradient + hairline.
+    @ViewBuilder private var headerChrome: some View {
+        if themeStore.current.chromeOnBackground {
+            Color.clear
+        } else {
+            LinearGradient(colors: [Color(red: 243/255, green: 242/255, blue: 239/255),
+                                    Color(red: 233/255, green: 232/255, blue: 227/255)],
+                           startPoint: .top, endPoint: .bottom)
+                .overlay(Rectangle().fill(KColor.line).frame(height: 1), alignment: .bottom)
+        }
+    }
+
+    /// Tab-bar backing — for `chromeOnBackground` themes it carries the theme's
+    /// primary "key" gradient (`buttonHi`→`buttonLo`, same as the main buttons) so
+    /// the tab row reads as a themed control strip rather than a gray slab; gray
+    /// device chrome otherwise. The selected tab keeps its own white chip either way.
+    @ViewBuilder private var tabBarChrome: some View {
+        if themeStore.current.chromeOnBackground {
+            LinearGradient(colors: [KColor.buttonHi, KColor.buttonLo],
+                           startPoint: .top, endPoint: .bottom)
+        } else {
+            LinearGradient(colors: [Color(red: 220/255, green: 218/255, blue: 212/255),
+                                    Color(red: 205/255, green: 203/255, blue: 196/255)],
+                           startPoint: .top, endPoint: .bottom)
+                .overlay(Rectangle().fill(Color(red: 184/255, green: 182/255, blue: 175/255)).frame(height: 1), alignment: .bottom)
+        }
+    }
 }
 
 // MARK: - Custom Tab Button
@@ -120,13 +136,20 @@ struct TabButton: View {
     let icon: String
     let isSelected: Bool
     let action: () -> Void
+    @EnvironmentObject var themeStore: ThemeStore
+
+    /// Unselected tabs read white on the button-gradient strip (matching the
+    /// primary key's face text); on the legacy gray chrome they use `onBgFaint`.
+    private var unselectedTint: Color {
+        themeStore.current.chromeOnBackground ? .white : KColor.onBgFaint
+    }
 
     var body: some View {
         Button(action: action) {
             VStack(spacing: 4) {
                 Image(systemName: icon)
                     .font(.system(size: 17, weight: .medium))
-                Text(title.uppercased())
+                Text(title.lowercased())
                     .font(KFont.mono(8.5))
                     .tracking(0.5)
                     .lineLimit(1)
@@ -135,7 +158,7 @@ struct TabButton: View {
             .frame(maxWidth: .infinity)
             .padding(.vertical, 8)
             .padding(.horizontal, 2)
-            .foregroundColor(isSelected ? KColor.orangeDeep : KColor.muted)
+            .foregroundColor(isSelected ? KColor.orangeDeep : unselectedTint)
             .background(
                 Group {
                     if isSelected {
@@ -176,7 +199,7 @@ struct TranscriptsTab: View {
                 if goalManager.meetingHistory.isEmpty {
                     Text("No transcripts yet. Start a recording to see history here.")
                         .font(.body)
-                        .foregroundColor(.black.opacity(0.6))
+                        .foregroundColor(KColor.ink.opacity(0.6))
                         .padding()
                         .frame(maxWidth: .infinity)
                         .background(KColor.paper.opacity(0.92))
@@ -227,7 +250,7 @@ struct TranscriptRow: View {
                     Text("\(completedCount)/\(meeting.goals.count) goals")
                         .font(KFont.mono(10))
                         .tracking(0.5)
-                        .foregroundColor(completedCount == meeting.goals.count && completedCount > 0 ? KColor.good : KColor.orangeDeep)
+                        .foregroundColor(completedCount == meeting.goals.count && completedCount > 0 ? KColor.good : KColor.muted)
 
                     if !meeting.notes.isEmpty {
                         Text(meeting.notes)
@@ -243,14 +266,14 @@ struct TranscriptRow: View {
                 // Delete button
                 Button(action: { showDeleteAlert = true }) {
                     Image(systemName: "trash.fill")
-                        .foregroundColor(Color(red: 249/255, green: 81/255, blue: 0))
+                        .foregroundColor(KColor.buttonHi)
                         .font(.system(size: 18))
                         .padding(8)
                 }
                 .buttonStyle(PlainButtonStyle())
             }
             .padding()
-            .background(KColor.paper.opacity(0.92))
+            .background(KColor.transcriptRowFill.opacity(0.92))
             .cornerRadius(10)
             .padding(.horizontal)
         }
@@ -539,13 +562,13 @@ struct GoalsTab: View {
                 HStack(spacing: 8) {
                     if isParsing {
                         ProgressView().controlSize(.small)
-                        Text("PARSING\u{2026}")
+                        Text("parsing\u{2026}")
                     } else if dictation.isListening {
                         Image(systemName: "stop.fill")
-                        Text("LISTENING\u{2026} TAP TO STOP")
+                        Text("listening\u{2026} tap to stop")
                     } else {
                         Image(systemName: "mic.fill")
-                        Text("SPEAK NEW GOALS")
+                        Text("speak new goals")
                     }
                 }
                 .font(KFont.zilla(12.5, .bold))
@@ -653,13 +676,13 @@ struct GoalSlotRow: View {
                     .padding(.vertical, 7)
                     .background(
                         RoundedRectangle(cornerRadius: 6, style: .continuous)
-                            .fill(Color.white)
+                            .fill(KColor.paper)
                             .overlay(RoundedRectangle(cornerRadius: 6, style: .continuous)
                                 .strokeBorder(KColor.line, lineWidth: 1))
                     )
 
                 Button(action: commit) {
-                    Text("Save")
+                    Text("save")
                         .font(KFont.zilla(12.5, .bold))
                         .padding(.horizontal, 14)
                         .padding(.vertical, 7)
@@ -676,7 +699,7 @@ struct GoalSlotRow: View {
                     editText = text
                     isEditing = true
                 }) {
-                    Text("Edit")
+                    Text("edit")
                         .font(KFont.zilla(12.5, .bold))
                         .padding(.horizontal, 14)
                         .padding(.vertical, 7)
@@ -697,6 +720,8 @@ struct GoalSlotRow: View {
 
 // MARK: - About Tab
 struct AboutTab: View {
+    @EnvironmentObject private var themeStore: ThemeStore
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 15) {
@@ -706,18 +731,20 @@ struct AboutTab: View {
                     subtitle: "How Kōchi works and handles your data."
                 )
 
+                themesCard
+
                 // Main description
                 VStack(alignment: .leading, spacing: 16) {
                     Text("Kochi transcribes your meetings entirely on-device with Apple Speech, and evaluates your goals and coaching using Apple's on-device Foundation model. Your audio never leaves your device.")
                         .font(.body)
-                        .foregroundColor(.black.opacity(0.8))
+                        .foregroundColor(KColor.ink.opacity(0.8))
 
                     Divider()
-                        .background(.black.opacity(0.3))
+                        .background(KColor.ink.opacity(0.25))
 
                     Text("How It Works")
                         .font(.headline)
-                        .foregroundColor(.black)
+                        .foregroundColor(KColor.ink)
 
                     VStack(alignment: .leading, spacing: 12) {
                         PrivacyFeatureRow(icon: "waveform", text: "Audio transcribed on-device with Apple Speech")
@@ -726,11 +753,11 @@ struct AboutTab: View {
                     }
 
                     Divider()
-                        .background(.black.opacity(0.3))
+                        .background(KColor.ink.opacity(0.25))
 
                     Text("Private by Design")
                         .font(.headline)
-                        .foregroundColor(.black)
+                        .foregroundColor(KColor.ink)
 
                     VStack(alignment: .leading, spacing: 12) {
                         PrivacyFeatureRow(icon: "wifi.slash", text: "Works without an internet connection")
@@ -739,15 +766,15 @@ struct AboutTab: View {
                     }
 
                     Divider()
-                        .background(.black.opacity(0.3))
+                        .background(KColor.ink.opacity(0.25))
 
                     Text("Privacy Note")
                         .font(.headline)
-                        .foregroundColor(.black)
+                        .foregroundColor(KColor.ink)
 
                     Text("K\u{014D}chi runs entirely on your device by default \u{2014} audio, transcription, and coaching all happen locally with no account or API key. The optional AI Analysis feature (Settings \u{2192} AI) is the one exception: if you add your own API key and tap Run AI Analysis on a meeting, that meeting\u{2019}s transcript is sent to your chosen provider. Your audio, transcripts, and goals stay stored locally on your device.")
                         .font(.body)
-                        .foregroundColor(.black.opacity(0.8))
+                        .foregroundColor(KColor.ink.opacity(0.8))
                 }
                 .padding()
                 .background(KColor.paper.opacity(0.92))
@@ -755,6 +782,90 @@ struct AboutTab: View {
                 .padding(.horizontal)
             }
             .padding(.bottom)
+        }
+    }
+
+    private var themesCard: some View {
+        VStack(alignment: .leading, spacing: 11) {
+            SlabLabel("Themes") { EmptyView() }
+            // Inline swatch row: every theme previews its own signature key
+            // gradient, so you pick by color instead of reading a dropdown.
+            HStack(alignment: .top, spacing: 8) {
+                ForEach(themeStore.available) { t in
+                    ThemeSwatch(theme: t,
+                                isSelected: t.id == themeStore.current.id,
+                                onTap: { themeStore.select(t.id) })
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .kCard()
+        .padding(.horizontal)
+    }
+}
+
+// MARK: - Theme Swatch (Themes picker)
+/// One selectable theme chip — a glossy key-gradient preview with the theme's
+/// name beneath. The active theme gets an ink ring + checkmark badge.
+private struct ThemeSwatch: View {
+    let theme: Theme
+    let isSelected: Bool
+    let onTap: () -> Void
+
+    private let shape = RoundedRectangle(cornerRadius: 11, style: .continuous)
+
+    var body: some View {
+        Button(action: onTap) {
+            VStack(spacing: 6) {
+                swatchFill
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 54)
+                    .clipShape(shape)
+                    // Glossy bevel like the device keys.
+                    .overlay(
+                        shape.strokeBorder(
+                            LinearGradient(colors: [.white.opacity(0.55), .white.opacity(0.05), .black.opacity(0.20)],
+                                           startPoint: .top, endPoint: .bottom),
+                            lineWidth: 1)
+                    )
+                    // Selection ring.
+                    .overlay(shape.strokeBorder(KColor.ink, lineWidth: isSelected ? 2.5 : 0))
+                    .overlay(alignment: .topTrailing) {
+                        if isSelected {
+                            Image(systemName: "checkmark.circle.fill")
+                                .font(.system(size: 14, weight: .bold))
+                                .symbolRenderingMode(.palette)
+                                .foregroundStyle(.white, theme.palette.buttonLo)
+                                .padding(3)
+                        }
+                    }
+                    .shadow(color: .black.opacity(isSelected ? 0.22 : 0.10),
+                            radius: isSelected ? 4 : 2, x: 0, y: isSelected ? 2 : 1)
+
+                Text(theme.displayName.lowercased())
+                    .font(KFont.mono(8.5))
+                    .tracking(0.4)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+                    .foregroundColor(isSelected ? KColor.ink : KColor.muted)
+            }
+            .frame(maxWidth: .infinity)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .animation(.easeOut(duration: 0.15), value: isSelected)
+    }
+
+    /// The chip's face: the theme's `theme.png` portrait when present, otherwise
+    /// the theme's signature key gradient.
+    @ViewBuilder private var swatchFill: some View {
+        if let url = theme.swatchImageURL, let nsImage = NSImage(contentsOf: url) {
+            Image(nsImage: nsImage)
+                .resizable()
+                .scaledToFill()
+        } else {
+            LinearGradient(colors: [theme.palette.buttonHi, theme.palette.buttonLo],
+                           startPoint: .top, endPoint: .bottom)
         }
     }
 }
@@ -768,16 +879,19 @@ struct TabHeader: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 9) {
+                // Title + its icon sit directly on the themed window background,
+                // so they use the theme's on-background ink (white on BRICKS/HERO,
+                // dark on the light themes) instead of a fixed orange/ink.
                 Image(systemName: icon)
                     .font(.system(size: 20, weight: .semibold))
-                    .foregroundColor(KColor.orange)
+                    .foregroundColor(KColor.onBg)
                 Text(title)
                     .font(KFont.zilla(22, .bold))
-                    .foregroundColor(KColor.ink)
+                    .foregroundColor(KColor.onBg)
             }
             Text(subtitle)
                 .font(KFont.mono(11))
-                .foregroundColor(KColor.muted)
+                .foregroundColor(KColor.onBgFaint)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal)
@@ -793,11 +907,11 @@ struct PrivacyFeatureRow: View {
     var body: some View {
         HStack(spacing: 12) {
             Image(systemName: icon)
-                .foregroundColor(Color(red: 249/255, green: 81/255, blue: 0))
+                .foregroundColor(KColor.buttonHi)
                 .frame(width: 24)
             Text(text)
                 .font(.subheadline)
-                .foregroundColor(.black)
+                .foregroundColor(KColor.ink)
         }
     }
 }
@@ -812,21 +926,21 @@ struct MeetingHistoryCompactRow: View {
             HStack {
                 Text(formatDate(meeting.startTime))
                     .font(.headline)
-                    .foregroundColor(Color.black)
+                    .foregroundColor(KColor.ink)
                 Spacer()
                 let completedCount = meeting.goals.filter { $0.isCompleted }.count
                 Text("\(completedCount)/\(meeting.goals.count) goals")
                     .font(.caption)
-                    .foregroundColor(Color(red: 249/255, green: 81/255, blue: 0))
+                    .foregroundColor(KColor.buttonHi)
                 Image(systemName: "chevron.right")
                     .font(.caption)
-                    .foregroundColor(Color.black.opacity(0.3))
+                    .foregroundColor(KColor.ink.opacity(0.3))
             }
 
             if !meeting.notes.isEmpty {
                 Text(meeting.notes)
                     .font(.caption)
-                    .foregroundColor(Color.black.opacity(0.7))
+                    .foregroundColor(KColor.ink.opacity(0.7))
                     .lineLimit(2)
             }
         }
@@ -888,7 +1002,7 @@ struct MeetingDetailView: View {
                     HStack(spacing: 4) {
                         Image(systemName: "chevron.left")
                             .font(.system(size: 11, weight: .bold))
-                        Text("Back")
+                        Text("back")
                             .font(KFont.zilla(12.5, .bold))
                     }
                     .padding(.horizontal, 12)
@@ -906,7 +1020,7 @@ struct MeetingDetailView: View {
                         HStack(spacing: 4) {
                             Image(systemName: "square.and.arrow.up")
                                 .font(.system(size: 11, weight: .bold))
-                            Text("Share")
+                            Text("share")
                                 .font(KFont.zilla(12.5, .bold))
                         }
                         .padding(.horizontal, 12)
@@ -953,11 +1067,10 @@ struct MeetingDetailView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(
             // Uniform pixel-grid camo so the top bar matches the rest of the page
-            // (the gradient BackgroundImage read plainer up top).
-            Image("BackgroundPlainImage")
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .ignoresSafeArea()
+            // (the gradient BackgroundImage read plainer up top). ThemeBackground
+            // gives a definite, full-window frame so the texture covers up under
+            // the traffic lights instead of leaking the window's gray base.
+            ThemeBackground("BackgroundPlainImage")
         )
         .sheet(isPresented: $showAudioShare) {
             ShareSheet(items: [audioURL].compactMap { $0 })
@@ -1401,7 +1514,7 @@ private struct MeetingGoalRow: View {
         .frame(minHeight: 42)
         .background(goalBackground)
         .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
-        .shadow(color: done ? Color(red: 140/255, green: 55/255, blue: 0).opacity(0.30) : .clear,
+        .shadow(color: done ? KColor.goalDoneLo.opacity(0.30) : .clear,
                 radius: 4, x: 0, y: 2)
     }
 
@@ -1486,16 +1599,16 @@ struct RecordingRow: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(formatDate(recording.date))
                         .font(.headline)
-                        .foregroundColor(Color.black)
+                        .foregroundColor(KColor.ink)
 
                     Text("Duration: \(formatDuration(recording.duration))")
                         .font(.caption)
-                        .foregroundColor(Color.black.opacity(0.7))
+                        .foregroundColor(KColor.ink.opacity(0.7))
                     
                     if !recording.transcription.isEmpty {
                         Text(recording.transcription)
                             .font(.caption)
-                            .foregroundColor(Color.black.opacity(0.6))
+                            .foregroundColor(KColor.ink.opacity(0.6))
                             .lineLimit(2)
                     }
                 }
@@ -1504,7 +1617,7 @@ struct RecordingRow: View {
                 
                 Image(systemName: "play.circle.fill")
                     .font(.title2)
-                    .foregroundColor(Color(red: 249/255, green: 81/255, blue: 0))
+                    .foregroundColor(KColor.buttonHi)
             }
             .padding()
             .background(KColor.paper.opacity(0.92))
@@ -1540,17 +1653,17 @@ struct AboutAITab: View {
                     HStack {
                         Image(systemName: "apple.logo")
                             .font(.title)
-                            .foregroundColor(Color(red: 249/255, green: 81/255, blue: 0))
+                            .foregroundColor(KColor.buttonHi)
 
                         Text("Apple Foundation Models")
                             .font(.title2)
                             .fontWeight(.bold)
-                            .foregroundColor(Color.black)
+                            .foregroundColor(KColor.ink)
                     }
 
                     Text("100% On-Device AI • No Downloads Required")
                         .font(.subheadline)
-                        .foregroundColor(Color(red: 249/255, green: 81/255, blue: 0))
+                        .foregroundColor(KColor.buttonHi)
                 }
                 .padding()
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -1562,7 +1675,7 @@ struct AboutAITab: View {
                 VStack(alignment: .leading, spacing: 12) {
                     Text("AI Capabilities")
                         .font(.headline)
-                        .foregroundColor(Color.black)
+                        .foregroundColor(KColor.ink)
                         .padding(.horizontal)
 
                     AICapabilityCard(
@@ -1598,7 +1711,7 @@ struct AboutAITab: View {
                 VStack(alignment: .leading, spacing: 12) {
                     Text("Privacy & Security")
                         .font(.headline)
-                        .foregroundColor(Color.black)
+                        .foregroundColor(KColor.ink)
                         .padding(.horizontal)
 
                     PrivacyBenefitRow(
@@ -1630,33 +1743,33 @@ struct AboutAITab: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("System Requirements")
                         .font(.headline)
-                        .foregroundColor(Color.black)
+                        .foregroundColor(KColor.ink)
 
                     HStack {
                         Text("macOS Version")
-                            .foregroundColor(Color.black.opacity(0.7))
+                            .foregroundColor(KColor.ink.opacity(0.7))
                         Spacer()
                         Text("27.0+")
                             .fontWeight(.medium)
-                            .foregroundColor(Color.black)
+                            .foregroundColor(KColor.ink)
                         Image(systemName: "checkmark.circle.fill")
                             .foregroundColor(.green)
                     }
 
                     HStack {
                         Text("Storage Required")
-                            .foregroundColor(Color.black.opacity(0.7))
+                            .foregroundColor(KColor.ink.opacity(0.7))
                         Spacer()
                         Text("0 MB (built-in)")
                             .fontWeight(.medium)
-                            .foregroundColor(Color.black)
+                            .foregroundColor(KColor.ink)
                         Image(systemName: "checkmark.circle.fill")
                             .foregroundColor(.green)
                     }
 
                     HStack {
                         Text("Status")
-                            .foregroundColor(Color.black.opacity(0.7))
+                            .foregroundColor(KColor.ink.opacity(0.7))
                         Spacer()
                         Text("Active & Ready")
                             .fontWeight(.medium)
@@ -1676,7 +1789,7 @@ struct AboutAITab: View {
                         .foregroundColor(.yellow)
                     Text("No downloads, no setup, always ready!")
                         .font(.caption)
-                        .foregroundColor(Color.black.opacity(0.6))
+                        .foregroundColor(KColor.ink.opacity(0.6))
                 }
                 .padding()
                 .frame(maxWidth: .infinity)
@@ -1698,22 +1811,22 @@ struct AICapabilityCard: View {
         HStack(spacing: 12) {
             Image(systemName: icon)
                 .font(.title2)
-                .foregroundColor(Color(red: 249/255, green: 81/255, blue: 0))
+                .foregroundColor(KColor.buttonHi)
                 .frame(width: 40)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
                     .font(.subheadline)
                     .fontWeight(.medium)
-                    .foregroundColor(Color.black)
+                    .foregroundColor(KColor.ink)
 
                 Text(description)
                     .font(.caption)
-                    .foregroundColor(Color.black.opacity(0.6))
+                    .foregroundColor(KColor.ink.opacity(0.6))
 
                 Text(framework)
                     .font(.caption2)
-                    .foregroundColor(Color(red: 249/255, green: 81/255, blue: 0).opacity(0.7))
+                    .foregroundColor(KColor.buttonHi.opacity(0.7))
             }
 
             Spacer()
@@ -1737,12 +1850,12 @@ struct PrivacyBenefitRow: View {
     var body: some View {
         HStack(spacing: 10) {
             Image(systemName: icon)
-                .foregroundColor(Color(red: 249/255, green: 81/255, blue: 0))
+                .foregroundColor(KColor.buttonHi)
                 .frame(width: 20)
 
             Text(text)
                 .font(.subheadline)
-                .foregroundColor(Color.black)
+                .foregroundColor(KColor.ink)
 
             Spacer()
         }
@@ -1760,11 +1873,19 @@ struct AITab: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 15) {
-                providerCard
-                keyCard
-                disclosureCard
+                TabHeader(
+                    icon: "sparkles",
+                    title: "AI",
+                    subtitle: "Bring your own key for optional cloud analysis."
+                )
+
+                VStack(alignment: .leading, spacing: 15) {
+                    providerCard
+                    keyCard
+                    disclosureCard
+                }
+                .padding(.horizontal)
             }
-            .padding()
             .padding(.bottom)
             .frame(maxWidth: .infinity, alignment: .leading)
         }
@@ -1773,16 +1894,7 @@ struct AITab: View {
     private var providerCard: some View {
         VStack(alignment: .leading, spacing: 10) {
             SlabLabel("Provider") { EmptyView() }
-            Picker("", selection: Binding(
-                get: { cloudAnalysisManager.provider },
-                set: { cloudAnalysisManager.selectProvider($0); keyInput = ""; saveError = nil }
-            )) {
-                ForEach(CloudProvider.allCases, id: \.self) { p in
-                    Text(p.displayName).tag(p)
-                }
-            }
-            .pickerStyle(.segmented)
-            .labelsHidden()
+            providerSegmented
 
             HStack(spacing: 9) {
                 Text("MODEL")
@@ -1809,6 +1921,41 @@ struct AITab: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .kCard()
+    }
+
+    /// Provider toggle — the selected segment carries the theme's primary key
+    /// gradient (`buttonHi`→`buttonLo`, matching the buttons) instead of the
+    /// stock gray segmented control.
+    private var providerSegmented: some View {
+        let shape = RoundedRectangle(cornerRadius: 8, style: .continuous)
+        return HStack(spacing: 0) {
+            ForEach(CloudProvider.allCases, id: \.self) { p in
+                let selected = cloudAnalysisManager.provider == p
+                Button(action: {
+                    cloudAnalysisManager.selectProvider(p); keyInput = ""; saveError = nil
+                }) {
+                    Text(p.displayName)
+                        .font(KFont.sans(13, .semibold))
+                        .foregroundColor(selected ? .white : KColor.inkSoft)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 7)
+                        .background {
+                            if selected {
+                                shape.fill(LinearGradient(colors: [KColor.buttonHi, KColor.buttonLo],
+                                                          startPoint: .top, endPoint: .bottom))
+                                    .overlay(shape.strokeBorder(
+                                        LinearGradient(colors: [.white.opacity(0.45), .white.opacity(0.04), .black.opacity(0.16)],
+                                                       startPoint: .top, endPoint: .bottom), lineWidth: 1))
+                            }
+                        }
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(3)
+        .background(shape.fill(KColor.panel2)
+            .overlay(shape.strokeBorder(KColor.line, lineWidth: 1)))
     }
 
     private var keyCard: some View {
@@ -1841,7 +1988,7 @@ struct AITab: View {
 
             HStack(spacing: 8) {
                 Button(action: saveKey) {
-                    Text("Save")
+                    Text("save")
                         .font(KFont.zilla(12.5, .bold))
                         .padding(.horizontal, 16)
                         .padding(.vertical, 7)
@@ -1852,7 +1999,7 @@ struct AITab: View {
 
                 if cloudAnalysisManager.hasKey {
                     Button(action: { cloudAnalysisManager.removeKey(); keyInput = "" }) {
-                        Text("Remove key")
+                        Text("remove key")
                             .font(KFont.zilla(12.5, .bold))
                             .padding(.horizontal, 16)
                             .padding(.vertical, 7)
@@ -1899,5 +2046,6 @@ struct SettingsView_Previews: PreviewProvider {
             .environmentObject(ThemeManager())
             .environmentObject(GoalManager())
             .environmentObject(CloudAnalysisManager())
+            .environmentObject(ThemeStore.shared)
     }
 }

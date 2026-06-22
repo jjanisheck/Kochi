@@ -75,7 +75,6 @@ class VideoCoachingManager: ObservableObject {
     @Published var currentVideoLabel: VideoLabel = .idle
     @Published var isPlaying: Bool = false
     @Published var player: AVPlayer?
-    @Published var videoTheme: String = "general" // "general" or "zen"
     @Published var coachingText: String = "" // Short text displayed with video
 
     private var currentPlayerItem: AVPlayerItem?
@@ -122,6 +121,14 @@ class VideoCoachingManager: ObservableObject {
             self,
             selector: #selector(handleRecordingStopped),
             name: .recordingStopped,
+            object: nil
+        )
+
+        // Reload the coach clip when the theme changes (new video folder/prefix)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleThemeChanged),
+            name: .themeChanged,
             object: nil
         )
     }
@@ -282,17 +289,22 @@ class VideoCoachingManager: ObservableObject {
     }
 
     private func createPlayerItem(for label: VideoLabel, variation: Int? = nil) -> AVPlayerItem? {
-        // Try to find video in Resources/Videos folder
-        // Videos are named like: general-idle-1.mp4, zen-goal-2.mp4, etc.
-
-        // Use configured theme (general or zen)
-        let theme = videoTheme
+        // Videos live in the active theme's folder, named <label>-<variation>.mp4
+        // (e.g. idle-1.mp4, goal-2.mp4). The theme folder supplies the styling,
+        // so the filename carries only the emotion and which variation it is.
+        let subdir = ActiveThemeVideo.subdirectory
 
         // Use the requested variation, or randomly select one (1-4 available).
         let variation = variation ?? Int.random(in: 1...4)
-        let videoName = "\(theme)-\(label.rawValue)-\(variation)"
+        let videoName = "\(label.rawValue)-\(variation)"
 
         print("🎬 Looking for video: \(videoName).mp4")
+
+        // Theme subdirectory lookup: Themes/<id>/videos/<name>.mp4
+        if let url = Bundle.main.url(forResource: videoName, withExtension: "mp4", subdirectory: subdir) {
+            print("✅ Found video in theme subdirectory (\(subdir)): \(videoName).mp4")
+            return AVPlayerItem(url: url)
+        }
 
         // Method 1: Try Bundle.main.url (most reliable for bundled resources)
         if let url = Bundle.main.url(forResource: videoName, withExtension: "mp4") {
@@ -353,7 +365,7 @@ class VideoCoachingManager: ObservableObject {
         }
 
         // Video not found - this is okay, app will show placeholder
-        print("❌ No video found for: \(videoName).mp4 (label: \(label.rawValue), theme: \(theme), variation: \(variation))")
+        print("❌ No video found for: \(videoName).mp4 (label: \(label.rawValue), variation: \(variation), subdir: \(subdir))")
         print("📂 Bundle path: \(Bundle.main.bundlePath)")
         return nil
     }
@@ -464,6 +476,14 @@ class VideoCoachingManager: ObservableObject {
     @objc private func handleRecordingStopped(_ notification: Notification) {
         print("🎬 Recording stopped - playing wrap video")
         playVideo(label: .wrap)
+    }
+
+    @objc private func handleThemeChanged() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.videoCache.removeAll()
+            self.playVideo(label: self.currentVideoLabel)
+        }
     }
 
     // MARK: - Public Methods

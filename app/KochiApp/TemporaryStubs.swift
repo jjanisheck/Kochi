@@ -36,8 +36,7 @@ class AppStoreHelper: ObservableObject {
 
 // Temporary stub views removed - actual implementations now in Xcode project:
 // - CoachingView.swift
-// - MultimodalView.swift  
-// - OnboardingView.swift
+// - MultimodalView.swift
 
 // Extension to temporarily fix View modifier
 extension View {

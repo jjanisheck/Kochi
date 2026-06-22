@@ -65,7 +65,7 @@ struct GoalsManagementView: View {
                             }) {
                                 HStack {
                                     Image(systemName: "arrow.clockwise")
-                                    Text("Reset All Completions")
+                                    Text("reset all completions")
                                 }
                                 .font(.headline)
                                 .foregroundColor(.white)
@@ -84,7 +84,7 @@ struct GoalsManagementView: View {
             .inlineNavigationTitle()
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
-                    Button("Done") {
+                    Button("done") {
                         isPresented = false
                     }
                     .foregroundColor(themeManager.accentColor)
@@ -136,7 +136,7 @@ struct SimpleGoalRow: View {
                     goalManager.deleteGoal(goal)
                 }) {
                     Image(systemName: "trash")
-                        .foregroundColor(.red.opacity(0.7))
+                        .foregroundColor(KColor.buttonHi)
                 }
             }
         }

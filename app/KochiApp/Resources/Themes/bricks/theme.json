@@ -1,0 +1,27 @@
+{
+  "displayName": "BRICKS",
+  "colorScheme": "light",
+  "chromeOnBackground": true,
+  "deckReelGrayscale": 0,
+  "deckReelBrightness": 0,
+  "colors": {
+    "orange": "#A8412B", "orangeDeep": "#7E2C1B",
+    "ink": "#1C1B19", "inkSoft": "#3B3A37",
+    "paper": "#FFFFFF", "win": "#E9E8E4",
+    "panel": "#EFEEEA", "panel2": "#E4E3DE",
+    "line": "#CDCCC6", "lineSoft": "#DAD9D3",
+    "muted": "#8D8C86", "muted2": "#A9A8A2",
+    "good": "#1F8A4C", "deck": "#34332C", "deckBorder": "#26251F",
+    "buttonHi": "#FF8C2B", "buttonLo": "#F25C00",
+    "onBg": "#FFFFFF", "onBgFaint": "#FFFFFF",
+    "goalRestFill": "#FFFFFF", "goalRestInk": "#EA5800",
+    "goalUnmetFill": "#F7A402CC", "goalUnmetInk": "#FFFFFF", "goalRestBorder": "#FFFFFF",
+    "deckScrimTop": "#00000000", "deckScrimBottom": "#00000033"
+  },
+  "images": {
+    "BackgroundImage": "images/BackgroundImage.png",
+    "BackgroundPlainImage": "images/BackgroundPlainImage.png",
+    "KochiLogo": "images/KochiLogo.png",
+    "FilmReel": "images/FilmReel.png"
+  }
+}

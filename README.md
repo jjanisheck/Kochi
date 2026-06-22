@@ -20,13 +20,15 @@ to the front whenever you need it. Built entirely in SwiftUI, native to macOS.
 > build and run the app.
 
 <p align="center">
+  <img src="docs/screenshots/default.gif" alt="Kōchi in motion — the default theme" width="260">
+  &nbsp;
   <img src="docs/screenshots/home.png" alt="Live meeting with goal tracking and a dual-channel transcript" width="260">
   &nbsp;
   <img src="docs/screenshots/meeting-detail.png" alt="Saved meeting detail with goals and full transcript" width="260">
   &nbsp;
   <img src="docs/screenshots/search.png" alt="Full-text search across saved transcripts" width="260">
 </p>
-<p align="center"><sub>Live coaching & goal tracking · saved meeting detail · search across transcripts</sub></p>
+<p align="center"><sub>Kōchi in motion · live coaching & goal tracking · saved meeting detail · search across transcripts</sub></p>
 
 ### Watch the tutorial
 
@@ -187,6 +189,32 @@ Claude or OpenAI API key and tap **Run AI Analysis** on a meeting, Kōchi sends 
 meeting's **text transcript** to the provider you chose to generate the written
 analysis. Your **audio is never sent**, the key is stored in the macOS Keychain, and
 nothing is sent unless you opt in by adding a key and running the analysis yourself.
+
+## Themes
+
+Reskin the whole app — palette, background, the spinning reel, even the coaching
+character — with a folder of art and one JSON file. Very WinAmp. Five ship today:
+
+<table>
+  <tr>
+    <td width="20%" align="center"><img src="docs/screenshots/default.gif" width="100%" alt="DEFAULT theme"></td>
+    <td width="20%" align="center"><img src="docs/screenshots/bricks.gif" width="100%" alt="BRICKS theme"></td>
+    <td width="20%" align="center"><img src="docs/screenshots/hero.gif" width="100%" alt="HERO theme"></td>
+    <td width="20%" align="center"><img src="docs/screenshots/noir.gif" width="100%" alt="NOIR theme"></td>
+    <td width="20%" align="center"><img src="docs/screenshots/zen.gif" width="100%" alt="ZEN theme"></td>
+  </tr>
+  <tr>
+    <td align="center"><b>default</b><br><sub>warm / orange</sub></td>
+    <td align="center"><b>bricks</b><br><sub>terracotta</sub></td>
+    <td align="center"><b>hero</b><br><sub>red·white·blue</sub></td>
+    <td align="center"><b>noir</b><br><sub>dark / mono</sub></td>
+    <td align="center"><b>zen</b><br><sub>calm / green</sub></td>
+  </tr>
+</table>
+
+Make your own: **[Creating a Kōchi theme](docs/creating-a-theme.md)** is the full
+step-by-step, and [Creating coach videos](docs/creating-coach-videos.md) is the
+character-clip deep-dive.
 
 ## Building & contributing
 

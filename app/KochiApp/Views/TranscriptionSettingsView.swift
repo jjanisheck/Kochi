@@ -44,12 +44,12 @@ struct TranscriptionSettingsView: View {
                             .foregroundColor(accentColor)
                         Text("On-Device Transcription")
                             .font(.headline)
-                            .foregroundColor(Color.black)
+                            .foregroundColor(KColor.ink)
                     }
 
                     Text("Speech-to-text runs entirely on this device using Apple's Speech framework. No internet connection or API key is required, and audio never leaves your device.")
                         .font(.caption)
-                        .foregroundColor(Color.black.opacity(0.7))
+                        .foregroundColor(KColor.ink.opacity(0.7))
 
                     HStack {
                         Image(systemName: speechAvailable ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
@@ -58,10 +58,10 @@ struct TranscriptionSettingsView: View {
                             Text(speechAvailable ? "On-device speech recognition is ready" : "On-device speech recognition is not ready")
                                 .font(.caption)
                                 .fontWeight(.medium)
-                                .foregroundColor(Color.black)
+                                .foregroundColor(KColor.ink)
                             Text(authorizationStatusText)
                                 .font(.caption2)
-                                .foregroundColor(Color.black.opacity(0.6))
+                                .foregroundColor(KColor.ink.opacity(0.6))
                         }
                         Spacer()
                     }
@@ -75,7 +75,7 @@ struct TranscriptionSettingsView: View {
                         Text(llmManager.isAvailable ? "Apple Intelligence model: Ready" : "Apple Intelligence model: Unavailable")
                             .font(.caption)
                             .fontWeight(.medium)
-                            .foregroundColor(Color.black)
+                            .foregroundColor(KColor.ink)
                         Spacer()
                     }
                     .padding()
@@ -94,7 +94,7 @@ struct TranscriptionSettingsView: View {
                             .foregroundColor(.green)
                         Text("Private by Design")
                             .font(.headline)
-                            .foregroundColor(Color.black)
+                            .foregroundColor(KColor.ink)
                     }
 
                     VStack(alignment: .leading, spacing: 6) {
@@ -130,7 +130,7 @@ struct BenefitRow: View {
 
             Text(text)
                 .font(.caption)
-                .foregroundColor(Color.black)
+                .foregroundColor(KColor.ink)
 
             Spacer()
         }
