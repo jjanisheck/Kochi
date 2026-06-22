@@ -3,6 +3,7 @@
   "colorScheme": "light",
   "backgroundStretch": true,
   "goalRestBlur": true,
+  "hideBrandRow": true,
   "deckReelGrayscale": 0,
   "deckReelBrightness": 0,
   "colors": {

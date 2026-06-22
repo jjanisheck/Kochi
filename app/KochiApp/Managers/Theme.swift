@@ -224,6 +224,10 @@ struct ThemeManifest: Decodable {
     /// primary key's face text). Optional; default true. Set false to fall back to
     /// the legacy gray "device chrome".
     let chromeOnBackground: Bool?
+    /// When true, the top brand row (KŌCHI logo + "MEETING COACH" + READY/REC
+    /// status) is hidden on the home screen, letting a theme that supplies its own
+    /// titling in the background art stand alone. Optional; default false.
+    let hideBrandRow: Bool?
 }
 
 /// A resolved theme: palette + asset URLs + identity.
@@ -243,6 +247,8 @@ struct Theme: Identifiable {
     /// Settings header + tab bar float transparently on the themed background
     /// (vs the default gray device chrome).
     let chromeOnBackground: Bool
+    /// Hide the home-screen brand row (logo + "MEETING COACH" + status).
+    let hideBrandRow: Bool
 
     /// Subdirectory (relative to bundle resources) where this theme's videos live.
     var videoSubdirectory: String { "Themes/\(id)/videos" }
@@ -280,7 +286,8 @@ struct Theme: Identifiable {
                      deckReelBrightness: m.deckReelBrightness ?? -0.15,
                      backgroundStretch: m.backgroundStretch ?? false,
                      goalRestBlur: m.goalRestBlur ?? false,
-                     chromeOnBackground: m.chromeOnBackground ?? true)
+                     chromeOnBackground: m.chromeOnBackground ?? true,
+                     hideBrandRow: m.hideBrandRow ?? false)
     }
 
     /// Guaranteed-valid default, used before discovery or if nothing is found.
@@ -292,7 +299,7 @@ struct Theme: Identifiable {
                      palette: .fallback, images: [:],
                      folderURL: folder, deckReelGrayscale: 1.0, deckReelBrightness: -0.15,
                      backgroundStretch: false, goalRestBlur: false,
-                     chromeOnBackground: true)
+                     chromeOnBackground: true, hideBrandRow: false)
     }()
 }
 
@@ -326,4 +333,11 @@ enum ActiveDeck {
 /// Written by `ThemeStore` on the main actor.
 enum ActiveGoal {
     nonisolated(unsafe) static var restBlur: Bool = false
+}
+
+/// Nonisolated mirror of home-screen chrome flags (read by `ContentView`, which
+/// uses the `KColor`/mirror pattern rather than an `@EnvironmentObject`).
+/// Written by `ThemeStore` on the main actor.
+enum ActiveChrome {
+    nonisolated(unsafe) static var hideBrandRow: Bool = false
 }

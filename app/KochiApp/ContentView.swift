@@ -23,7 +23,10 @@ struct ContentView: View {
     var body: some View {
         VStack(spacing: 0) {
             VStack(spacing: 12) {
+                // Hidden (not removed) so the row still reserves its height and
+                // the layout below doesn't shift up.
                 BrandRow(phase: phase)
+                    .opacity(ActiveChrome.hideBrandRow ? 0 : 1)
                 CoachHero(videoManager: videoManager, captionText: coachLine)
                     .frame(height: 166)
                 goalsSection
