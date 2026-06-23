@@ -49,8 +49,15 @@ struct ThemeImage: View {
 struct ThemeBackground: View {
     @EnvironmentObject private var themeStore: ThemeStore
     private let name: String
+    /// Which screen edges the art bleeds under. Defaults to every edge (the
+    /// original behavior); callers can keep the top safe area clear (e.g. iOS,
+    /// so a black band can sit behind the Dynamic Island).
+    private let ignoredEdges: Edge.Set
 
-    init(_ name: String) { self.name = name }
+    init(_ name: String, ignoresSafeAreaEdges: Edge.Set = .all) {
+        self.name = name
+        self.ignoredEdges = ignoresSafeAreaEdges
+    }
 
     var body: some View {
         GeometryReader { geo in
@@ -74,6 +81,6 @@ struct ThemeBackground: View {
                     .clipped()
             }
         }
-        .ignoresSafeArea()
+        .ignoresSafeArea(edges: ignoredEdges)
     }
 }

@@ -60,7 +60,13 @@ struct ContentView: View {
         // far taller than the card; a near-square theme image (e.g. BRICKS, whose
         // ratio nearly matches the card) could otherwise under-fill and leak the
         // window's white base out the bottom.
-        .background(ThemeBackground("BackgroundImage"))
+        .background(ThemeBackground("BackgroundImage", ignoresSafeAreaEdges: backgroundIgnoredEdges))
+        #if os(iOS)
+        // Behind the themed card: solid black filling the whole screen, so the
+        // top safe area (Dynamic Island / status bar) reads as a clean black band
+        // — the parchment art deliberately stops below it (see backgroundIgnoredEdges).
+        .background(Color.black.ignoresSafeArea())
+        #endif
         // Settings sheet as an overlay so it's clamped to the card's bounds
         // rather than expanding the panel.
         .overlay {
@@ -89,12 +95,23 @@ struct ContentView: View {
         #endif
     }
 
-    /// Top inset: snug under macOS traffic lights; the safe area handles iOS.
+    /// Top inset: snug under macOS traffic lights. On iOS, push the card down a
+    /// little from the black top band so it doesn't crowd the Dynamic Island.
     private var topInset: CGFloat {
         #if os(macOS)
         return 8
         #else
-        return 4
+        return 18
+        #endif
+    }
+
+    /// Edges the themed background bleeds under. macOS bleeds everywhere; iOS
+    /// keeps the top safe area clear so the black island band shows through.
+    private var backgroundIgnoredEdges: Edge.Set {
+        #if os(macOS)
+        return .all
+        #else
+        return [.horizontal, .bottom]
         #endif
     }
 
@@ -511,7 +528,13 @@ private struct TapeDeck: View {
             // top edge instead of butting right against it.
             stream
                 .padding(.top, 5)
+                #if os(macOS)
                 .frame(height: 124)
+                #else
+                // Let the deck (and the reel behind it) grow to fill the taller
+                // phone screen instead of sitting at a fixed height.
+                .frame(maxHeight: .infinity)
+                #endif
                 .clipped()
 
             tape
