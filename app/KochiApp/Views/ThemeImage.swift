@@ -61,6 +61,15 @@ struct ThemeBackground: View {
 
     var body: some View {
         GeometryReader { geo in
+            #if os(iOS)
+            // Phone screens are far taller than the device-card art, so fit/fill
+            // would letterbox the frame (showing a zoomed copy at top/bottom) or
+            // crop the decorative border. Stretch the art to the exact background
+            // size so its border lines up with every screen edge — a slight,
+            // parchment-friendly distortion.
+            ThemeImage(name)
+                .frame(width: geo.size.width, height: geo.size.height)
+            #else
             if themeStore.current.backgroundStretch {
                 ZStack {
                     // Underlay: same art filled edge-to-edge so the letterbox
@@ -80,6 +89,7 @@ struct ThemeBackground: View {
                     .frame(width: geo.size.width, height: geo.size.height)
                     .clipped()
             }
+            #endif
         }
         .ignoresSafeArea(edges: ignoredEdges)
     }
