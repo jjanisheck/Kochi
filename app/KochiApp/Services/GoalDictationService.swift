@@ -1,5 +1,6 @@
 import Foundation
 import AVFoundation
+import Combine
 
 /// A small mic-only dictation helper for the "Speak new goals" flow. Reuses the
 /// on-device `SpeechChannel` (macOS 26+ `SpeechAnalyzer`/`SpeechTranscriber`) with

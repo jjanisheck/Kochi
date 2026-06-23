@@ -28,7 +28,12 @@ class AudioManager: NSObject, ObservableObject {
     // (Apple Speech — fully on-device, no API key).
     @Published var dualEngine = DualTranscriptionEngine()
     /// Capture the far side of a call (system audio) in addition to the mic.
+    /// macOS only — iOS is mic-only (no ScreenCaptureKit equivalent).
+    #if os(macOS)
     @Published var captureSystemAudio = true
+    #else
+    @Published var captureSystemAudio = false
+    #endif
     private var audioBufferDelegate: AudioBufferDelegate?
 
     // MARK: - File Management
@@ -49,6 +54,16 @@ class AudioManager: NSObject, ObservableObject {
     
     // MARK: - Setup
     private func setupAudioSession() {
+        #if os(iOS)
+        // iOS requires an active audio session before AVAudioEngine can tap the mic.
+        let session = AVAudioSession.sharedInstance()
+        do {
+            try session.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker, .allowBluetooth])
+            try session.setActive(true)
+        } catch {
+            print("⚠️ AVAudioSession setup failed: \(error)")
+        }
+        #endif
         // macOS: AVAudioEngine's input node works without an audio session.
     }
 

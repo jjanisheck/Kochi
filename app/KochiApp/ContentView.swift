@@ -28,14 +28,22 @@ struct ContentView: View {
                 BrandRow(phase: phase)
                     .opacity(ActiveChrome.hideBrandRow ? 0 : 1)
                 CoachHero(videoManager: videoManager, captionText: coachLine)
-                    .frame(height: 166)
+                    .frame(height: coachHeroHeight)
                 goalsSection
                 transcriptSection
+                    #if os(iOS)
+                    // On the taller phone screen, let the transcript consume the
+                    // leftover vertical space instead of leaving dead area.
+                    .frame(maxHeight: .infinity)
+                    #endif
             }
             .padding(.horizontal, 14)
             // Snug the logo row up under the macOS traffic lights.
-            .padding(.top, 8)
+            .padding(.top, topInset)
             .padding(.bottom, 13)
+            #if os(iOS)
+            .frame(maxHeight: .infinity)
+            #endif
 
             Toolbar(
                 phase: phase,
@@ -68,6 +76,26 @@ struct ContentView: View {
         .onReceive(audioManager.$transcriptionText) { newText in
             handleTranscriptUpdate(newText)
         }
+    }
+
+    // MARK: - Layout metrics (platform-tuned; macOS keeps its exact numbers)
+
+    /// Coach hero height: fixed on macOS, a touch taller on the phone.
+    private var coachHeroHeight: CGFloat {
+        #if os(macOS)
+        return 166
+        #else
+        return 200
+        #endif
+    }
+
+    /// Top inset: snug under macOS traffic lights; the safe area handles iOS.
+    private var topInset: CGFloat {
+        #if os(macOS)
+        return 8
+        #else
+        return 4
+        #endif
     }
 
     // MARK: - Sections
@@ -103,6 +131,9 @@ struct ContentView: View {
                 isRecording: audioManager.isRecording,
                 audioLevel: audioManager.audioLevel
             )
+            #if os(iOS)
+            .frame(maxHeight: .infinity)
+            #endif
         }
     }
 

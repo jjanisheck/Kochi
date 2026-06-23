@@ -1,48 +1,60 @@
 import SwiftUI
+#if os(macOS)
 import AppKit
+#else
+import UIKit
+#endif
 
-/// macOS equivalents for common system colors. These map to the closest
-/// `NSColor` semantic color, falling back to neutral grays that match the
-/// expected light-mode shades.
+/// System color equivalents shared by both platforms.
 extension Color {
     static var systemBackground: Color {
+        #if os(macOS)
         return Color(nsColor: .windowBackgroundColor)
+        #else
+        return Color(uiColor: .systemBackground)
+        #endif
     }
 
     static var systemGroupedBackground: Color {
+        #if os(macOS)
         return Color(nsColor: .underPageBackgroundColor)
+        #else
+        return Color(uiColor: .systemGroupedBackground)
+        #endif
     }
 
-    static var systemGray4: Color {
-        return Color(red: 0.82, green: 0.82, blue: 0.84)
-    }
-
-    static var systemGray5: Color {
-        return Color(red: 0.90, green: 0.90, blue: 0.92)
-    }
-
-    static var systemGray6: Color {
-        return Color(red: 0.95, green: 0.95, blue: 0.97)
-    }
+    static var systemGray4: Color { Color(red: 0.82, green: 0.82, blue: 0.84) }
+    static var systemGray5: Color { Color(red: 0.90, green: 0.90, blue: 0.92) }
+    static var systemGray6: Color { Color(red: 0.95, green: 0.95, blue: 0.97) }
 }
 
-/// Cross-platform navigation modifiers. The iOS navigation-bar APIs are
-/// unavailable on macOS, so these no-op there (macOS has no navigation bar).
+/// Cross-platform navigation/text modifiers. macOS has no navigation bar, so
+/// these stay no-ops there; iOS gets the real behavior.
 extension View {
     @ViewBuilder
     func inlineNavigationTitle() -> some View {
+        #if os(macOS)
         self
+        #else
+        self.navigationBarTitleDisplayMode(.inline)
+        #endif
     }
 
     @ViewBuilder
     func hiddenNavigationBar() -> some View {
+        #if os(macOS)
         self
+        #else
+        self.toolbar(.hidden, for: .navigationBar)
+        #endif
     }
 
-    /// iOS: disables autocapitalization for text entry. macOS: no-op (macOS text
-    /// fields do not auto-capitalize).
     @ViewBuilder
     func noAutocapitalization() -> some View {
+        #if os(macOS)
         self
+        #else
+        self.textInputAutocapitalization(.never)
+        #endif
     }
 }

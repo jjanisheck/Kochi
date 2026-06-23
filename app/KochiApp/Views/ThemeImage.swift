@@ -5,6 +5,11 @@
 //  asset catalog when the theme doesn't override it. Drop-in for Image("name").
 
 import SwiftUI
+#if os(macOS)
+import AppKit
+#else
+import UIKit
+#endif
 
 struct ThemeImage: View {
     @EnvironmentObject private var themeStore: ThemeStore
@@ -13,14 +18,22 @@ struct ThemeImage: View {
     init(_ name: String) { self.name = name }
 
     var body: some View {
-        if let url = themeStore.current.images[name],
-           let nsImage = NSImage(contentsOf: url) {
-            Image(nsImage: nsImage)
-                .resizable()
+        if let url = themeStore.current.images[name], let img = Self.loadImage(url) {
+            img.resizable()
         } else {
             Image(name)
                 .resizable()
         }
+    }
+
+    private static func loadImage(_ url: URL) -> Image? {
+        #if os(macOS)
+        guard let nsImage = NSImage(contentsOf: url) else { return nil }
+        return Image(nsImage: nsImage)
+        #else
+        guard let uiImage = UIImage(contentsOfFile: url.path) else { return nil }
+        return Image(uiImage: uiImage)
+        #endif
     }
 }
 

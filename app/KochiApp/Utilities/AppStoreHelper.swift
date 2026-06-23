@@ -1,6 +1,11 @@
 import Foundation
 import StoreKit
+import Combine
+#if os(macOS)
 import AppKit
+#else
+import UIKit
+#endif
 
 // MARK: - App Store Helper
 class AppStoreHelper: ObservableObject {
@@ -184,7 +189,11 @@ We'd love to hear your feedback! Contact us at \(supportEmail)
     
     // MARK: - App Store Links
     private func openURL(_ url: URL) {
+        #if os(macOS)
         NSWorkspace.shared.open(url)
+        #else
+        UIApplication.shared.open(url)
+        #endif
     }
 
     func openAppStore() {
@@ -201,10 +210,19 @@ We'd love to hear your feedback! Contact us at \(supportEmail)
         let shareText = "Check out Kochi - AI Presentation Coach!"
         let shareURL = URL(string: "https://apps.apple.com/app/id\(appStoreID)")!
 
+        #if os(macOS)
         let picker = NSSharingServicePicker(items: [shareText, shareURL])
         if let contentView = NSApp.keyWindow?.contentView {
             picker.show(relativeTo: .zero, of: contentView, preferredEdge: .minY)
         }
+        #else
+        let activity = UIActivityViewController(activityItems: [shareText, shareURL], applicationActivities: nil)
+        if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let root = scene.keyWindow?.rootViewController {
+            activity.popoverPresentationController?.sourceView = root.view
+            root.present(activity, animated: true)
+        }
+        #endif
     }
 }
 

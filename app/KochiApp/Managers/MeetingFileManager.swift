@@ -1,4 +1,7 @@
 import Foundation
+#if os(iOS)
+import UIKit
+#endif
 
 /// Manages meeting folder structure and real-time transcript file writing
 /// Guarantees all spoken words are captured to disk immediately, crash-safe
@@ -210,7 +213,11 @@ class MeetingFileManager {
     private func writeMetadata(startTime: Date) {
         guard let meetingURL = currentMeetingURL else { return }
 
+        #if os(macOS)
         let deviceName = Host.current().localizedName ?? "Mac"
+        #else
+        let deviceName = UIDevice.current.name
+        #endif
 
         let metadata: [String: Any] = [
             "startTime": ISO8601DateFormatter().string(from: startTime),

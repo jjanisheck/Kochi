@@ -1,4 +1,9 @@
 import SwiftUI
+#if os(macOS)
+import AppKit
+#else
+import UIKit
+#endif
 
 struct SettingsView: View {
     @Binding var isPresented: Bool
@@ -859,14 +864,25 @@ private struct ThemeSwatch: View {
     /// The chip's face: the theme's `theme.png` portrait when present, otherwise
     /// the theme's signature key gradient.
     @ViewBuilder private var swatchFill: some View {
-        if let url = theme.swatchImageURL, let nsImage = NSImage(contentsOf: url) {
-            Image(nsImage: nsImage)
+        if let url = theme.swatchImageURL, let swatch = Self.loadImage(url) {
+            swatch
                 .resizable()
                 .scaledToFill()
         } else {
             LinearGradient(colors: [theme.palette.buttonHi, theme.palette.buttonLo],
                            startPoint: .top, endPoint: .bottom)
         }
+    }
+
+    /// Loads a theme swatch portrait as a SwiftUI `Image` on either platform.
+    private static func loadImage(_ url: URL) -> Image? {
+        #if os(macOS)
+        guard let nsImage = NSImage(contentsOf: url) else { return nil }
+        return Image(nsImage: nsImage)
+        #else
+        guard let uiImage = UIImage(contentsOfFile: url.path) else { return nil }
+        return Image(uiImage: uiImage)
+        #endif
     }
 }
 
@@ -1210,9 +1226,11 @@ struct MeetingDetailView: View {
         VStack(alignment: .leading, spacing: 10) {
             SlabLabel("Audio")
             HStack(spacing: 9) {
+                #if os(macOS)
                 AudioActionButton(icon: "folder", label: "Reveal") {
                     NSWorkspace.shared.activateFileViewerSelecting([audioURL])
                 }
+                #endif
                 AudioActionButton(icon: "square.and.arrow.up", label: "Share") {
                     showAudioShare = true
                 }
@@ -1232,8 +1250,10 @@ struct MeetingDetailView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    /// Copy the recording to a user-chosen location via the sandbox-safe save panel.
+    /// Copy the recording to a user-chosen location. macOS uses a save panel;
+    /// iOS presents the share sheet (save-to-Files / AirDrop / etc.).
     private func exportAudio(_ url: URL) {
+        #if os(macOS)
         let panel = NSSavePanel()
         panel.nameFieldStringValue = "\(meeting.audioFolderName ?? "meeting")-audio.m4a"
         panel.canCreateDirectories = true
@@ -1241,6 +1261,14 @@ struct MeetingDetailView: View {
             try? FileManager.default.removeItem(at: dest)
             try? FileManager.default.copyItem(at: url, to: dest)
         }
+        #else
+        let activity = UIActivityViewController(activityItems: [url], applicationActivities: nil)
+        if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let root = scene.keyWindow?.rootViewController {
+            activity.popoverPresentationController?.sourceView = root.view
+            root.present(activity, animated: true)
+        }
+        #endif
     }
 
     /// True when there's anything worth copying (goals and/or a transcript).
@@ -1289,8 +1317,12 @@ struct MeetingDetailView: View {
     /// "Copied" confirmation.
     private func copyMeeting() {
         let text = meetingPlainText()
+        #if os(macOS)
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(text, forType: .string)
+        #else
+        UIPasteboard.general.string = text
+        #endif
         didCopy = true
         Task {
             try? await Task.sleep(nanoseconds: 1_500_000_000)
@@ -1349,7 +1381,11 @@ struct MeetingDetailView: View {
             if cloudAnalysisManager.isConfigured {
                 HStack(spacing: 12) {
                     Toggle("Include goals", isOn: $includeGoals)
+                        #if os(macOS)
                         .toggleStyle(.checkbox)
+                        #else
+                        .toggleStyle(.switch)
+                        #endif
                         .font(KFont.sans(12, .medium))
                         .foregroundColor(KColor.inkSoft)
                         .tint(KColor.orange)
@@ -1546,6 +1582,7 @@ struct SettingsTab: View {
 }
 
 // MARK: - Share Sheet
+#if os(macOS)
 struct ShareSheet: NSViewRepresentable {
     let items: [Any]
 
@@ -1561,6 +1598,17 @@ struct ShareSheet: NSViewRepresentable {
 
     func updateNSView(_ nsView: NSView, context: Context) {}
 }
+#else
+struct ShareSheet: UIViewControllerRepresentable {
+    let items: [Any]
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: items, applicationActivities: nil)
+    }
+
+    func updateUIViewController(_ controller: UIActivityViewController, context: Context) {}
+}
+#endif
 
 // MARK: - Audio Action Button
 struct AudioActionButton: View {

@@ -3,116 +3,166 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0AF00002000000000000DEFA /* Themes in Resources */ = {isa = PBXBuildFile; fileRef = 0AF00001000000000000DEFA /* Themes */; };
-		0AF10002000000000000DEFA /* KochiApp/Managers/Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AF10001000000000000DEFA /* KochiApp/Managers/Theme.swift */; };
-		0AF10004000000000000DEFA /* KochiApp/Managers/ThemeStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AF10003000000000000DEFA /* KochiApp/Managers/ThemeStore.swift */; };
-		0AF10006000000000000DEFA /* KochiApp/Views/ThemeImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AF10005000000000000DEFA /* KochiApp/Views/ThemeImage.swift */; };
+		02A43DE85B8D59AE705A5C19 /* MixedAudioRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04MIXREC002 /* MixedAudioRecorder.swift */; };
 		04684A1E2EB6DAD8001E0449 /* CoachingVideoPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04684A1D2EB6DAD8001E0449 /* CoachingVideoPlayerView.swift */; };
 		04684A862EB6E1C8001E0449 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 04684A522EB6E1C8001E0449 /* README.md */; };
 		04684AE52EB81ACE001E0449 /* filmreel.png in Resources */ = {isa = PBXBuildFile; fileRef = 04684AE42EB81ACE001E0449 /* filmreel.png */; };
 		048F21A52E29677B001FA450 /* GoalEvaluation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 048F21A02E29677B001FA450 /* GoalEvaluation.swift */; };
-		16FF74F26DE705B53B57EB3A /* FoundationModelsTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9998351DC542016612CB10 /* FoundationModelsTypes.swift */; };
 		048F21A72E29677B001FA450 /* KochiDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 048F21A12E29677B001FA450 /* KochiDataModel.xcdatamodeld */; };
 		048F21A82E29677B001FA450 /* CoreDataModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 048F219F2E29677B001FA450 /* CoreDataModels.swift */; };
 		048F21AA2E2990B0001FA450 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 048F21A92E29710E001FA450 /* Assets.xcassets */; };
-		04DUALENG001 /* KochiApp/Services/DualTranscriptionEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04DUALENG002 /* KochiApp/Services/DualTranscriptionEngine.swift */; };
-		04SYSAUD001 /* KochiApp/Services/SystemAudioCapture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04SYSAUD002 /* KochiApp/Services/SystemAudioCapture.swift */; };
-		04TAPSHIM001 /* KochiApp/AudioTapShim.m in Sources */ = {isa = PBXBuildFile; fileRef = 04TAPSHIM002 /* KochiApp/AudioTapShim.m */; };
-		04GOALDICT001 /* KochiApp/Services/GoalDictationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04GOALDICT002 /* KochiApp/Services/GoalDictationService.swift */; };
-		04KEYCH001 /* KochiApp/Services/KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04KEYCH002 /* KochiApp/Services/KeychainStore.swift */; };
-		04CAMODELS001 /* KochiApp/Services/CloudLLM/CloudAnalysisModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04CAMODELS002 /* KochiApp/Services/CloudLLM/CloudAnalysisModels.swift */; };
-		04CLLMCL001 /* KochiApp/Services/CloudLLM/CloudLLMClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04CLLMCL002 /* KochiApp/Services/CloudLLM/CloudLLMClient.swift */; };
-		04ANTHRO001 /* KochiApp/Services/CloudLLM/AnthropicClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04ANTHRO002 /* KochiApp/Services/CloudLLM/AnthropicClient.swift */; };
-		04OPENAI001 /* KochiApp/Services/CloudLLM/OpenAIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04OPENAI002 /* KochiApp/Services/CloudLLM/OpenAIClient.swift */; };
-		04CAMGR001 /* KochiApp/Managers/CloudAnalysisManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04CAMGR002 /* KochiApp/Managers/CloudAnalysisManager.swift */; };
-		04MIXREC001 /* KochiApp/Services/MixedAudioRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04MIXREC002 /* KochiApp/Services/MixedAudioRecorder.swift */; };
-		04FILETR001 /* KochiApp/Services/FileTranscriber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04FILETR002 /* KochiApp/Services/FileTranscriber.swift */; };
-		04SELFTEST001 /* KochiApp/Services/TranscriptionSelfTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04SELFTEST002 /* KochiApp/Services/TranscriptionSelfTest.swift */; };
-		04PLATCOLOR001 /* KochiApp/Utilities/PlatformColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04PLATCOLOR002 /* KochiApp/Utilities/PlatformColors.swift */; };
+		04ANTHRO001 /* AnthropicClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04ANTHRO002 /* AnthropicClient.swift */; };
 		04C3F3F22E28D064000228D6 /* LLMManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04C3F3F12E28D064000228D6 /* LLMManager.swift */; };
 		04C3F4032E28DB0A000228D6 /* PromptTemplates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04C3F4022E28DB0A000228D6 /* PromptTemplates.swift */; };
 		04C3F4042E28DB0A000228D6 /* EnhancedThemeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04C3F4012E28DB0A000228D6 /* EnhancedThemeManager.swift */; };
-		47C9718F353F438DB95A0329 /* FoundationModelsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2CC9206C4B5D8E7DCEB38AA /* FoundationModelsService.swift */; };
+		04CAMGR001 /* CloudAnalysisManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04CAMGR002 /* CloudAnalysisManager.swift */; };
+		04CAMODELS001 /* CloudAnalysisModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04CAMODELS002 /* CloudAnalysisModels.swift */; };
+		04CLLMCL001 /* CloudLLMClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04CLLMCL002 /* CloudLLMClient.swift */; };
+		04DUALENG001 /* DualTranscriptionEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04DUALENG002 /* DualTranscriptionEngine.swift */; };
 		04F1EB672E28AF330086D5BC /* TemporaryStubs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04F1EB662E28AF330086D5BC /* TemporaryStubs.swift */; };
 		04F1EB6F2E28C1170086D5BC /* CoachingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04F1EB692E28C1170086D5BC /* CoachingView.swift */; };
 		04F1EB702E28C1170086D5BC /* ModelSelectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04F1EB6A2E28C1170086D5BC /* ModelSelectorView.swift */; };
 		04F1EB722E28C1170086D5BC /* TranscriptionSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04F1EB6D2E28C1170086D5BC /* TranscriptionSettingsView.swift */; };
 		04F1EB772E28C2850086D5BC /* TranscriptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04F1EB762E28C2850086D5BC /* TranscriptionManager.swift */; };
+		04FILETR001 /* FileTranscriber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04FILETR002 /* FileTranscriber.swift */; };
+		04GOALDICT001 /* GoalDictationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04GOALDICT002 /* GoalDictationService.swift */; };
 		04GOALS002 /* GoalsManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04GOALS001 /* GoalsManagementView.swift */; };
-		04VIDEO002 /* KochiApp/Managers/VideoCoachingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04VIDEO001 /* KochiApp/Managers/VideoCoachingManager.swift */; };
-		1A0000001 /* KochiApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000002 /* KochiApp.swift */; };
-		1A0000003 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000004 /* ContentView.swift */; };
-		0KSTYLE01 /* KochiDeviceStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0KSTYLE02 /* KochiDeviceStyle.swift */; };
+		04KEYCH001 /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04KEYCH002 /* KeychainStore.swift */; };
+		04MIXREC001 /* MixedAudioRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04MIXREC002 /* MixedAudioRecorder.swift */; };
+		04OPENAI001 /* OpenAIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04OPENAI002 /* OpenAIClient.swift */; };
+		04PLATCOLOR001 /* PlatformColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04PLATCOLOR002 /* PlatformColors.swift */; };
+		04SELFTEST001 /* TranscriptionSelfTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04SELFTEST002 /* TranscriptionSelfTest.swift */; };
+		04SYSAUD001 /* SystemAudioCapture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04SYSAUD002 /* SystemAudioCapture.swift */; };
+		04TAPSHIM001 /* AudioTapShim.m in Sources */ = {isa = PBXBuildFile; fileRef = 04TAPSHIM002 /* AudioTapShim.m */; };
+		04VIDEO002 /* VideoCoachingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04VIDEO001 /* VideoCoachingManager.swift */; };
+		058AAC2295A5D55129389229 /* filmreel.png in Resources */ = {isa = PBXBuildFile; fileRef = 04684AE42EB81ACE001E0449 /* filmreel.png */; };
+		0AF00002000000000000DEFA /* Themes in Resources */ = {isa = PBXBuildFile; fileRef = 0AF00001000000000000DEFA /* Themes */; };
+		0AF10002000000000000DEFA /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AF10001000000000000DEFA /* Theme.swift */; };
+		0AF10004000000000000DEFA /* ThemeStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AF10003000000000000DEFA /* ThemeStore.swift */; };
+		0AF10006000000000000DEFA /* ThemeImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AF10005000000000000DEFA /* ThemeImage.swift */; };
+		0E5C56A33671FE9564131BF1 /* GoalDictationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04GOALDICT002 /* GoalDictationService.swift */; };
 		0FONTB01 /* ZillaSlab-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0FONTR01 /* ZillaSlab-Regular.ttf */; };
 		0FONTB02 /* ZillaSlab-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0FONTR02 /* ZillaSlab-Medium.ttf */; };
 		0FONTB03 /* ZillaSlab-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0FONTR03 /* ZillaSlab-SemiBold.ttf */; };
 		0FONTB04 /* ZillaSlab-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0FONTR04 /* ZillaSlab-Bold.ttf */; };
 		0FONTB05 /* JetBrainsMono.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0FONTR05 /* JetBrainsMono.ttf */; };
 		0FONTB06 /* HankenGrotesk.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0FONTR06 /* HankenGrotesk.ttf */; };
+		0KSTYLE01 /* KochiDeviceStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0KSTYLE02 /* KochiDeviceStyle.swift */; };
+		110B644CCE416FCE41FEEA97 /* RecordingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000006 /* RecordingView.swift */; };
+		16FF74F26DE705B53B57EB3A /* FoundationModelsTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9998351DC542016612CB10 /* FoundationModelsTypes.swift */; };
+		1898601870928612B818D5C6 /* AudioTapShim.m in Sources */ = {isa = PBXBuildFile; fileRef = 04TAPSHIM002 /* AudioTapShim.m */; };
+		1A0000001 /* KochiApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000002 /* KochiApp.swift */; };
+		1A0000003 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000004 /* ContentView.swift */; };
 		1A0000005 /* RecordingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000006 /* RecordingView.swift */; };
 		1A0000009 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A000000A /* SettingsView.swift */; };
 		1A000000B /* AudioManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A000000C /* AudioManager.swift */; };
 		1A000000D /* GoalManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A000000E /* GoalManager.swift */; };
 		1A000000F /* ThemeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000010 /* ThemeManager.swift */; };
 		1A0000011 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A0000012 /* AVFoundation.framework */; };
-		1A0000031 /* AVKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A0000032 /* AVKit.framework */; };
 		1A0000013 /* Speech.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A0000014 /* Speech.framework */; };
 		1A0000015 /* CoreML.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A0000016 /* CoreML.framework */; };
+		1A0000031 /* AVKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A0000032 /* AVKit.framework */; };
+		1DB5FD9F4F52DC6DE485653D /* ZillaSlab-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0FONTR04 /* ZillaSlab-Bold.ttf */; };
+		2EBC02B5A192834689998543 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A000000A /* SettingsView.swift */; };
+		2F6B384061560D45A60C22E3 /* OpenAIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04OPENAI002 /* OpenAIClient.swift */; };
+		3789CBABEC7DD6A44C8A91C4 /* FoundationModelsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2CC9206C4B5D8E7DCEB38AA /* FoundationModelsService.swift */; };
+		3C212959324BB16BFB076B17 /* ThemeImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AF10005000000000000DEFA /* ThemeImage.swift */; };
+		3FF6451ED6EDEA4403EB1243 /* GoalEvaluation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 048F21A02E29677B001FA450 /* GoalEvaluation.swift */; };
+		3FFAA13BD25D33685236F0BD /* HankenGrotesk.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0FONTR06 /* HankenGrotesk.ttf */; };
+		4115959C10E09ACC309BDB23 /* TranscriptionSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04F1EB6D2E28C1170086D5BC /* TranscriptionSettingsView.swift */; };
+		42B1B82AF060DEDEB98B425C /* CloudAnalysisManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04CAMGR002 /* CloudAnalysisManager.swift */; };
+		440135B66E2CD2C0761FE448 /* FoundationModelsTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9998351DC542016612CB10 /* FoundationModelsTypes.swift */; };
+		47C9718F353F438DB95A0329 /* FoundationModelsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2CC9206C4B5D8E7DCEB38AA /* FoundationModelsService.swift */; };
+		51C6F77BDD260E232A581520 /* GoalsManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04GOALS001 /* GoalsManagementView.swift */; };
+		57885C6A15D025D45FD9F184 /* VideoCoachingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04VIDEO001 /* VideoCoachingManager.swift */; };
+		592CF29FA149AF5C1ADDAB73 /* CloudAnalysisModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04CAMODELS002 /* CloudAnalysisModels.swift */; };
+		5BDCDF8F80E8218AE6F60BE2 /* PlatformColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04PLATCOLOR002 /* PlatformColors.swift */; };
+		63ED3ABF5FF45C795A4EA010 /* KochiDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 048F21A12E29677B001FA450 /* KochiDataModel.xcdatamodeld */; };
+		67425EBF4489FAECE21F1078 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 04684A522EB6E1C8001E0449 /* README.md */; };
+		6BDE069CCE09243430CBEB48 /* KochiApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000002 /* KochiApp.swift */; };
+		710AC1373B5CBD8A8D443C2F /* ThemeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000010 /* ThemeManager.swift */; };
+		735F64F8957365D07C1206B3 /* EnhancedThemeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04C3F4012E28DB0A000228D6 /* EnhancedThemeManager.swift */; };
+		7888E13675D0F385F3B4E5DF /* CoreDataModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 048F219F2E29677B001FA450 /* CoreDataModels.swift */; };
+		78E1ACBAF327E260BBF07453 /* TranscriptionSelfTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04SELFTEST002 /* TranscriptionSelfTest.swift */; };
+		7A973F46FE8635014EC3F834 /* ZillaSlab-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0FONTR03 /* ZillaSlab-SemiBold.ttf */; };
+		7BAB2A90E80736109E6304A5 /* Themes in Resources */ = {isa = PBXBuildFile; fileRef = 0AF00001000000000000DEFA /* Themes */; };
+		89EF829EF5BECE657FB850B2 /* GoalManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A000000E /* GoalManager.swift */; };
+		8BA8743833954FCE8E5943F9 /* ZillaSlab-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0FONTR01 /* ZillaSlab-Regular.ttf */; };
+		8CBB02EF247A7B9BF82551F2 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000004 /* ContentView.swift */; };
+		8D6FEB803FE1DAAFDC8486DF /* DualTranscriptionEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04DUALENG002 /* DualTranscriptionEngine.swift */; };
+		8FDC21D2DFBA9733FDBDD079 /* KochiDeviceStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0KSTYLE02 /* KochiDeviceStyle.swift */; };
+		90FF28C838025077F34B3426 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AF10001000000000000DEFA /* Theme.swift */; };
+		951C686745A5AEEFF186BBE5 /* MeetingFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A44B64F3CA4B /* MeetingFileManager.swift */; };
+		9566266A6F60C02C503774D2 /* LLMManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04C3F3F12E28D064000228D6 /* LLMManager.swift */; };
+		9DAD7D304077015F57FD82CB /* CloudLLMClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04CLLMCL002 /* CloudLLMClient.swift */; };
+		9DE13321DF616E27D7AFE4DE /* TemporaryStubs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04F1EB662E28AF330086D5BC /* TemporaryStubs.swift */; };
+		9F2DF7319C06C928CCEA7476 /* TranscriptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04F1EB762E28C2850086D5BC /* TranscriptionManager.swift */; };
+		A53EAD5C06E364C907F2903F /* AudioManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A000000C /* AudioManager.swift */; };
+		A6F7CF61EB8DEA2AC6701FD8 /* ZillaSlab-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0FONTR02 /* ZillaSlab-Medium.ttf */; };
+		A72FE9CB4847B23E5E3CA5C1 /* CoachingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04F1EB692E28C1170086D5BC /* CoachingView.swift */; };
+		ABC50B28A78E40B784577B89 /* PromptTemplates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04C3F4022E28DB0A000228D6 /* PromptTemplates.swift */; };
 		AFFBC913860C /* MeetingFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A44B64F3CA4B /* MeetingFileManager.swift */; };
+		B53F9281D94BA11E8E347080 /* JetBrainsMono.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0FONTR05 /* JetBrainsMono.ttf */; };
+		B8E003C062AD68F31D2878CE /* ModelSelectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04F1EB6A2E28C1170086D5BC /* ModelSelectorView.swift */; };
+		BBBA04C090EC6A004C3756F8 /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04KEYCH002 /* KeychainStore.swift */; };
+		C0B13910FE65CE4600475FD5 /* AnthropicClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04ANTHRO002 /* AnthropicClient.swift */; };
+		DFF54BDDFFC994417D0775FE /* ThemeStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AF10003000000000000DEFA /* ThemeStore.swift */; };
+		E3E4F81470E29CB317DAA6FD /* CoachingVideoPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04684A1D2EB6DAD8001E0449 /* CoachingVideoPlayerView.swift */; };
+		F5403C0E747DEEF8246DE90B /* FileTranscriber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04FILETR002 /* FileTranscriber.swift */; };
+		FA049A18124361A64F8E53C9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 048F21A92E29710E001FA450 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		0AF00001000000000000DEFA /* Themes */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Resources/Themes; sourceTree = "<group>"; };
-		0AF10001000000000000DEFA /* KochiApp/Managers/Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Managers/Theme.swift; sourceTree = "<group>"; };
-		0AF10003000000000000DEFA /* KochiApp/Managers/ThemeStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Managers/ThemeStore.swift; sourceTree = "<group>"; };
-		0AF10005000000000000DEFA /* KochiApp/Views/ThemeImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeImage.swift; sourceTree = "<group>"; };
+		04561A1B2FEA5B26000BD604 /* KochiApp-iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "KochiApp-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		04684A1D2EB6DAD8001E0449 /* CoachingVideoPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoachingVideoPlayerView.swift; sourceTree = "<group>"; };
 		04684A522EB6E1C8001E0449 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		04684AE42EB81ACE001E0449 /* filmreel.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = filmreel.png; sourceTree = "<group>"; };
-		0KSTYLE02 /* KochiDeviceStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiDeviceStyle.swift; sourceTree = "<group>"; };
-		0FONTR01 /* ZillaSlab-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Fonts/ZillaSlab-Regular.ttf"; sourceTree = "<group>"; };
-		0FONTR02 /* ZillaSlab-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Fonts/ZillaSlab-Medium.ttf"; sourceTree = "<group>"; };
-		0FONTR03 /* ZillaSlab-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Fonts/ZillaSlab-SemiBold.ttf"; sourceTree = "<group>"; };
-		0FONTR04 /* ZillaSlab-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Fonts/ZillaSlab-Bold.ttf"; sourceTree = "<group>"; };
-		0FONTR05 /* JetBrainsMono.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Fonts/JetBrainsMono.ttf"; sourceTree = "<group>"; };
-		0FONTR06 /* HankenGrotesk.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Fonts/HankenGrotesk.ttf"; sourceTree = "<group>"; };
 		048F219F2E29677B001FA450 /* CoreDataModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataModels.swift; sourceTree = "<group>"; };
 		048F21A02E29677B001FA450 /* GoalEvaluation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalEvaluation.swift; sourceTree = "<group>"; };
-		9F9998351DC542016612CB10 /* FoundationModelsTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoundationModelsTypes.swift; sourceTree = "<group>"; };
 		048F21A42E29677B001FA450 /* KochiDataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = KochiDataModel.xcdatamodel; sourceTree = "<group>"; };
 		048F21A92E29710E001FA450 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		04DUALENG002 /* KochiApp/Services/DualTranscriptionEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Services/DualTranscriptionEngine.swift; sourceTree = "<group>"; };
-		04SYSAUD002 /* KochiApp/Services/SystemAudioCapture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Services/SystemAudioCapture.swift; sourceTree = "<group>"; };
-		04TAPSHIM002 /* KochiApp/AudioTapShim.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KochiApp/AudioTapShim.m; sourceTree = "<group>"; };
-		04TAPSHIMH /* KochiApp/AudioTapShim.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KochiApp/AudioTapShim.h; sourceTree = "<group>"; };
-		04BRIDGEH /* KochiApp/Kochi-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KochiApp/Kochi-Bridging-Header.h; sourceTree = "<group>"; };
-		04GOALDICT002 /* KochiApp/Services/GoalDictationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Services/GoalDictationService.swift; sourceTree = "<group>"; };
-		04KEYCH002 /* KochiApp/Services/KeychainStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Services/KeychainStore.swift; sourceTree = "<group>"; };
-		04CAMODELS002 /* KochiApp/Services/CloudLLM/CloudAnalysisModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Services/CloudLLM/CloudAnalysisModels.swift; sourceTree = "<group>"; };
-		04CLLMCL002 /* KochiApp/Services/CloudLLM/CloudLLMClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Services/CloudLLM/CloudLLMClient.swift; sourceTree = "<group>"; };
-		04ANTHRO002 /* KochiApp/Services/CloudLLM/AnthropicClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Services/CloudLLM/AnthropicClient.swift; sourceTree = "<group>"; };
-		04OPENAI002 /* KochiApp/Services/CloudLLM/OpenAIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Services/CloudLLM/OpenAIClient.swift; sourceTree = "<group>"; };
-		04CAMGR002 /* KochiApp/Managers/CloudAnalysisManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Managers/CloudAnalysisManager.swift; sourceTree = "<group>"; };
-		04MIXREC002 /* KochiApp/Services/MixedAudioRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Services/MixedAudioRecorder.swift; sourceTree = "<group>"; };
-		04FILETR002 /* KochiApp/Services/FileTranscriber.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Services/FileTranscriber.swift; sourceTree = "<group>"; };
-		04SELFTEST002 /* KochiApp/Services/TranscriptionSelfTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Services/TranscriptionSelfTest.swift; sourceTree = "<group>"; };
-		04PLATCOLOR002 /* KochiApp/Utilities/PlatformColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Utilities/PlatformColors.swift; sourceTree = "<group>"; };
+		04ANTHRO002 /* AnthropicClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Services/CloudLLM/AnthropicClient.swift; sourceTree = "<group>"; };
+		04BRIDGEH /* Kochi-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "KochiApp/Kochi-Bridging-Header.h"; sourceTree = "<group>"; };
 		04C3F3F12E28D064000228D6 /* LLMManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMManager.swift; sourceTree = "<group>"; };
 		04C3F4012E28DB0A000228D6 /* EnhancedThemeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnhancedThemeManager.swift; sourceTree = "<group>"; };
 		04C3F4022E28DB0A000228D6 /* PromptTemplates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptTemplates.swift; sourceTree = "<group>"; };
-		A2CC9206C4B5D8E7DCEB38AA /* FoundationModelsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FoundationModelsService.swift; path = KochiApp/Services/FoundationModelsService.swift; sourceTree = "<group>"; };
+		04CAMGR002 /* CloudAnalysisManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Managers/CloudAnalysisManager.swift; sourceTree = "<group>"; };
+		04CAMODELS002 /* CloudAnalysisModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Services/CloudLLM/CloudAnalysisModels.swift; sourceTree = "<group>"; };
+		04CLLMCL002 /* CloudLLMClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Services/CloudLLM/CloudLLMClient.swift; sourceTree = "<group>"; };
+		04DUALENG002 /* DualTranscriptionEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Services/DualTranscriptionEngine.swift; sourceTree = "<group>"; };
 		04F1EB662E28AF330086D5BC /* TemporaryStubs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemporaryStubs.swift; sourceTree = "<group>"; };
 		04F1EB692E28C1170086D5BC /* CoachingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoachingView.swift; sourceTree = "<group>"; };
 		04F1EB6A2E28C1170086D5BC /* ModelSelectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelSelectorView.swift; sourceTree = "<group>"; };
 		04F1EB6D2E28C1170086D5BC /* TranscriptionSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptionSettingsView.swift; sourceTree = "<group>"; };
 		04F1EB762E28C2850086D5BC /* TranscriptionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptionManager.swift; sourceTree = "<group>"; };
+		04FILETR002 /* FileTranscriber.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Services/FileTranscriber.swift; sourceTree = "<group>"; };
+		04GOALDICT002 /* GoalDictationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Services/GoalDictationService.swift; sourceTree = "<group>"; };
 		04GOALS001 /* GoalsManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalsManagementView.swift; sourceTree = "<group>"; };
-		04VIDEO001 /* KochiApp/Managers/VideoCoachingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Managers/VideoCoachingManager.swift; sourceTree = "<group>"; };
-		1A0000000 /* KochiApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KochiApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		04KEYCH002 /* KeychainStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Services/KeychainStore.swift; sourceTree = "<group>"; };
+		04MIXREC002 /* MixedAudioRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Services/MixedAudioRecorder.swift; sourceTree = "<group>"; };
+		04OPENAI002 /* OpenAIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Services/CloudLLM/OpenAIClient.swift; sourceTree = "<group>"; };
+		04PLATCOLOR002 /* PlatformColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Utilities/PlatformColors.swift; sourceTree = "<group>"; };
+		04SELFTEST002 /* TranscriptionSelfTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Services/TranscriptionSelfTest.swift; sourceTree = "<group>"; };
+		04SYSAUD002 /* SystemAudioCapture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Services/SystemAudioCapture.swift; sourceTree = "<group>"; };
+		04TAPSHIM002 /* AudioTapShim.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KochiApp/AudioTapShim.m; sourceTree = "<group>"; };
+		04TAPSHIMH /* AudioTapShim.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KochiApp/AudioTapShim.h; sourceTree = "<group>"; };
+		04VIDEO001 /* VideoCoachingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Managers/VideoCoachingManager.swift; sourceTree = "<group>"; };
+		0AF00001000000000000DEFA /* Themes */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Resources/Themes; sourceTree = "<group>"; };
+		0AF10001000000000000DEFA /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Managers/Theme.swift; sourceTree = "<group>"; };
+		0AF10003000000000000DEFA /* ThemeStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp/Managers/ThemeStore.swift; sourceTree = "<group>"; };
+		0AF10005000000000000DEFA /* ThemeImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeImage.swift; sourceTree = "<group>"; };
+		0FONTR01 /* ZillaSlab-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Fonts/ZillaSlab-Regular.ttf"; sourceTree = "<group>"; };
+		0FONTR02 /* ZillaSlab-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Fonts/ZillaSlab-Medium.ttf"; sourceTree = "<group>"; };
+		0FONTR03 /* ZillaSlab-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Fonts/ZillaSlab-SemiBold.ttf"; sourceTree = "<group>"; };
+		0FONTR04 /* ZillaSlab-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Fonts/ZillaSlab-Bold.ttf"; sourceTree = "<group>"; };
+		0FONTR05 /* JetBrainsMono.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fonts/JetBrainsMono.ttf; sourceTree = "<group>"; };
+		0FONTR06 /* HankenGrotesk.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fonts/HankenGrotesk.ttf; sourceTree = "<group>"; };
+		0KSTYLE02 /* KochiDeviceStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiDeviceStyle.swift; sourceTree = "<group>"; };
+		1A0000000 /* Kochi.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Kochi.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1A0000002 /* KochiApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KochiApp.swift; sourceTree = "<group>"; };
 		1A0000004 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		1A0000006 /* RecordingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingView.swift; sourceTree = "<group>"; };
@@ -121,14 +171,37 @@
 		1A000000E /* GoalManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalManager.swift; sourceTree = "<group>"; };
 		1A0000010 /* ThemeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeManager.swift; sourceTree = "<group>"; };
 		1A0000012 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
-		1A0000032 /* AVKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVKit.framework; path = System/Library/Frameworks/AVKit.framework; sourceTree = SDKROOT; };
 		1A0000014 /* Speech.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Speech.framework; path = System/Library/Frameworks/Speech.framework; sourceTree = SDKROOT; };
 		1A0000016 /* CoreML.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreML.framework; path = System/Library/Frameworks/CoreML.framework; sourceTree = SDKROOT; };
 		1A0000018 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1A0000032 /* AVKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVKit.framework; path = System/Library/Frameworks/AVKit.framework; sourceTree = SDKROOT; };
+		9F9998351DC542016612CB10 /* FoundationModelsTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoundationModelsTypes.swift; sourceTree = "<group>"; };
+		A2CC9206C4B5D8E7DCEB38AA /* FoundationModelsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FoundationModelsService.swift; path = KochiApp/Services/FoundationModelsService.swift; sourceTree = "<group>"; };
 		A44B64F3CA4B /* MeetingFileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetingFileManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		04561A1C2FEA5B26000BD604 /* KochiApp-iOS */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
+			explicitFileTypes = {
+			};
+			explicitFolders = (
+			);
+			path = "KochiApp-iOS";
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
 /* Begin PBXFrameworksBuildPhase section */
+		04561A182FEA5B26000BD604 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		1A0000019 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -146,25 +219,25 @@
 		04684AE32EB6FD8B001E0449 /* Recovered References */ = {
 			isa = PBXGroup;
 			children = (
-				0AF10001000000000000DEFA /* KochiApp/Managers/Theme.swift */,
-				0AF10003000000000000DEFA /* KochiApp/Managers/ThemeStore.swift */,
-				04VIDEO001 /* KochiApp/Managers/VideoCoachingManager.swift */,
-				04DUALENG002 /* KochiApp/Services/DualTranscriptionEngine.swift */,
-				04SYSAUD002 /* KochiApp/Services/SystemAudioCapture.swift */,
-				04TAPSHIM002 /* KochiApp/AudioTapShim.m */,
-				04TAPSHIMH /* KochiApp/AudioTapShim.h */,
-				04BRIDGEH /* KochiApp/Kochi-Bridging-Header.h */,
-				04GOALDICT002 /* KochiApp/Services/GoalDictationService.swift */,
-				04KEYCH002 /* KochiApp/Services/KeychainStore.swift */,
-				04CAMODELS002 /* KochiApp/Services/CloudLLM/CloudAnalysisModels.swift */,
-				04CLLMCL002 /* KochiApp/Services/CloudLLM/CloudLLMClient.swift */,
-				04ANTHRO002 /* KochiApp/Services/CloudLLM/AnthropicClient.swift */,
-				04OPENAI002 /* KochiApp/Services/CloudLLM/OpenAIClient.swift */,
-				04CAMGR002 /* KochiApp/Managers/CloudAnalysisManager.swift */,
-				04MIXREC002 /* KochiApp/Services/MixedAudioRecorder.swift */,
-				04FILETR002 /* KochiApp/Services/FileTranscriber.swift */,
-				04SELFTEST002 /* KochiApp/Services/TranscriptionSelfTest.swift */,
-				04PLATCOLOR002 /* KochiApp/Utilities/PlatformColors.swift */,
+				0AF10001000000000000DEFA /* Theme.swift */,
+				0AF10003000000000000DEFA /* ThemeStore.swift */,
+				04VIDEO001 /* VideoCoachingManager.swift */,
+				04DUALENG002 /* DualTranscriptionEngine.swift */,
+				04SYSAUD002 /* SystemAudioCapture.swift */,
+				04TAPSHIM002 /* AudioTapShim.m */,
+				04TAPSHIMH /* AudioTapShim.h */,
+				04BRIDGEH /* Kochi-Bridging-Header.h */,
+				04GOALDICT002 /* GoalDictationService.swift */,
+				04KEYCH002 /* KeychainStore.swift */,
+				04CAMODELS002 /* CloudAnalysisModels.swift */,
+				04CLLMCL002 /* CloudLLMClient.swift */,
+				04ANTHRO002 /* AnthropicClient.swift */,
+				04OPENAI002 /* OpenAIClient.swift */,
+				04CAMGR002 /* CloudAnalysisManager.swift */,
+				04MIXREC002 /* MixedAudioRecorder.swift */,
+				04FILETR002 /* FileTranscriber.swift */,
+				04SELFTEST002 /* TranscriptionSelfTest.swift */,
+				04PLATCOLOR002 /* PlatformColors.swift */,
 			);
 			name = "Recovered References";
 			sourceTree = "<group>";
@@ -185,6 +258,7 @@
 			children = (
 				A2CC9206C4B5D8E7DCEB38AA /* FoundationModelsService.swift */,
 				1A000001B /* KochiApp */,
+				04561A1C2FEA5B26000BD604 /* KochiApp-iOS */,
 				1A000001C /* Products */,
 				1A000001D /* Frameworks */,
 				04684AE32EB6FD8B001E0449 /* Recovered References */,
@@ -220,7 +294,8 @@
 		1A000001C /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				1A0000000 /* KochiApp.app */,
+				1A0000000 /* Kochi.app */,
+				04561A1B2FEA5B26000BD604 /* KochiApp-iOS.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -245,7 +320,7 @@
 				1A0000006 /* RecordingView.swift */,
 				1A000000A /* SettingsView.swift */,
 				04GOALS001 /* GoalsManagementView.swift */,
-				0AF10005000000000000DEFA /* KochiApp/Views/ThemeImage.swift */,
+				0AF10005000000000000DEFA /* ThemeImage.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -268,6 +343,26 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		04561A1A2FEA5B26000BD604 /* KochiApp-iOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 04561A232FEA5B27000BD604 /* Build configuration list for PBXNativeTarget "KochiApp-iOS" */;
+			buildPhases = (
+				04561A172FEA5B26000BD604 /* Sources */,
+				04561A182FEA5B26000BD604 /* Frameworks */,
+				04561A192FEA5B26000BD604 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				04561A1C2FEA5B26000BD604 /* KochiApp-iOS */,
+			);
+			name = "KochiApp-iOS";
+			productName = "KochiApp-iOS";
+			productReference = 04561A1B2FEA5B26000BD604 /* KochiApp-iOS.app */;
+			productType = "com.apple.product-type.application";
+		};
 		1A0000020 /* KochiApp */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 1A0000021 /* Build configuration list for PBXNativeTarget "KochiApp" */;
@@ -282,7 +377,7 @@
 			);
 			name = KochiApp;
 			productName = KochiApp;
-			productReference = 1A0000000 /* KochiApp.app */;
+			productReference = 1A0000000 /* Kochi.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -292,9 +387,12 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1500;
+				LastSwiftUpdateCheck = 2700;
 				LastUpgradeCheck = 1500;
 				TargetAttributes = {
+					04561A1A2FEA5B26000BD604 = {
+						CreatedOnToolsVersion = 27.0;
+					};
 					1A0000020 = {
 						CreatedOnToolsVersion = 15.0;
 					};
@@ -314,11 +412,29 @@
 			projectRoot = "";
 			targets = (
 				1A0000020 /* KochiApp */,
+				04561A1A2FEA5B26000BD604 /* KochiApp-iOS */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		04561A192FEA5B26000BD604 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7BAB2A90E80736109E6304A5 /* Themes in Resources */,
+				FA049A18124361A64F8E53C9 /* Assets.xcassets in Resources */,
+				67425EBF4489FAECE21F1078 /* README.md in Resources */,
+				058AAC2295A5D55129389229 /* filmreel.png in Resources */,
+				8BA8743833954FCE8E5943F9 /* ZillaSlab-Regular.ttf in Resources */,
+				A6F7CF61EB8DEA2AC6701FD8 /* ZillaSlab-Medium.ttf in Resources */,
+				7A973F46FE8635014EC3F834 /* ZillaSlab-SemiBold.ttf in Resources */,
+				1DB5FD9F4F52DC6DE485653D /* ZillaSlab-Bold.ttf in Resources */,
+				B53F9281D94BA11E8E347080 /* JetBrainsMono.ttf in Resources */,
+				3FFAA13BD25D33685236F0BD /* HankenGrotesk.ttf in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		1A0000023 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -339,12 +455,60 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		04561A172FEA5B26000BD604 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				90FF28C838025077F34B3426 /* Theme.swift in Sources */,
+				DFF54BDDFFC994417D0775FE /* ThemeStore.swift in Sources */,
+				6BDE069CCE09243430CBEB48 /* KochiApp.swift in Sources */,
+				A72FE9CB4847B23E5E3CA5C1 /* CoachingView.swift in Sources */,
+				9566266A6F60C02C503774D2 /* LLMManager.swift in Sources */,
+				B8E003C062AD68F31D2878CE /* ModelSelectorView.swift in Sources */,
+				4115959C10E09ACC309BDB23 /* TranscriptionSettingsView.swift in Sources */,
+				3FF6451ED6EDEA4403EB1243 /* GoalEvaluation.swift in Sources */,
+				440135B66E2CD2C0761FE448 /* FoundationModelsTypes.swift in Sources */,
+				63ED3ABF5FF45C795A4EA010 /* KochiDataModel.xcdatamodeld in Sources */,
+				7888E13675D0F385F3B4E5DF /* CoreDataModels.swift in Sources */,
+				8CBB02EF247A7B9BF82551F2 /* ContentView.swift in Sources */,
+				8FDC21D2DFBA9733FDBDD079 /* KochiDeviceStyle.swift in Sources */,
+				110B644CCE416FCE41FEEA97 /* RecordingView.swift in Sources */,
+				51C6F77BDD260E232A581520 /* GoalsManagementView.swift in Sources */,
+				E3E4F81470E29CB317DAA6FD /* CoachingVideoPlayerView.swift in Sources */,
+				2EBC02B5A192834689998543 /* SettingsView.swift in Sources */,
+				9F2DF7319C06C928CCEA7476 /* TranscriptionManager.swift in Sources */,
+				8D6FEB803FE1DAAFDC8486DF /* DualTranscriptionEngine.swift in Sources */,
+				1898601870928612B818D5C6 /* AudioTapShim.m in Sources */,
+				0E5C56A33671FE9564131BF1 /* GoalDictationService.swift in Sources */,
+				BBBA04C090EC6A004C3756F8 /* KeychainStore.swift in Sources */,
+				592CF29FA149AF5C1ADDAB73 /* CloudAnalysisModels.swift in Sources */,
+				9DAD7D304077015F57FD82CB /* CloudLLMClient.swift in Sources */,
+				C0B13910FE65CE4600475FD5 /* AnthropicClient.swift in Sources */,
+				2F6B384061560D45A60C22E3 /* OpenAIClient.swift in Sources */,
+				42B1B82AF060DEDEB98B425C /* CloudAnalysisManager.swift in Sources */,
+				02A43DE85B8D59AE705A5C19 /* MixedAudioRecorder.swift in Sources */,
+				F5403C0E747DEEF8246DE90B /* FileTranscriber.swift in Sources */,
+				78E1ACBAF327E260BBF07453 /* TranscriptionSelfTest.swift in Sources */,
+				5BDCDF8F80E8218AE6F60BE2 /* PlatformColors.swift in Sources */,
+				951C686745A5AEEFF186BBE5 /* MeetingFileManager.swift in Sources */,
+				ABC50B28A78E40B784577B89 /* PromptTemplates.swift in Sources */,
+				735F64F8957365D07C1206B3 /* EnhancedThemeManager.swift in Sources */,
+				A53EAD5C06E364C907F2903F /* AudioManager.swift in Sources */,
+				89EF829EF5BECE657FB850B2 /* GoalManager.swift in Sources */,
+				710AC1373B5CBD8A8D443C2F /* ThemeManager.swift in Sources */,
+				9DE13321DF616E27D7AFE4DE /* TemporaryStubs.swift in Sources */,
+				57885C6A15D025D45FD9F184 /* VideoCoachingManager.swift in Sources */,
+				3789CBABEC7DD6A44C8A91C4 /* FoundationModelsService.swift in Sources */,
+				3C212959324BB16BFB076B17 /* ThemeImage.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		1A0000022 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0AF10002000000000000DEFA /* KochiApp/Managers/Theme.swift in Sources */,
-				0AF10004000000000000DEFA /* KochiApp/Managers/ThemeStore.swift in Sources */,
+				0AF10002000000000000DEFA /* Theme.swift in Sources */,
+				0AF10004000000000000DEFA /* ThemeStore.swift in Sources */,
 				1A0000001 /* KochiApp.swift in Sources */,
 				04F1EB6F2E28C1170086D5BC /* CoachingView.swift in Sources */,
 				04C3F3F22E28D064000228D6 /* LLMManager.swift in Sources */,
@@ -361,20 +525,20 @@
 				04684A1E2EB6DAD8001E0449 /* CoachingVideoPlayerView.swift in Sources */,
 				1A0000009 /* SettingsView.swift in Sources */,
 				04F1EB772E28C2850086D5BC /* TranscriptionManager.swift in Sources */,
-				04DUALENG001 /* KochiApp/Services/DualTranscriptionEngine.swift in Sources */,
-				04SYSAUD001 /* KochiApp/Services/SystemAudioCapture.swift in Sources */,
-				04TAPSHIM001 /* KochiApp/AudioTapShim.m in Sources */,
-				04GOALDICT001 /* KochiApp/Services/GoalDictationService.swift in Sources */,
-				04KEYCH001 /* KochiApp/Services/KeychainStore.swift in Sources */,
-				04CAMODELS001 /* KochiApp/Services/CloudLLM/CloudAnalysisModels.swift in Sources */,
-				04CLLMCL001 /* KochiApp/Services/CloudLLM/CloudLLMClient.swift in Sources */,
-				04ANTHRO001 /* KochiApp/Services/CloudLLM/AnthropicClient.swift in Sources */,
-				04OPENAI001 /* KochiApp/Services/CloudLLM/OpenAIClient.swift in Sources */,
-				04CAMGR001 /* KochiApp/Managers/CloudAnalysisManager.swift in Sources */,
-				04MIXREC001 /* KochiApp/Services/MixedAudioRecorder.swift in Sources */,
-				04FILETR001 /* KochiApp/Services/FileTranscriber.swift in Sources */,
-				04SELFTEST001 /* KochiApp/Services/TranscriptionSelfTest.swift in Sources */,
-				04PLATCOLOR001 /* KochiApp/Utilities/PlatformColors.swift in Sources */,
+				04DUALENG001 /* DualTranscriptionEngine.swift in Sources */,
+				04SYSAUD001 /* SystemAudioCapture.swift in Sources */,
+				04TAPSHIM001 /* AudioTapShim.m in Sources */,
+				04GOALDICT001 /* GoalDictationService.swift in Sources */,
+				04KEYCH001 /* KeychainStore.swift in Sources */,
+				04CAMODELS001 /* CloudAnalysisModels.swift in Sources */,
+				04CLLMCL001 /* CloudLLMClient.swift in Sources */,
+				04ANTHRO001 /* AnthropicClient.swift in Sources */,
+				04OPENAI001 /* OpenAIClient.swift in Sources */,
+				04CAMGR001 /* CloudAnalysisManager.swift in Sources */,
+				04MIXREC001 /* MixedAudioRecorder.swift in Sources */,
+				04FILETR001 /* FileTranscriber.swift in Sources */,
+				04SELFTEST001 /* TranscriptionSelfTest.swift in Sources */,
+				04PLATCOLOR001 /* PlatformColors.swift in Sources */,
 				AFFBC913860C /* MeetingFileManager.swift in Sources */,
 				04C3F4032E28DB0A000228D6 /* PromptTemplates.swift in Sources */,
 				04C3F4042E28DB0A000228D6 /* EnhancedThemeManager.swift in Sources */,
@@ -382,15 +546,91 @@
 				1A000000D /* GoalManager.swift in Sources */,
 				1A000000F /* ThemeManager.swift in Sources */,
 				04F1EB672E28AF330086D5BC /* TemporaryStubs.swift in Sources */,
-				04VIDEO002 /* KochiApp/Managers/VideoCoachingManager.swift in Sources */,
+				04VIDEO002 /* VideoCoachingManager.swift in Sources */,
 				47C9718F353F438DB95A0329 /* FoundationModelsService.swift in Sources */,
-				0AF10006000000000000DEFA /* KochiApp/Views/ThemeImage.swift in Sources */,
+				0AF10006000000000000DEFA /* ThemeImage.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		04561A242FEA5B27000BD604 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "KochiApp/KochiApp-iOS.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = F8G3UV3DQD;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = KochiApp/Info.plist;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.janisheck.kochi;
+				PRODUCT_NAME = Kochi;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "KochiApp/Kochi-Bridging-Header.h";
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		04561A252FEA5B27000BD604 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "KochiApp/KochiApp-iOS.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = F8G3UV3DQD;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = KochiApp/Info.plist;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.janisheck.kochi;
+				PRODUCT_NAME = Kochi;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "KochiApp/Kochi-Bridging-Header.h";
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		1A0000026 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -516,12 +756,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = KochiApp/Kochi.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = F8G3UV3DQD;
+				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = KochiApp/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Kochi";
+				INFOPLIST_KEY_CFBundleDisplayName = Kochi;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Kochi needs access to your microphone to record audio for transcription and coaching.";
 				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Kochi uses speech recognition to transcribe your recordings and provide real-time feedback.";
@@ -529,16 +771,14 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 27.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.janisheck.kochiapp;
 				PRODUCT_NAME = Kochi;
 				SUPPORTED_PLATFORMS = macosx;
 				SUPPORTS_MACCATALYST = NO;
-				MACOSX_DEPLOYMENT_TARGET = 27.0;
-				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = KochiApp/Kochi.entitlements;
-				ENABLE_HARDENED_RUNTIME = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "KochiApp/Kochi-Bridging-Header.h";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "KochiApp/Kochi-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
@@ -549,12 +789,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = KochiApp/Kochi.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = F8G3UV3DQD;
+				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = KochiApp/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Kochi";
+				INFOPLIST_KEY_CFBundleDisplayName = Kochi;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Kochi needs access to your microphone to record audio for transcription and coaching.";
 				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Kochi uses speech recognition to transcribe your recordings and provide real-time feedback.";
@@ -562,16 +804,14 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 27.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.janisheck.kochiapp;
 				PRODUCT_NAME = Kochi;
 				SUPPORTED_PLATFORMS = macosx;
 				SUPPORTS_MACCATALYST = NO;
-				MACOSX_DEPLOYMENT_TARGET = 27.0;
-				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = KochiApp/Kochi.entitlements;
-				ENABLE_HARDENED_RUNTIME = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "KochiApp/Kochi-Bridging-Header.h";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "KochiApp/Kochi-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
@@ -579,6 +819,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		04561A232FEA5B27000BD604 /* Build configuration list for PBXNativeTarget "KochiApp-iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				04561A242FEA5B27000BD604 /* Debug */,
+				04561A252FEA5B27000BD604 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		1A0000021 /* Build configuration list for PBXNativeTarget "KochiApp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

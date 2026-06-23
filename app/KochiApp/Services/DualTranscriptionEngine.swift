@@ -165,7 +165,9 @@ final class DualTranscriptionEngine: ObservableObject {
 
     private let micChannel = SpeechChannel(label: DualTranscriptionEngine.micLabel)
     private let systemChannel = SpeechChannel(label: DualTranscriptionEngine.systemLabel)
+    #if os(macOS)
     private let systemCapture = SystemAudioCapture()
+    #endif
 
     /// Finalized lines per speaker, plus the current live partial per speaker.
     private var finalized: [TranscriptLine] = []
@@ -200,6 +202,9 @@ final class DualTranscriptionEngine: ObservableObject {
 
         micChannel.start()
 
+        #if os(macOS)
+        // System (far-side) audio capture is macOS-only (ScreenCaptureKit).
+        // iOS is mic-only, so this whole branch is compiled out there.
         if includeSystemAudio {
             systemChannel.start()
             systemCapture.onBuffer = { [weak self] buffer in
@@ -212,6 +217,7 @@ final class DualTranscriptionEngine: ObservableObject {
                 }
             }
         }
+        #endif
     }
 
     /// Feed a microphone buffer (from AudioManager's existing input tap).
@@ -222,7 +228,9 @@ final class DualTranscriptionEngine: ObservableObject {
     func stop() {
         micChannel.stop()
         systemChannel.stop()
+        #if os(macOS)
         systemCapture.stop()
+        #endif
         DispatchQueue.main.async { self.isRunning = false }
     }
 

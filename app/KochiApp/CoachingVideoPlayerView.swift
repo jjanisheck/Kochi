@@ -79,8 +79,13 @@ struct CoachingVideoPlayerView: View {
 // Renders an AVPlayer through a raw AVPlayerLayer — no playback controls, no
 // hover affordances, not clickable. Used instead of AVKit's `VideoPlayer`,
 // which always overlays transport controls on pointer hover.
+#if os(macOS)
 import AppKit
+#else
+import UIKit
+#endif
 
+#if os(macOS)
 struct PlayerLayerView: NSViewRepresentable {
     let player: AVPlayer
     var cornerRadius: CGFloat = 0
@@ -129,6 +134,45 @@ final class PlayerLayerHostView: NSView {
     // Let every pointer event pass straight through — the video is decorative.
     override func hitTest(_ point: NSPoint) -> NSView? { nil }
 }
+#else
+struct PlayerLayerView: UIViewRepresentable {
+    let player: AVPlayer
+    var cornerRadius: CGFloat = 0
+
+    func makeUIView(context: Context) -> PlayerLayerHostView {
+        let view = PlayerLayerHostView()
+        view.playerLayer.player = player
+        view.cornerRadius = cornerRadius
+        return view
+    }
+
+    func updateUIView(_ uiView: PlayerLayerHostView, context: Context) {
+        uiView.playerLayer.player = player
+        uiView.cornerRadius = cornerRadius
+    }
+}
+
+final class PlayerLayerHostView: UIView {
+    override class var layerClass: AnyClass { AVPlayerLayer.self }
+    var playerLayer: AVPlayerLayer { layer as! AVPlayerLayer }
+    var cornerRadius: CGFloat = 0 { didSet { applyCornerRadius() } }
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        playerLayer.videoGravity = .resizeAspectFill
+        isUserInteractionEnabled = false
+        applyCornerRadius()
+    }
+
+    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+
+    private func applyCornerRadius() {
+        // Clip the video at the layer level so the rounded corners are reliable.
+        layer.cornerRadius = cornerRadius
+        layer.masksToBounds = cornerRadius > 0
+    }
+}
+#endif
 
 struct CoachingVideoPlayerView_Previews: PreviewProvider {
     static var previews: some View {

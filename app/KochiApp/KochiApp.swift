@@ -29,8 +29,10 @@ struct KochiApp: App {
     }
 
     // A regular windowed app (Dock icon + normal window level). The menu-bar
-    // icon is kept as a quick way to summon the window.
+    // icon is kept as a quick way to summon the window. (macOS only.)
+    #if os(macOS)
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
+    #endif
 
     @StateObject private var audioManager = AudioManager()
     @StateObject private var goalManager = GoalManager()
@@ -55,6 +57,7 @@ struct KochiApp: App {
                 .id(themeStore.themeVersion)
                 .animation(.easeInOut(duration: 0.3), value: themeStore.themeVersion)
                 .onAppear { setupApp() }
+                #if os(macOS)
                 // Fixed device-card width. The card fills to the very top;
                 // the header rows inset their content past the traffic lights so
                 // the READY bar snugs right up under the system dot bar.
@@ -62,10 +65,13 @@ struct KochiApp: App {
                 // Hand SwiftUI's `openWindow` action to the AppKit delegate so the
                 // menu-bar icon can spawn a fresh window once the last one is closed.
                 .background(WindowOpenerBridge())
+                #endif
         }
+        #if os(macOS)
         .windowStyle(.hiddenTitleBar)
         .windowResizability(.contentSize)
         .defaultPosition(.center)
+        #endif
     }
 
     private func setupApp() {
@@ -80,6 +86,7 @@ struct KochiApp: App {
     }
 }
 
+#if os(macOS)
 import AppKit
 
 /// Keeps the menu-bar icon. The app is a regular windowed app (Dock icon,
@@ -169,3 +176,4 @@ private struct WindowOpenerBridge: View {
             }
     }
 }
+#endif
