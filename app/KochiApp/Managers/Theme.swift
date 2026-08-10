@@ -101,22 +101,48 @@ enum ThemeColorMath {
         let rotated = (h + 165.0 / 360.0).truncatingRemainder(dividingBy: 1)
         // Clamp both ways: a neon accent must not produce a neon counterpart, and
         // a muddy one must still be distinguishable.
-        return color(h: rotated, s: min(max(s, 0.35), 0.62), b: min(max(b, 0.45), 0.78))
+        return color(h: rotated, s: min(max(s, 0.45), 0.75), b: 0.62)
     }
 
-    /// A tint of `base` for a bubble fill — low alpha so the frosted recess and
-    /// the theme background read through it.
-    static func bubbleFill(_ base: Color, isDark: Bool) -> Color {
-        base.opacity(isDark ? 0.26 : 0.16)
+    /// Relative luminance, WCAG 2.1.
+    static func luminance(_ color: Color) -> Double {
+        guard let (r, g, b, _) = rgba(color) else { return 0 }
+        func f(_ u: Double) -> Double { u <= 0.03928 ? u / 12.92 : pow((u + 0.055) / 1.055, 2.4) }
+        return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b)
     }
 
-    /// Body text for a bubble of `base`: the same hue pushed to a legible end of
-    /// the range — deep on a light palette, bright on a dark one — so the two
-    /// speakers stay colour-coded without either becoming unreadable.
-    static func bubbleInk(_ base: Color, isDark: Bool) -> Color {
-        guard let (h, s, _, _) = hsb(base) else { return isDark ? .white : .black }
-        return isDark ? color(h: h, s: min(s, 0.42), b: 0.92)
-                      : color(h: h, s: min(max(s, 0.5), 0.95), b: 0.36)
+    /// WCAG contrast ratio. 4.5 is the pass mark for body text.
+    static func contrast(_ a: Color, _ b: Color) -> Double {
+        let la = luminance(a), lb = luminance(b)
+        return (max(la, lb) + 0.05) / (min(la, lb) + 0.05)
+    }
+
+    static func mix(_ a: Color, _ b: Color) -> Color {
+        guard let x = rgba(a), let y = rgba(b) else { return a }
+        return Color(.sRGB, red: (x.r + y.r) / 2, green: (x.g + y.g) / 2,
+                     blue: (x.b + y.b) / 2, opacity: 1)
+    }
+
+    /// The darker stop for a bubble gradient, mirroring how `buttonLo` sits under
+    /// `buttonHi` on the physical keys.
+    static func gradientLo(of hi: Color) -> Color {
+        guard let (h, s, b, _) = hsb(hi) else { return hi }
+        return color(h: h, s: s, b: max(b * 0.76, 0.12))
+    }
+
+    /// Body text for a filled bubble. White when it clears the 4.5 body-text
+    /// threshold — that is what the primary key uses, so the bubble reads as the
+    /// same piece of hardware — and otherwise the fill's own hue driven deep until
+    /// it does. A bright accent like the default orange cannot carry white text at
+    /// 11.5pt, so it gets near-black in its own hue instead of an unreadable match.
+    static func legibleInk(on fill: Color) -> Color {
+        if contrast(.white, fill) >= 4.5 { return .white }
+        guard let (h, s, _, _) = hsb(fill) else { return .black }
+        for b in [0.20, 0.17, 0.14, 0.11, 0.08] {
+            let candidate = color(h: h, s: min(s * 1.05, 1), b: b)
+            if contrast(candidate, fill) >= 4.5 { return candidate }
+        }
+        return contrast(.black, fill) >= contrast(.white, fill) ? .black : .white
     }
 }
 
@@ -187,13 +213,14 @@ struct ThemePalette {
     /// Optional; defaults to the theme's own `paper`/`panel` at ~22–30% — a wash,
     /// not a fill, so the background art stays legible through it.
     let transcriptFill: Color
-    /// The two speakers' bubbles. ME defaults to the theme accent (`buttonHi`),
-    /// THEM to that accent rotated 165° round the wheel — clearly a different
-    /// voice, still in the same family. The `Ink` tokens are the body text, pushed
-    /// deep on a light palette and bright on a dark one. All four are optional;
-    /// override any of them per theme.
-    let transcriptMeFill, transcriptMeInk: Color
-    let transcriptThemFill, transcriptThemInk: Color
+    /// The two speakers' bubbles, drawn as gradients exactly like the physical
+    /// keys. ME *is* the RECORD key: `buttonHi` → `buttonLo`. THEM is that accent
+    /// rotated 165° round the wheel and darkened to the same depth, so the far
+    /// side reads as a different voice on matching hardware. The `Ink` tokens are
+    /// chosen for legibility — white where it clears WCAG AA (as on the key),
+    /// otherwise the fill's own hue driven deep. All six are optional.
+    let transcriptMeFill, transcriptMeLo, transcriptMeInk: Color
+    let transcriptThemFill, transcriptThemLo, transcriptThemInk: Color
 
     /// Ordered token names — used to decode/validate the `colors` map.
     static let tokenNames = ["orange","orangeDeep","ink","inkSoft","paper","win",
@@ -204,8 +231,9 @@ struct ThemePalette {
                              "goalDoneHi","goalDoneLo","meterHi","meterLo",
                              "neutralKeyFill","logoTint","slabRule","onBg","onBgFaint",
                              "deckScrimTop","deckScrimBottom",
-                             "transcriptFill","transcriptMeFill","transcriptMeInk",
-                             "transcriptThemFill","transcriptThemInk"]
+                             "transcriptFill",
+                             "transcriptMeFill","transcriptMeLo","transcriptMeInk",
+                             "transcriptThemFill","transcriptThemLo","transcriptThemInk"]
 
     /// Today's exact palette — the safety net if discovery ever finds nothing.
     static let fallback = ThemePalette(
@@ -276,10 +304,14 @@ struct ThemePalette {
         let them = ThemeColorMath.counterpart(of: me)
         self.transcriptFill = c("transcriptFill")
             ?? (dark ? panel.opacity(0.30) : paper.opacity(0.22))
-        self.transcriptMeFill = c("transcriptMeFill") ?? ThemeColorMath.bubbleFill(me, isDark: dark)
-        self.transcriptMeInk = c("transcriptMeInk") ?? ThemeColorMath.bubbleInk(me, isDark: dark)
-        self.transcriptThemFill = c("transcriptThemFill") ?? ThemeColorMath.bubbleFill(them, isDark: dark)
-        self.transcriptThemInk = c("transcriptThemInk") ?? ThemeColorMath.bubbleInk(them, isDark: dark)
+        self.transcriptMeFill = c("transcriptMeFill") ?? me
+        self.transcriptMeLo = c("transcriptMeLo") ?? self.buttonLo
+        self.transcriptThemFill = c("transcriptThemFill") ?? them
+        self.transcriptThemLo = c("transcriptThemLo") ?? ThemeColorMath.gradientLo(of: them)
+        self.transcriptMeInk = c("transcriptMeInk")
+            ?? ThemeColorMath.legibleInk(on: ThemeColorMath.mix(self.transcriptMeFill, self.transcriptMeLo))
+        self.transcriptThemInk = c("transcriptThemInk")
+            ?? ThemeColorMath.legibleInk(on: ThemeColorMath.mix(self.transcriptThemFill, self.transcriptThemLo))
     }
 
     /// Memberwise init (used by `fallback`).
@@ -316,10 +348,13 @@ struct ThemePalette {
         let dark = ThemeColorMath.isDark(ink: ink)
         let them = ThemeColorMath.counterpart(of: buttonHi)
         self.transcriptFill = dark ? panel.opacity(0.30) : paper.opacity(0.22)
-        self.transcriptMeFill = ThemeColorMath.bubbleFill(buttonHi, isDark: dark)
-        self.transcriptMeInk = ThemeColorMath.bubbleInk(buttonHi, isDark: dark)
-        self.transcriptThemFill = ThemeColorMath.bubbleFill(them, isDark: dark)
-        self.transcriptThemInk = ThemeColorMath.bubbleInk(them, isDark: dark)
+        self.transcriptMeFill = buttonHi
+        self.transcriptMeLo = buttonLo
+        self.transcriptThemFill = them
+        self.transcriptThemLo = ThemeColorMath.gradientLo(of: them)
+        self.transcriptMeInk = ThemeColorMath.legibleInk(on: ThemeColorMath.mix(buttonHi, buttonLo))
+        self.transcriptThemInk = ThemeColorMath.legibleInk(
+            on: ThemeColorMath.mix(them, ThemeColorMath.gradientLo(of: them)))
     }
 }
 

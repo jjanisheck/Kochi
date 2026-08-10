@@ -193,34 +193,39 @@ default shown.
 | `onBg`, `onBgFaint` | `inkSoft` / `muted` | Text that sits directly on the background (labels, status) |
 | `deckScrimTop`, `deckScrimBottom` | black 0.45 → 0.7 | Gradient darkening over the reel (use `#RRGGBBAA` to lighten) |
 | `transcriptFill` | `paper` @22% (light) / `panel` @30% (dark) | The live-transcript recess. It is a **wash over your background**, not a card — keep the alpha low or the panel goes back to reading as a solid slab. Raise it if your art is busy enough to fight the text. |
-| `transcriptMeFill`, `transcriptMeInk` | derived from `buttonHi` | Your side of the conversation: bubble tint + body text |
-| `transcriptThemFill`, `transcriptThemInk` | derived, `buttonHi` rotated 165° | The other side |
+| `transcriptMeFill`, `transcriptMeLo`, `transcriptMeInk` | `buttonHi` / `buttonLo` / auto | Your side: the RECORD key's own gradient + its body text |
+| `transcriptThemFill`, `transcriptThemLo`, `transcriptThemInk` | derived, `buttonHi` rotated 165° | The other side, same depth |
 
 #### How the transcript colours are derived
 
-You do not have to set any of the five. **ME takes your `buttonHi` accent; THEM is
-that accent rotated 165° round the colour wheel** — far enough to read as a
-different voice, short of the exact 180° complement, which lands on a jarring
-opposite. Saturation and brightness are then clamped so a neon accent cannot
-produce a neon counterpart, and the body inks are pushed deep on a light palette
-or bright on a dark one.
+You do not have to set any of these. **A speech bubble is drawn as a key** — the
+same top-to-bottom gradient and top highlight the RECORD button wears — so a line
+of transcript reads as the same piece of hardware as the transport.
 
-An accent with almost no hue to rotate (NOIR's grey, saturation < 0.15) falls back
-to a calm blue-grey, rather than producing a second grey indistinguishable from ME.
+**ME is literally the RECORD key**: `buttonHi` → `buttonLo`. **THEM is that accent
+rotated 165° round the wheel** and darkened to the same depth: far enough to read
+as a different voice, short of the exact 180° complement, which lands on a jarring
+opposite. An accent with almost no hue to rotate (NOIR's grey, saturation < 0.15)
+falls back to a calm blue-grey rather than a second grey indistinguishable from ME.
+
+The ink is chosen for legibility, not fixed: **white where it clears WCAG AA — as
+it does on the key — and otherwise the fill's own hue driven deep until it does.**
+A bright accent like the default orange cannot carry white body text at 11.5pt, so
+it gets a near-black in its own hue instead of an unreadable match.
 
 What the five shipped themes get for free:
 
-| theme | ME | THEM | contrast (ME / THEM) |
-|-------|-----|------|----------------------|
-| default | `#FF7A36` orange | `#4CBCC7` cyan | 11.5 / 8.1 |
-| bricks | `#FF8C2B` amber | `#4CADC7` cyan | 10.9 / 8.9 |
-| noir | `#6E6E6E` grey | `#6B8099` blue-grey *(fallback)* | 12.0 / 7.9 |
-| zen | `#46B883` green | `#B84698` magenta | 7.9 / 11.7 |
-| hero | `#D32F2F` red | `#4CC7A8` teal | 13.4 / 7.8 |
+| theme | ME gradient | ink | THEM gradient | ink |
+|-------|-------------|-----|---------------|-----|
+| default | `#FF7A36`→`#EC5000` | `#331303` (5.5) | `#28949E`→`#1E7078` | white (4.5) |
+| bricks | `#FF8C2B`→`#F25C00` | `#331602` (6.0) | `#28859E`→`#1E6578` | white (5.2) |
+| noir | `#6E6E6E`→`#0E0E0E` | white (10.7) | `#6B8099`→`#516174` | white (5.1) |
+| zen | `#46B883`→`#2E8B57` | `#0E2B1D` (4.7) | `#9E3C82`→`#782E63` | white (7.4) |
+| hero | `#D32F2F`→`#9E1B1B` | white (6.3) | `#289E80`→`#1E7862` | black (5.0) |
 
-Contrast is the WCAG ratio of body text against the frosted ground; 4.5 is the
-pass mark for body text, so all ten clear it comfortably. Override any token if
-you want a different pairing — but check the ratio if you do.
+Bracketed numbers are the WCAG contrast ratio of the ink against its own bubble;
+4.5 is the pass mark for body text, so all ten clear it. Override any token if you
+want a different pairing — but check the ratio if you do.
 
 > `hero` is the worked example for all of these — red `buttonHi/Lo`, blue
 > `meterHi/Lo`, frosted `goalRestFill`, brown `slabRule`/`logoTint`, lightened
