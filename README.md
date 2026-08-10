@@ -162,14 +162,25 @@ open Kochi.xcodeproj
 
 ### 2. Set your signing team
 
-Because Apple apps must be signed, and the checked-in project carries the
-original author's team:
+The project ships with **no development team** — `DEVELOPMENT_TEAM` is blank on
+purpose, so nobody inherits anyone else's signing identity. Xcode will tell you
+"Signing requires a development team" until you set your own:
 
 1. In Xcode, select the **KochiApp** target → **Signing & Capabilities**.
 2. Pick your **Team** (your free Apple ID works).
 3. Change the **Bundle Identifier** to something of your own, e.g.
    `com.yourname.kochi`.
 4. Repeat both for the **Kochi-iOS** target if you want the iPhone build.
+
+> **Heads up for contributors:** picking a team makes Xcode write it straight back
+> into `project.pbxproj`. Before you commit, check you are not sending your own
+> team ID along with the change:
+>
+> ```bash
+> git diff app/Kochi.xcodeproj/project.pbxproj | grep DEVELOPMENT_TEAM
+> ```
+>
+> If it shows your ID, `git checkout` that file or revert those lines.
 
 ### 3. Run
 

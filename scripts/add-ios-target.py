@@ -8,9 +8,19 @@ point: `KochiApp.swift` (AppKit window + menu-bar item) is replaced by
 Idempotent: re-running after the target exists is a no-op.
 """
 
+import os
 import re
 import sys
 from pathlib import Path
+
+# Signing identity is not baked in — nobody should inherit someone else's from a
+# checked-out project. Set these in your environment before running, or leave them
+# and pick your team in Xcode's Signing & Capabilities afterwards.
+#
+#   KOCHI_DEVELOPMENT_TEAM=ABCDE12345 KOCHI_BUNDLE_ID=com.you.kochi.ios \
+#       python3 scripts/add-ios-target.py
+DEVELOPMENT_TEAM = os.environ.get("KOCHI_DEVELOPMENT_TEAM", "")
+BUNDLE_ID = os.environ.get("KOCHI_BUNDLE_ID", "com.example.kochiapp.ios")
 
 ROOT = Path(__file__).resolve().parent.parent
 PBX = ROOT / "app" / "Kochi.xcodeproj" / "project.pbxproj"
@@ -239,7 +249,7 @@ def main():
             "\t\t\t\tASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;\n"
             "\t\t\t\tCODE_SIGN_STYLE = Automatic;\n"
             "\t\t\t\tCURRENT_PROJECT_VERSION = 1;\n"
-            "\t\t\t\tDEVELOPMENT_TEAM = F8G3UV3DQD;\n"
+            f"\t\t\t\tDEVELOPMENT_TEAM = \"{DEVELOPMENT_TEAM}\";\n"
             "\t\t\t\tENABLE_PREVIEWS = YES;\n"
             "\t\t\t\tGENERATE_INFOPLIST_FILE = YES;\n"
             "\t\t\t\tINFOPLIST_FILE = KochiApp/Info.plist;\n"
@@ -253,7 +263,7 @@ def main():
             '\t\t\t\t\t"@executable_path/Frameworks",\n'
             "\t\t\t\t);\n"
             "\t\t\t\tMARKETING_VERSION = 1.0;\n"
-            "\t\t\t\tPRODUCT_BUNDLE_IDENTIFIER = com.janisheck.kochiapp.ios;\n"
+            f"\t\t\t\tPRODUCT_BUNDLE_IDENTIFIER = {BUNDLE_ID};\n"
             '\t\t\t\tPRODUCT_NAME = "Kochi-iOS";\n'
             '\t\t\t\tSUPPORTED_PLATFORMS = "iphoneos iphonesimulator";\n'
             "\t\t\t\tSUPPORTS_MACCATALYST = NO;\n"
