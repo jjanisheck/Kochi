@@ -95,7 +95,9 @@ enum ThemeColorMath {
     /// falls back to a calm blue-grey rather than producing another grey that
     /// would be indistinguishable from the ME side.
     static func counterpart(of accent: Color) -> Color {
-        guard let (h, s, b, _) = hsb(accent), s >= 0.15 else {
+        // Brightness is deliberately dropped: the counterpart is pinned to a fixed
+        // depth below so a pale accent cannot yield a washed-out THEM bubble.
+        guard let (h, s, _, _) = hsb(accent), s >= 0.15 else {
             return Color(.sRGB, red: 0.42, green: 0.50, blue: 0.60, opacity: 1)
         }
         let rotated = (h + 165.0 / 360.0).truncatingRemainder(dividingBy: 1)

@@ -44,13 +44,25 @@ check() { # $1=label $2=phase-id $3=sdk $4=target-triple $5=derived-sources-dir
   fi
 
   echo "    ${#files[@]} sources + ${#gen[@]} generated"
-  if swiftc -typecheck \
+  local out errs warns
+  out=$(swiftc -typecheck \
       -sdk "$(xcrun --sdk "$3" --show-sdk-path)" \
       -target "$4" \
       -import-objc-header app/KochiApp/Kochi-Bridging-Header.h \
-      "${files[@]}" "${gen[@]}" 2>&1 | grep -E "error:" | grep -v "^ "; then
+      "${files[@]}" "${gen[@]}" 2>&1)
+
+  # Warnings count too. Xcode shows them, so silence here has to mean silence
+  # there; only errors fail the run.
+  errs=$(echo "$out" | grep -E "error:" | grep -v "^ *|")
+  warns=$(echo "$out" | grep -E "warning:" | grep -v "^ *|")
+
+  [ -n "$warns" ] && echo "$warns" | sed 's/^/    /'
+  if [ -n "$errs" ]; then
+    echo "$errs" | sed 's/^/    /'
     echo "    FAILED"
     STATUS=1
+  elif [ -n "$warns" ]; then
+    echo "    OK (with warnings)"
   else
     echo "    OK"
   fi
