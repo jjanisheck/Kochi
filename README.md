@@ -273,6 +273,19 @@ xcodebuild -project Kochi.xcodeproj -scheme Kochi-iOS -destination 'generic/plat
 xcodebuild -project Kochi.xcodeproj -scheme KochiApp -destination 'platform=macOS' test
 ```
 
+For a fast check without launching Xcode, `scripts/typecheck.sh` runs the real
+type checker over both targets' exact source sets (read from `project.pbxproj`)
+and reports errors **and** warnings:
+
+```bash
+./scripts/typecheck.sh          # both targets
+./scripts/typecheck.sh ios      # or: macos
+```
+
+It needs one prior Xcode build so the generated Core Data classes exist, and says
+so rather than passing silently if they are missing. It is a type check, not a
+build — it does not link, run tests, or produce an app.
+
 Confirm **both** targets build before committing, and don't commit secrets or
 build artifacts (`DerivedData/`, `.build/`).
 
@@ -324,6 +337,10 @@ doesn't need notarization.
   JetBrains Mono / Hanken Grotesk), `kCard()`, `SlabLabel`, `BeveledKeyStyle`,
   `ChatTranscriptView`, and the tape deck (`TapeDeckPanel`, `TapeReel`,
   `DeckCounterWindow`). Reuse these instead of system fonts and colors.
+
+  The live transcript's bubbles are drawn as RECORD keys — ME takes the theme's
+  own `buttonHi`→`buttonLo` gradient, THEM a rotated counterpart — both derived in
+  `ThemePalette` and overridable per theme.
 
   Colors come from `KColor`, which reads the `ActivePalette` mirror rather than a
   published property — so a view that paints with `KColor` has **no** SwiftUI

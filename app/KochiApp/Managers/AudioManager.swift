@@ -73,7 +73,7 @@ class AudioManager: NSObject, ObservableObject {
     /// uses the asynchronous API, with the result handed back on the main queue.
     /// Everything that depends on a live input route runs in the completion, not
     /// after the call returns.
-    private static let sessionQueue = DispatchQueue(label: "com.janisheck.kochi.audio-session")
+    private static let sessionQueue = DispatchQueue(label: "kochi.audio-session")
 
     private func setupAudioSession(completion: ((Bool) -> Void)? = nil) {
         #if os(iOS)
