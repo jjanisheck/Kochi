@@ -245,14 +245,24 @@ struct KochiMC1View: View {
                 transcriptBody
                 // Bottom fade, so the newest line runs under the module floor
                 // instead of stopping dead against it.
-                LinearGradient(colors: [KColor.transcriptRowFill, KColor.transcriptRowFill.opacity(0)],
+                LinearGradient(colors: [KColor.transcriptFill, KColor.transcriptFill.opacity(0)],
                                startPoint: .bottom, endPoint: .top)
                     .frame(height: 24)
                     .allowsHitTesting(false)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(KColor.transcriptRowFill)
+            // Frosted, not solid: a blur of the theme background under a
+            // translucent tint, so the transcript sits *in* the theme rather than
+            // as a white slab on top of it. The blur is what keeps the text
+            // readable over busy art — the same treatment the goal rows use when
+            // a theme opts into `goalRestBlur`.
+            .background(.ultraThinMaterial)
+            .background(KColor.transcriptFill)
             .clipShape(RoundedRectangle(cornerRadius: MC1.screenRadius, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: MC1.screenRadius, style: .continuous)
+                    .strokeBorder(KColor.line.opacity(0.45), lineWidth: 1)
+            )
         }
         .frame(minHeight: MC1.deckHeight + 2 * MC1.modulePad)
         .frame(maxHeight: .infinity)

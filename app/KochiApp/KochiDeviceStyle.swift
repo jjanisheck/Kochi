@@ -50,6 +50,11 @@ enum KColor {
     static var onBgFaint: Color    { p.onBgFaint }
     static var deckScrimTop: Color    { p.deckScrimTop }
     static var deckScrimBottom: Color { p.deckScrimBottom }
+    static var transcriptFill: Color      { p.transcriptFill }
+    static var transcriptMeFill: Color    { p.transcriptMeFill }
+    static var transcriptMeInk: Color     { p.transcriptMeInk }
+    static var transcriptThemFill: Color  { p.transcriptThemFill }
+    static var transcriptThemInk: Color   { p.transcriptThemInk }
 }
 
 // MARK: - Bundled fonts
@@ -356,7 +361,7 @@ struct ChatTranscriptView: View {
             }
             Text(turn.text)
                 .font(KFont.mono(11.5))
-                .foregroundColor(textColor)
+                .foregroundColor(ink(turn.speaker))
                 .multilineTextAlignment(rightAligned ? .trailing : .leading)
                 .fixedSize(horizontal: false, vertical: true)
         }
@@ -367,44 +372,48 @@ struct ChatTranscriptView: View {
 
     @ViewBuilder private func bubbleBackground(_ s: TranscriptSpeaker) -> some View {
         let shape = RoundedRectangle(cornerRadius: 8, style: .continuous)
-        if onDark {
-            // Over the spinning reel a faint tint is unreadable, so the live
-            // transcript mirrors the goal rows: a frosted blur of the deck behind
-            // the themed `goalRestFill`, read with the dark goal ink. The blur is
-            // what obscures the reel enough for the text to pop.
-            shape
-                .fill(.ultraThinMaterial)
-                .overlay(shape.fill(KColor.goalRestFill))
-                .overlay(shape.strokeBorder(strokeColor(s), lineWidth: 1))
-        } else {
-            shape
-                .fill(bubbleColor(s))
-                .overlay(shape.strokeBorder(strokeColor(s), lineWidth: 1))
+        // The bubble is a tint, not a slab. It sits on the frosted recess, which
+        // is itself showing the theme background, so a translucent fill lets the
+        // theme read all the way through while the blur underneath keeps the text
+        // legible. `.other` (unattributed) stays a neutral wash.
+        shape
+            .fill(fill(s))
+            .overlay(shape.strokeBorder(strokeColor(s), lineWidth: 1))
+    }
+
+    // Mic ("Me") and system ("Them") now come from the palette: ME is the theme's
+    // own accent, THEM is that accent rotated round the wheel, both derived in
+    // `ThemePalette` and overridable per theme. They used to be two hardcoded
+    // RGB literals, which is why the transcript looked the same under every theme.
+
+    private func fill(_ s: TranscriptSpeaker) -> Color {
+        switch s {
+        case .me:    return KColor.transcriptMeFill
+        case .them:  return KColor.transcriptThemFill
+        case .other: return onDark ? Color.white.opacity(0.06) : Color.black.opacity(0.04)
         }
     }
 
-    // Mic ("Me") = orange, System ("Them") = steel blue. Tuned per background.
-    private var meHue: Color { Color(red: 255/255, green: 138/255, blue: 77/255) }
-    private var themHue: Color { Color(red: 120/255, green: 158/255, blue: 200/255) }
+    private func ink(_ s: TranscriptSpeaker) -> Color {
+        switch s {
+        case .me:    return KColor.transcriptMeInk
+        case .them:  return KColor.transcriptThemInk
+        // Unattributed lines take the body ink of whichever ground they are on.
+        case .other: return onDark ? KColor.goalRestInk : KColor.ink
+        }
+    }
 
-    private var textColor: Color {
-        // The live (onDark) transcript sits on the frosted `goalRestFill` bubble,
-        // so it reads with that fill's paired ink — guaranteed-legible per theme.
-        onDark ? KColor.goalRestInk : KColor.ink
-    }
     private func labelColor(_ s: TranscriptSpeaker) -> Color {
-        // Both "ME" and "THEM" labels use the theme's primary key color.
-        KColor.buttonHi
+        // The speaker tag is the bubble's own ink, so ME and THEM are labelled in
+        // the colour they are written in rather than both in the accent.
+        ink(s)
     }
-    private func bubbleColor(_ s: TranscriptSpeaker) -> Color {
-        if s == .other { return onDark ? Color.white.opacity(0.06) : Color.black.opacity(0.04) }
-        let hue = s == .them ? themHue : meHue
-        return onDark ? hue.opacity(0.16) : hue.opacity(0.10)
-    }
+
     private func strokeColor(_ s: TranscriptSpeaker) -> Color {
         if s == .other { return onDark ? Color.white.opacity(0.10) : Color.black.opacity(0.08) }
-        let hue = s == .them ? themHue : meHue
-        return onDark ? hue.opacity(0.30) : hue.opacity(0.25)
+        // Same hue as the fill, carried at a higher alpha so the bubble has a
+        // defined edge against the frosted ground without a hard outline.
+        return (s == .them ? KColor.transcriptThemFill : KColor.transcriptMeFill).opacity(0.85)
     }
 }
 

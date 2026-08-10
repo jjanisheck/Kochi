@@ -32,6 +32,94 @@ extension Color {
     }
 }
 
+// MARK: - Colour maths
+
+/// sRGB components and HSB conversion for palette colours, used to derive the
+/// live-transcript tones from whatever accent a theme already declares. Every
+/// palette colour originates as a hex string, so this round-trips exactly.
+enum ThemeColorMath {
+    static func rgba(_ color: Color) -> (r: Double, g: Double, b: Double, a: Double)? {
+        #if canImport(UIKit)
+        var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
+        guard UIColor(color).getRed(&r, green: &g, blue: &b, alpha: &a) else { return nil }
+        return (Double(r), Double(g), Double(b), Double(a))
+        #elseif canImport(AppKit)
+        guard let c = NSColor(color).usingColorSpace(.sRGB) else { return nil }
+        return (Double(c.redComponent), Double(c.greenComponent),
+                Double(c.blueComponent), Double(c.alphaComponent))
+        #else
+        return nil
+        #endif
+    }
+
+    static func hsb(_ color: Color) -> (h: Double, s: Double, b: Double, a: Double)? {
+        guard let (r, g, b, a) = rgba(color) else { return nil }
+        let maxV = max(r, g, b), minV = min(r, g, b), delta = maxV - minV
+        var h = 0.0
+        if delta > 0 {
+            if maxV == r { h = ((g - b) / delta).truncatingRemainder(dividingBy: 6) }
+            else if maxV == g { h = (b - r) / delta + 2 }
+            else { h = (r - g) / delta + 4 }
+            h /= 6
+            if h < 0 { h += 1 }
+        }
+        return (h, maxV == 0 ? 0 : delta / maxV, maxV, a)
+    }
+
+    static func color(h: Double, s: Double, b: Double, a: Double = 1) -> Color {
+        let i = Int(h * 6) % 6
+        let f = h * 6 - Double(Int(h * 6))
+        let p = b * (1 - s), q = b * (1 - f * s), t = b * (1 - (1 - f) * s)
+        let (r, g, bl): (Double, Double, Double)
+        switch i {
+        case 0: (r, g, bl) = (b, t, p)
+        case 1: (r, g, bl) = (q, b, p)
+        case 2: (r, g, bl) = (p, b, t)
+        case 3: (r, g, bl) = (p, q, b)
+        case 4: (r, g, bl) = (t, p, b)
+        default: (r, g, bl) = (b, p, q)
+        }
+        return Color(.sRGB, red: r, green: g, blue: bl, opacity: a)
+    }
+
+    /// True when the palette is a dark one — judged by its own body ink being
+    /// light, which is the only signal `ThemePalette` has without the scheme.
+    static func isDark(ink: Color) -> Bool { (hsb(ink)?.b ?? 0) > 0.5 }
+
+    /// The counterpart hue for the far side of a conversation: the accent rotated
+    /// most of the way round the wheel. Stops short of a true 180° complement,
+    /// which lands on the eye-jarring exact opposite; 165° reads as clearly
+    /// "a different speaker" while still sitting in the same family.
+    ///
+    /// A near-neutral accent (NOIR's grey) has no meaningful hue to rotate, so it
+    /// falls back to a calm blue-grey rather than producing another grey that
+    /// would be indistinguishable from the ME side.
+    static func counterpart(of accent: Color) -> Color {
+        guard let (h, s, b, _) = hsb(accent), s >= 0.15 else {
+            return Color(.sRGB, red: 0.42, green: 0.50, blue: 0.60, opacity: 1)
+        }
+        let rotated = (h + 165.0 / 360.0).truncatingRemainder(dividingBy: 1)
+        // Clamp both ways: a neon accent must not produce a neon counterpart, and
+        // a muddy one must still be distinguishable.
+        return color(h: rotated, s: min(max(s, 0.35), 0.62), b: min(max(b, 0.45), 0.78))
+    }
+
+    /// A tint of `base` for a bubble fill — low alpha so the frosted recess and
+    /// the theme background read through it.
+    static func bubbleFill(_ base: Color, isDark: Bool) -> Color {
+        base.opacity(isDark ? 0.26 : 0.16)
+    }
+
+    /// Body text for a bubble of `base`: the same hue pushed to a legible end of
+    /// the range — deep on a light palette, bright on a dark one — so the two
+    /// speakers stay colour-coded without either becoming unreadable.
+    static func bubbleInk(_ base: Color, isDark: Bool) -> Color {
+        guard let (h, s, _, _) = hsb(base) else { return isDark ? .white : .black }
+        return isDark ? color(h: h, s: min(s, 0.42), b: 0.92)
+                      : color(h: h, s: min(max(s, 0.5), 0.95), b: 0.36)
+    }
+}
+
 /// The palette tokens that back `KColor`. `buttonHi`/`buttonLo` are the primary
 /// (glossy "key") button + hit-goal gradient stops; a theme may omit them in its
 /// JSON, in which case they default to `orange`/`orangeDeep`.
@@ -93,6 +181,18 @@ struct ThemePalette {
     /// black 0.45 → 0.7 deck darkening. A near-clear scrim lets the image's
     /// real colors show through.
     let deckScrimTop, deckScrimBottom: Color
+    /// Live-transcript recess: a translucent tint laid over a blur of the theme
+    /// background, so the panel sits *in* the theme instead of on top of it as a
+    /// solid white slab. Use 8-digit `#RRGGBBAA` hex — the alpha is the point.
+    /// Optional; defaults to the theme's own `paper`/`panel` at ~62% .
+    let transcriptFill: Color
+    /// The two speakers' bubbles. ME defaults to the theme accent (`buttonHi`),
+    /// THEM to that accent rotated 165° round the wheel — clearly a different
+    /// voice, still in the same family. The `Ink` tokens are the body text, pushed
+    /// deep on a light palette and bright on a dark one. All four are optional;
+    /// override any of them per theme.
+    let transcriptMeFill, transcriptMeInk: Color
+    let transcriptThemFill, transcriptThemInk: Color
 
     /// Ordered token names — used to decode/validate the `colors` map.
     static let tokenNames = ["orange","orangeDeep","ink","inkSoft","paper","win",
@@ -102,7 +202,9 @@ struct ThemePalette {
                              "goalUnmetFill","goalUnmetInk","goalKeyFill","transcriptRowFill","goalRestBorder",
                              "goalDoneHi","goalDoneLo","meterHi","meterLo",
                              "neutralKeyFill","logoTint","slabRule","onBg","onBgFaint",
-                             "deckScrimTop","deckScrimBottom"]
+                             "deckScrimTop","deckScrimBottom",
+                             "transcriptFill","transcriptMeFill","transcriptMeInk",
+                             "transcriptThemFill","transcriptThemInk"]
 
     /// Today's exact palette — the safety net if discovery ever finds nothing.
     static let fallback = ThemePalette(
@@ -164,6 +266,19 @@ struct ThemePalette {
         self.onBgFaint = c("onBgFaint") ?? muted
         self.deckScrimTop = c("deckScrimTop") ?? Color.black.opacity(0.45)
         self.deckScrimBottom = c("deckScrimBottom") ?? Color.black.opacity(0.7)
+
+        // Live transcript. Derived from what the theme already declares, so every
+        // theme — including ones written later — gets a legible, on-palette
+        // transcript for free, and any of the five can still be overridden.
+        let dark = ThemeColorMath.isDark(ink: ink)
+        let me = self.buttonHi
+        let them = ThemeColorMath.counterpart(of: me)
+        self.transcriptFill = c("transcriptFill")
+            ?? (dark ? panel.opacity(0.55) : paper.opacity(0.62))
+        self.transcriptMeFill = c("transcriptMeFill") ?? ThemeColorMath.bubbleFill(me, isDark: dark)
+        self.transcriptMeInk = c("transcriptMeInk") ?? ThemeColorMath.bubbleInk(me, isDark: dark)
+        self.transcriptThemFill = c("transcriptThemFill") ?? ThemeColorMath.bubbleFill(them, isDark: dark)
+        self.transcriptThemInk = c("transcriptThemInk") ?? ThemeColorMath.bubbleInk(them, isDark: dark)
     }
 
     /// Memberwise init (used by `fallback`).
@@ -195,6 +310,15 @@ struct ThemePalette {
         self.logoTint = logoTint; self.slabRule = slabRule
         self.onBg = onBg; self.onBgFaint = onBgFaint
         self.deckScrimTop = deckScrimTop; self.deckScrimBottom = deckScrimBottom
+        // Derived here too, so the memberwise init (and `fallback`) stay in step
+        // with the JSON path without repeating five more parameters.
+        let dark = ThemeColorMath.isDark(ink: ink)
+        let them = ThemeColorMath.counterpart(of: buttonHi)
+        self.transcriptFill = dark ? panel.opacity(0.55) : paper.opacity(0.62)
+        self.transcriptMeFill = ThemeColorMath.bubbleFill(buttonHi, isDark: dark)
+        self.transcriptMeInk = ThemeColorMath.bubbleInk(buttonHi, isDark: dark)
+        self.transcriptThemFill = ThemeColorMath.bubbleFill(them, isDark: dark)
+        self.transcriptThemInk = ThemeColorMath.bubbleInk(them, isDark: dark)
     }
 }
 

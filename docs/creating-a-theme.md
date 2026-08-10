@@ -192,6 +192,35 @@ default shown.
 | `logoTint` | — (no tint) | Multiply-recolor for a **white** `KochiLogo.png` |
 | `onBg`, `onBgFaint` | `inkSoft` / `muted` | Text that sits directly on the background (labels, status) |
 | `deckScrimTop`, `deckScrimBottom` | black 0.45 → 0.7 | Gradient darkening over the reel (use `#RRGGBBAA` to lighten) |
+| `transcriptFill` | `paper` @62% (light) / `panel` @55% (dark) | The live-transcript recess. It is frosted — a blur of your background under this tint — so **keep it translucent**; a solid value puts the white slab back. |
+| `transcriptMeFill`, `transcriptMeInk` | derived from `buttonHi` | Your side of the conversation: bubble tint + body text |
+| `transcriptThemFill`, `transcriptThemInk` | derived, `buttonHi` rotated 165° | The other side |
+
+#### How the transcript colours are derived
+
+You do not have to set any of the five. **ME takes your `buttonHi` accent; THEM is
+that accent rotated 165° round the colour wheel** — far enough to read as a
+different voice, short of the exact 180° complement, which lands on a jarring
+opposite. Saturation and brightness are then clamped so a neon accent cannot
+produce a neon counterpart, and the body inks are pushed deep on a light palette
+or bright on a dark one.
+
+An accent with almost no hue to rotate (NOIR's grey, saturation < 0.15) falls back
+to a calm blue-grey, rather than producing a second grey indistinguishable from ME.
+
+What the five shipped themes get for free:
+
+| theme | ME | THEM | contrast (ME / THEM) |
+|-------|-----|------|----------------------|
+| default | `#FF7A36` orange | `#4CBCC7` cyan | 11.5 / 8.1 |
+| bricks | `#FF8C2B` amber | `#4CADC7` cyan | 10.9 / 8.9 |
+| noir | `#6E6E6E` grey | `#6B8099` blue-grey *(fallback)* | 12.0 / 7.9 |
+| zen | `#46B883` green | `#B84698` magenta | 7.9 / 11.7 |
+| hero | `#D32F2F` red | `#4CC7A8` teal | 13.4 / 7.8 |
+
+Contrast is the WCAG ratio of body text against the frosted ground; 4.5 is the
+pass mark for body text, so all ten clear it comfortably. Override any token if
+you want a different pairing — but check the ratio if you do.
 
 > `hero` is the worked example for all of these — red `buttonHi/Lo`, blue
 > `meterHi/Lo`, frosted `goalRestFill`, brown `slabRule`/`logoTint`, lightened
