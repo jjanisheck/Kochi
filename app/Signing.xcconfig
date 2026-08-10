@@ -1,0 +1,23 @@
+// Kōchi — signing configuration
+//
+// This file is tracked; it deliberately contains no identity. Your Apple
+// development team lives in `Signing.local.xcconfig`, which sits beside this file
+// and is gitignored, so a checked-out project never carries anyone's signing
+// identity and Xcode has nowhere to write yours back into `project.pbxproj`.
+//
+// To sign the app, create `app/Signing.local.xcconfig`:
+//
+//     KOCHI_DEVELOPMENT_TEAM = ABCDE12345
+//
+// Your team ID is in Xcode ▸ Settings ▸ Accounts (select your account, then
+// "Manage Certificates…"), or at developer.apple.com/account under Membership.
+//
+// Set the team **here, in that file** rather than in Xcode's Signing &
+// Capabilities dropdown. Using the dropdown makes Xcode write the value into
+// project.pbxproj, which is exactly what this arrangement avoids.
+//
+// The `?` makes the include optional: with no local file the build still
+// configures, Xcode simply reports that signing needs a team.
+#include? "Signing.local.xcconfig"
+
+DEVELOPMENT_TEAM = $(KOCHI_DEVELOPMENT_TEAM)

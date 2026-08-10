@@ -103,6 +103,9 @@ ruvector.db
 # --- Old design/coordination notes (not app docs) ---
 docs/archive/
 
+# --- Signing identity: never committed, see app/Signing.xcconfig ---
+Signing.local.xcconfig
+
 # --- AI assistant planning/spec artifacts (kept locally, not published) ---
 docs/superpowers/
 tasks/

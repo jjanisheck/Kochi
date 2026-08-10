@@ -162,25 +162,26 @@ open Kochi.xcodeproj
 
 ### 2. Set your signing team
 
-The project ships with **no development team** — `DEVELOPMENT_TEAM` is blank on
-purpose, so nobody inherits anyone else's signing identity. Xcode will tell you
-"Signing requires a development team" until you set your own:
+Signing lives **outside version control**. `app/Signing.xcconfig` is tracked and
+deliberately holds no identity; it optionally includes `app/Signing.local.xcconfig`,
+which is gitignored and is where your team ID goes. Create it:
 
-1. In Xcode, select the **KochiApp** target → **Signing & Capabilities**.
-2. Pick your **Team** (your free Apple ID works).
-3. Change the **Bundle Identifier** to something of your own, e.g.
-   `com.yourname.kochi`.
-4. Repeat both for the **Kochi-iOS** target if you want the iPhone build.
+```bash
+echo 'KOCHI_DEVELOPMENT_TEAM = ABCDE12345' > app/Signing.local.xcconfig
+```
 
-> **Heads up for contributors:** picking a team makes Xcode write it straight back
-> into `project.pbxproj`. Before you commit, check you are not sending your own
-> team ID along with the change:
->
-> ```bash
-> git diff app/Kochi.xcodeproj/project.pbxproj | grep DEVELOPMENT_TEAM
-> ```
->
-> If it shows your ID, `git checkout` that file or revert those lines.
+Your team ID is in Xcode ▸ Settings ▸ Accounts (select your account →
+"Manage Certificates…"), or at developer.apple.com/account under Membership. A
+free Apple ID works.
+
+Then set your own bundle identifier per target in Xcode ▸ **Signing &
+Capabilities** — e.g. `com.yourname.kochi` and `com.yourname.kochi.ios`.
+
+> **Set the team in that file, not in Xcode's Team dropdown.** Using the dropdown
+> makes Xcode write your ID into `project.pbxproj`, which is the thing this
+> arrangement exists to prevent. The `#include?` is optional, so a clone without
+> the local file still configures cleanly — Xcode just reports that signing needs
+> a team.
 
 ### 3. Run
 

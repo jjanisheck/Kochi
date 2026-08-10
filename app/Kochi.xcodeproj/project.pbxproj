@@ -179,6 +179,7 @@
 		A44B64F3CA4B /* MeetingFileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetingFileManager.swift; sourceTree = "<group>"; };
 		1BMC1V001 /* KochiMC1View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = KochiMC1View.swift; path = KochiMC1View.swift; sourceTree = "<group>"; };
 		1BIOSAPP01 /* KochiApp_iOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = KochiApp_iOS.swift; path = KochiApp_iOS.swift; sourceTree = "<group>"; };
+		0SIGNCFG01 /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
 		1B0000000 /* Kochi-iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Kochi-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -244,6 +245,7 @@
 		1A000001A = {
 			isa = PBXGroup;
 			children = (
+				0SIGNCFG01 /* Signing.xcconfig */,
 				A2CC9206C4B5D8E7DCEB38AA /* FoundationModelsService.swift */,
 				1A000001B /* KochiApp */,
 				1A000001C /* Products */,
@@ -543,6 +545,7 @@
 /* Begin XCBuildConfiguration section */
 		1A0000026 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0SIGNCFG01 /* Signing.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -606,6 +609,7 @@
 		};
 		1A0000027 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0SIGNCFG01 /* Signing.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -669,7 +673,6 @@
 				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = KochiApp/Kochi.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = NO;
@@ -713,7 +716,6 @@
 				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = KochiApp/Kochi.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = NO;
@@ -755,7 +757,6 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = KochiApp/Info.plist;
@@ -787,7 +788,6 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = KochiApp/Info.plist;
