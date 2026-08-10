@@ -5,7 +5,7 @@
 //  Shared "physical device" design system for the KŌCHI Meeting Companion,
 //  ported from the Claude Design prototype (KOCHI Meeting Companion.html /
 //  app.jsx). Palette, bundled-font helpers, beveled physical-key button style,
-//  and the mono section label are reused by ContentView and SettingsView.
+//  and the mono section label are reused by KochiMC1View and SettingsView.
 //
 
 import SwiftUI
@@ -408,3 +408,169 @@ struct ChatTranscriptView: View {
     }
 }
 
+
+// MARK: - Tape deck
+//
+// The transport of a real deck: two reels — supply and take-up — with a
+// recessed counter/VU window between them, over the theme's own plate art.
+// Shared so the desktop and the phone render one deck, not two that drift.
+
+/// mm:ss, the tape counter's format.
+func deckTime(_ t: TimeInterval) -> String {
+    let s = max(0, Int(t))
+    return String(format: "%02d:%02d", s / 60, s % 60)
+}
+
+/// One tape reel, drawn from the app's own reel art over the themed deck plate,
+/// with the per-theme grayscale/brightness treatment from `ActiveDeck`. No blend
+/// mode: `.screen` only works while the plate is a literal near-black, and washes
+/// the deck out once the plate is theme art.
+struct TapeReel: View {
+    let isSpinning: Bool
+    /// Seconds per revolution. The take-up reel runs faster than the supply
+    /// reel, the way real tape does.
+    let revolutionSeconds: Double
+    let size: CGFloat
+
+    @State private var angle: Double = 0
+
+    var body: some View {
+        ThemeImage("FilmReel")
+            .scaledToFit()
+            .frame(width: size, height: size)
+            .grayscale(ActiveDeck.reelGrayscale)
+            .brightness(ActiveDeck.reelBrightness)
+            .rotationEffect(.degrees(angle))
+            .allowsHitTesting(false)
+            .onChange(of: isSpinning) { _, spinning in
+                if spinning { spin() } else { halt() }
+            }
+            .onAppear { if isSpinning { spin() } }
+    }
+
+    private func spin() {
+        angle = 0
+        withAnimation(.linear(duration: revolutionSeconds).repeatForever(autoreverses: false)) {
+            angle = 360
+        }
+    }
+
+    private func halt() {
+        withAnimation(.easeOut(duration: 0.35)) { angle = 0 }
+    }
+}
+
+/// The recessed window between the reels: tape counter over an 8-segment VU
+/// meter, the way the transport of a real deck reads.
+struct DeckCounterWindow: View {
+    let elapsed: TimeInterval
+    let level: Float
+    let isLive: Bool
+
+    private static let segments = 8
+
+    var body: some View {
+        VStack(spacing: 7) {
+            Text(deckTime(elapsed))
+                .font(KFont.mono(21, .medium))
+                .tracking(0.4)
+                .foregroundColor(isLive ? KColor.orange : KColor.muted2)
+
+            HStack(alignment: .bottom, spacing: 3) {
+                ForEach(0..<Self.segments, id: \.self) { i in
+                    Rectangle()
+                        .fill(i < lit
+                              ? AnyShapeStyle(LinearGradient(colors: [KColor.meterHi, KColor.meterLo],
+                                                             startPoint: .top, endPoint: .bottom))
+                              : AnyShapeStyle(KColor.deckBorder))
+                        .frame(width: 3, height: 13)
+                        // Segments fall away from full height as the level drops,
+                        // so the meter reads as a needle, not a bar.
+                        .scaleEffect(y: i < lit ? 1 : 0.35, anchor: .bottom)
+                }
+            }
+            .frame(height: 13, alignment: .bottom)
+            .animation(.easeOut(duration: 0.12), value: lit)
+        }
+        .padding(.horizontal, 11)
+        .padding(.vertical, 9)
+        .background(
+            RoundedRectangle(cornerRadius: 4, style: .continuous)
+                .fill(KColor.deck)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 4, style: .continuous)
+                        .strokeBorder(.white.opacity(0.06), lineWidth: 1)
+                )
+        )
+    }
+
+    private var lit: Int {
+        guard isLive else { return 0 }
+        return max(1, min(Self.segments, Int(level * Float(Self.segments))))
+    }
+}
+
+/// The whole deck: themed plate, two reels cropped in half by the deck floor,
+/// and the counter window centred between them.
+struct TapeDeckPanel: View {
+    let elapsed: TimeInterval
+    let level: Float
+    let isLive: Bool
+    var height: CGFloat = 96
+    var cornerRadius: CGFloat = 5
+
+    /// Reels are twice the deck's height, so the floor crops them in half and
+    /// only their top halves are on show.
+    private var reelSize: CGFloat { height * 2 }
+    /// Inset of each reel's centre from its edge, scaled off the reel so the
+    /// pair always leaves the counter window clear in the middle.
+    private var reelInset: CGFloat { reelSize * 0.3 }
+
+    var body: some View {
+        GeometryReader { geo in
+            ZStack {
+                // Base tone, so a theme with no plate art never flashes white.
+                KColor.deck
+
+                // The plate needs a definite frame, exactly as `ThemeBackground`
+                // gives its art. A bare `scaledToFill()` keeps the image's own
+                // (much larger) size, which inflates the ZStack — and since a
+                // GeometryReader pins its content to the top-leading corner, the
+                // centred counter then sits well below the visible deck.
+                ThemeImage("BackgroundPlainImage")
+                    .scaledToFill()
+                    .frame(width: geo.size.width, height: geo.size.height)
+                    .clipped()
+
+                // The themed deck scrim. This is what makes the deck read like
+                // the coach screen: that module lays its caption gradient over a
+                // black base, so the liquid-glass sheen — which is pure white —
+                // has something dark to catch on. Straight onto bright plate art
+                // the same sheen all but disappears and the deck goes flat.
+                //
+                // `deckScrimTop`/`deckScrimBottom` are first-class palette tokens
+                // (BRICKS and HERO already tune them; everything else takes the
+                // black 0.45 → 0.7 default) that nothing was reading. Sitting
+                // under the reels, the scrim also restores the dark field the
+                // silver-on-black reel art was drawn for.
+                LinearGradient(colors: [KColor.deckScrimTop, KColor.deckScrimBottom],
+                               startPoint: .top, endPoint: .bottom)
+
+                // Reels hang half below the floor: centred on the deck's bottom
+                // edge, so only their top halves show.
+                TapeReel(isSpinning: isLive, revolutionSeconds: 2.4, size: reelSize)
+                    .position(x: reelInset, y: geo.size.height)
+                TapeReel(isSpinning: isLive, revolutionSeconds: 3.6, size: reelSize)
+                    .position(x: geo.size.width - reelInset, y: geo.size.height)
+
+                // Dead centre of the deck, between the two reels.
+                DeckCounterWindow(elapsed: elapsed, level: level, isLive: isLive)
+                    .position(x: geo.size.width / 2, y: geo.size.height / 2)
+            }
+            .frame(width: geo.size.width, height: geo.size.height)
+        }
+        .frame(height: height)
+        .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+        .liquidGlass(cornerRadius, inset: 3)
+    }
+}

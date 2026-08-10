@@ -1,3 +1,7 @@
+// ScreenCaptureKit system-audio capture is macOS-only; on iOS the far side
+// of a call is never available to a third-party app, so this whole file is
+// compiled out and `DualTranscriptionEngine` runs mic-only there.
+#if os(macOS)
 import Foundation
 import AVFoundation
 import ScreenCaptureKit
@@ -89,3 +93,4 @@ final class SystemAudioCapture: NSObject, SCStreamOutput, SCStreamDelegate {
         return pcm
     }
 }
+#endif

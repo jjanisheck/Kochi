@@ -335,7 +335,7 @@ enum ActiveGoal {
     nonisolated(unsafe) static var restBlur: Bool = false
 }
 
-/// Nonisolated mirror of home-screen chrome flags (read by `ContentView`, which
+/// Nonisolated mirror of home-screen chrome flags (read by `KochiMC1View`, which
 /// uses the `KColor`/mirror pattern rather than an `@EnvironmentObject`).
 /// Written by `ThemeStore` on the main actor.
 enum ActiveChrome {

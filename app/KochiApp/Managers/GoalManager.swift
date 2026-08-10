@@ -148,6 +148,15 @@ class GoalManager: ObservableObject {
         currentMeeting?.audioFolderName = name
     }
 
+    /// Drop the in-progress meeting without filing it. Used when a recording
+    /// never actually started: `startNewMeeting` has already run by then, and
+    /// `endCurrentMeeting` would commit an empty session to history.
+    func discardCurrentMeeting() {
+        currentMeeting = nil
+        notes = ""
+        saveNotes()
+    }
+
     func endCurrentMeeting() {
         guard var meeting = currentMeeting else { return }
 

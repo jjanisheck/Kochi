@@ -12,6 +12,10 @@ class AudioManager: NSObject, ObservableObject {
     @Published var transcriptionText = ""
     @Published var coachingResponse = ""
     @Published var hasPermission = false
+    /// Non-nil when a recording could not start, or died on its way up. The UI
+    /// shows this instead of a session that looks live but is deaf. Cleared at
+    /// the top of the next start.
+    @Published var recordingFailure: String?
     
     // MARK: - Audio Properties
     private var audioEngine: AVAudioEngine?
@@ -48,8 +52,70 @@ class AudioManager: NSObject, ObservableObject {
     }
     
     // MARK: - Setup
-    private func setupAudioSession() {
-        // macOS: AVAudioEngine's input node works without an audio session.
+    /// Configure and activate the iOS audio session, then call back on the main
+    /// queue with whether the session came up. On macOS `AVAudioEngine`'s input
+    /// node works without a session, so this reports success immediately.
+    ///
+    /// Called from `init` and again immediately before each recording, and the
+    /// second call is the one that matters: iOS only wires up a real input route
+    /// when the session is active and record-capable at the moment
+    /// `AVAudioEngine.inputNode` is first touched. The session opened at `init`
+    /// predates the microphone permission prompt (the app is constructed before
+    /// the first view appears) and predates any coach-video playback, either of
+    /// which leaves the engine with a 0 Hz input format and a tap that never
+    /// fires — the app looks like it is recording but hears nothing.
+    ///
+    /// Nothing here touches the session on the caller's thread. `setCategory` is
+    /// a hang risk once the session is active, and the synchronous
+    /// `setActive(_:options:)` is a hang risk always — both trip the runtime's
+    /// "AVAudioSession Hang Risk" check when the record button calls them on the
+    /// main thread. So the configuration runs on this serial queue and activation
+    /// uses the asynchronous API, with the result handed back on the main queue.
+    /// Everything that depends on a live input route runs in the completion, not
+    /// after the call returns.
+    private static let sessionQueue = DispatchQueue(label: "com.janisheck.kochi.audio-session")
+
+    private func setupAudioSession(completion: ((Bool) -> Void)? = nil) {
+        #if os(iOS)
+        Self.sessionQueue.async {
+            let session = AVAudioSession.sharedInstance()
+            do {
+                // `.default`, not `.spokenAudio`: the SDK documents spokenAudio
+                // purely as a playback mode for podcast/audiobook apps that want to
+                // be paused rather than ducked. It says nothing about input, and
+                // setting it on a record path leaves the session without a usable
+                // input route — the engine then reports a 2 ch / 0 Hz format and
+                // AURemoteIO fails -10851.
+                try session.setCategory(.playAndRecord,
+                                        mode: .default,
+                                        options: [.defaultToSpeaker, .allowBluetoothHFP])
+            } catch {
+                print("⚠️ Audio session category failed: \(error.localizedDescription)")
+                DispatchQueue.main.async { completion?(false) }
+                return
+            }
+            session.activate(options: []) { activated, error in
+                if let error = error {
+                    print("⚠️ Audio session activation failed: \(error.localizedDescription)")
+                }
+                let inputs = session.currentRoute.inputs.map(\.portType.rawValue).joined(separator: ", ")
+                print("🔊 Session active=\(activated) inputAvailable=\(session.isInputAvailable) "
+                      + "rate=\(session.sampleRate) inputs=[\(inputs.isEmpty ? "none" : inputs)]")
+                // An active session with no input route still yields a 0 Hz engine,
+                // so treat "no input" as a failure rather than letting the caller
+                // find out downstream.
+                let usable = activated && session.isInputAvailable
+                if activated && !session.isInputAvailable {
+                    print("❌ Audio session active but no input route. On the Simulator, "
+                          + "enable I/O ▸ Audio Input and grant Simulator mic access in "
+                          + "System Settings ▸ Privacy & Security ▸ Microphone.")
+                }
+                DispatchQueue.main.async { completion?(usable) }
+            }
+        }
+        #else
+        completion?(true)
+        #endif
     }
 
     func requestMicrophonePermission() {
@@ -87,11 +153,22 @@ class AudioManager: NSObject, ObservableObject {
     
     // MARK: - Recording
     func startRecording() {
-        guard hasPermission else { return }
+        recordingFailure = nil
+
+        // `hasPermission` needs BOTH the mic and speech-recognition grants, so a
+        // silent no-op here is otherwise indistinguishable from a broken button.
+        guard hasPermission else {
+            print("❌ Recording blocked — mic: \(AVCaptureDevice.authorizationStatus(for: .audio).rawValue), "
+                  + "speech: \(SFSpeechRecognizer.authorizationStatus().rawValue) (1 = granted for both)")
+            recordingFailure = "Kochi needs both microphone and speech-recognition access. "
+                             + "Grant them in Settings, then try again."
+            return
+        }
 
         // Create meeting folder and get audio file URL
         guard meetingFileManager.startNewMeeting() != nil else {
             print("❌ Failed to create meeting folder")
+            recordingFailure = "Couldn't create the meeting folder on disk."
             return
         }
 
@@ -117,6 +194,39 @@ class AudioManager: NSObject, ObservableObject {
         startSpeechRecognition()
     }
     
+    /// Roll a failed start all the way back.
+    ///
+    /// `startRecording` opens a meeting folder, an output file, a timer and a
+    /// level meter before the audio engine is known to work — and on iOS the
+    /// engine now comes up asynchronously, well after those. Without this, a
+    /// failure past that point left the app metering silence into an empty
+    /// meeting: recording forever, as far as the user could tell, and saving a
+    /// 0-character transcript at the end.
+    private func abortRecording(_ reason: String) {
+        DispatchQueue.main.async {
+            guard self.isRecording else { return }
+            print("❌ Recording aborted: \(reason)")
+
+            self.mixedRecorder?.stop()
+            self.mixedRecorder = nil
+            self.stopMetering()
+            self.stopRecordingTimer()
+            self.stopSpeechRecognition()
+
+            // Discard the folder — a start that captured nothing should not
+            // leave an empty meeting behind for the user to find and delete.
+            if let url = self.meetingFileManager.currentMeetingURL {
+                self.meetingFileManager.deleteMeeting(at: url)
+                self.meetingFileManager.currentMeetingURL = nil
+            }
+            self.currentRecordingURL = nil
+            self.activeMeetingFolderName = nil
+
+            self.isRecording = false
+            self.recordingFailure = reason
+        }
+    }
+
     func stopRecording() {
         mixedRecorder?.stop()
         mixedRecorder = nil
@@ -235,7 +345,28 @@ class AudioManager: NSObject, ObservableObject {
         // Start the on-device engine (mic = "Me", system audio = "Them").
         dualEngine.start(includeSystemAudio: captureSystemAudio)
 
-        // Setup audio engine for real-time transcription
+        // The engine is built inside the completion, not after this call: on iOS
+        // the input node only gets a real route once activation lands, and
+        // activation cannot be waited on from the main thread. See setupAudioSession().
+        setupAudioSession { [weak self] activated in
+            guard let self = self else { return }
+            // Activation is slow enough that the user can stop before it lands;
+            // without this the engine would come up after the recording ended.
+            guard self.isRecording else {
+                print("⏹ Recording stopped before the audio session activated.")
+                return
+            }
+            guard activated else {
+                self.abortRecording("The audio session couldn't start, so there was no microphone to record from.")
+                return
+            }
+            self.startAudioEngine()
+        }
+    }
+
+    /// Build the engine, tap the microphone, and start it. Must run only once the
+    /// audio session is active (iOS) — see `startSpeechRecognition()`.
+    private func startAudioEngine() {
         audioEngine = AVAudioEngine()
         guard let audioEngine = audioEngine else {
             print("❌ Failed to create audio engine")
@@ -244,7 +375,29 @@ class AudioManager: NSObject, ObservableObject {
 
         do {
             let inputNode = audioEngine.inputNode
+            // The graph-side format is what the tap must use, but log the hardware
+            // side too: when they disagree the IO unit failed to configure.
             let recordingFormat = inputNode.outputFormat(forBus: 0)
+            print("🎚 inputNode hardware=\(inputNode.inputFormat(forBus: 0)) graph=\(recordingFormat)")
+
+            // A zero format means AURemoteIO never came up. Installing a tap with
+            // it throws an uncatchable Objective-C exception, so bail loudly.
+            guard recordingFormat.sampleRate > 0, recordingFormat.channelCount > 0 else {
+                #if targetEnvironment(simulator)
+                print("❌ AVAudioEngine could not enable microphone input (format: "
+                      + "\(recordingFormat)). The audio session is fine — this is the "
+                      + "Simulator's AURemoteIO input limitation (-10851). Run on a "
+                      + "physical iPhone to record.")
+                self.audioEngine = nil
+                abortRecording("The Simulator can't capture microphone input. Run on a device to record.")
+                #else
+                print("❌ AVAudioEngine could not enable microphone input (format: "
+                      + "\(recordingFormat)) despite an active session with an input route.")
+                self.audioEngine = nil
+                abortRecording("Couldn't open the microphone. Check that no other app is using it.")
+                #endif
+                return
+            }
 
             print("🎤 Audio format: \(recordingFormat)")
             print("🎤 Sample rate: \(recordingFormat.sampleRate)")
@@ -297,6 +450,8 @@ class AudioManager: NSObject, ObservableObject {
 
         } catch {
             print("❌ Speech recognition error: \(error)")
+            audioEngine = nil
+            abortRecording("The audio engine failed to start: \(error.localizedDescription)")
         }
     }
     
@@ -331,26 +486,42 @@ class AudioManager: NSObject, ObservableObject {
         guard let audioEngine = audioEngine else { return }
         print("🔄 Restarting audio engine...")
 
-        do {
-            // Remove old tap
-            audioEngine.inputNode.removeTap(onBus: 0)
+        audioEngine.inputNode.removeTap(onBus: 0)
 
-            // Reinstall tap
+        // The usual reason the engine dies on iOS is that the session lost its
+        // input route (interruption, route change, backgrounding), so bring the
+        // session back — asynchronously — before asking for the format again.
+        setupAudioSession { [weak self] activated in
+            guard let self = self, let audioEngine = self.audioEngine else { return }
+            guard activated else {
+                self.abortRecording("Lost the audio session mid-recording and couldn't get it back. "
+                                    + "Whatever was captured up to now has been discarded.")
+                return
+            }
+
             let inputNode = audioEngine.inputNode
             let recordingFormat = inputNode.outputFormat(forBus: 0)
+
+            guard recordingFormat.sampleRate > 0, recordingFormat.channelCount > 0 else {
+                print("❌ Restart aborted — input node still reports \(recordingFormat).")
+                self.abortRecording("Lost the microphone mid-recording. Another app may have taken it.")
+                return
+            }
 
             inputNode.kochi_installTap(onBus: 0, bufferSize: 1024, format: recordingFormat) { [weak self] buffer, _ in
                 self?.audioBufferDelegate?.processBuffer(buffer)
             }
 
-            // Restart engine
-            audioEngine.prepare()
-            try audioEngine.start()
-
-            lastAudioBufferTime = Date()
-            print("✅ Audio engine restarted successfully")
-        } catch {
-            print("❌ Failed to restart audio engine: \(error)")
+            do {
+                audioEngine.prepare()
+                try audioEngine.start()
+                self.lastAudioBufferTime = Date()
+                print("✅ Audio engine restarted successfully")
+            } catch {
+                print("❌ Failed to restart audio engine: \(error)")
+                self.abortRecording("The audio engine stopped and couldn't be restarted: "
+                                    + error.localizedDescription)
+            }
         }
     }
 

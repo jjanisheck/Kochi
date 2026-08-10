@@ -1,6 +1,11 @@
 import Foundation
 import StoreKit
+#if canImport(AppKit)
 import AppKit
+#endif
+#if canImport(UIKit)
+import UIKit
+#endif
 
 // MARK: - App Store Helper
 class AppStoreHelper: ObservableObject {
@@ -184,7 +189,11 @@ We'd love to hear your feedback! Contact us at \(supportEmail)
     
     // MARK: - App Store Links
     private func openURL(_ url: URL) {
+        #if canImport(UIKit)
+        UIApplication.shared.open(url)
+        #else
         NSWorkspace.shared.open(url)
+        #endif
     }
 
     func openAppStore() {
@@ -201,10 +210,19 @@ We'd love to hear your feedback! Contact us at \(supportEmail)
         let shareText = "Check out Kochi - AI Presentation Coach!"
         let shareURL = URL(string: "https://apps.apple.com/app/id\(appStoreID)")!
 
+        #if canImport(UIKit)
+        // iOS shares through a UIActivityViewController presented on the key
+        // window's root controller (the app has no AppKit sharing picker).
+        let activity = UIActivityViewController(activityItems: [shareText, shareURL],
+                                                applicationActivities: nil)
+        let scene = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.first
+        scene?.keyWindow?.rootViewController?.present(activity, animated: true)
+        #else
         let picker = NSSharingServicePicker(items: [shareText, shareURL])
         if let contentView = NSApp.keyWindow?.contentView {
             picker.show(relativeTo: .zero, of: contentView, preferredEdge: .minY)
         }
+        #endif
     }
 }
 

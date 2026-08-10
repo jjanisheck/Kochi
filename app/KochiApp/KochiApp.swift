@@ -44,21 +44,25 @@ struct KochiApp: App {
 
     var body: some Scene {
         WindowGroup(id: KochiApp.mainWindowID) {
-            ContentView()
+            // Both platforms render the same MC—1 layout, at the same scale, so
+            // they cannot drift apart again. The desktop keeps its own shell
+            // around it: the menu-bar whistle, the window bridge and the
+            // headless --selftest entry points above.
+            KochiMC1View()
                 .environmentObject(audioManager)
                 .environmentObject(goalManager)
                 .environmentObject(themeManager)
                 .environmentObject(llmManager)
                 .environmentObject(cloudAnalysisManager)
                 .environmentObject(themeStore)
-                .preferredColorScheme(themeStore.current.colorScheme)
-                .id(themeStore.themeVersion)
-                .animation(.easeInOut(duration: 0.3), value: themeStore.themeVersion)
+                // The theme hooks (scheme, rebuild-on-change, cross-fade) live
+                // inside KochiMC1View now, so both entry points get them and
+                // neither can forget one. They were only ever here on macOS,
+                // which is why the phone kept stale colours after a theme swap.
                 .onAppear { setupApp() }
-                // Fixed device-card width. The card fills to the very top;
-                // the header rows inset their content past the traffic lights so
-                // the READY bar snugs right up under the system dot bar.
-                .frame(width: 436)
+                // The iPhone 17 canvas, point for point, so the desktop window
+                // is the phone at 1:1 rather than a wider variant of it.
+                .frame(width: 393, height: 852)
                 // Hand SwiftUI's `openWindow` action to the AppKit delegate so the
                 // menu-bar icon can spawn a fresh window once the last one is closed.
                 .background(WindowOpenerBridge())

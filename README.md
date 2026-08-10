@@ -1,11 +1,11 @@
 # Kōchi
 
-**A private, on-device meeting companion for Mac — a local alternative to cloud notetakers like Granola.**
+**A private, on-device meeting companion for Mac and iPhone — a local alternative to cloud notetakers like Granola.**
 
 Kōchi listens to your meetings, transcribes both sides of the conversation,
 tracks your goals, and coaches you in real time — and it does **all of it on your
-Mac**. No cloud, no account, no subscription, and **your audio never leaves your
-device**. Optionally, you can add your own Claude or OpenAI API key for a deeper
+own device**. No cloud, no account, no subscription, and **your audio never
+leaves your device**. Optionally, you can add your own Claude or OpenAI API key for a deeper
 written meeting analysis — that's the one feature that sends anything out, it's
 off by default, and it sends only the text transcript (never your audio).
 
@@ -114,12 +114,19 @@ If privacy, cost, or working on a plane matter to you, Kōchi is for you.
 
 Kōchi runs Apple's newest on-device models, so it needs current hardware and OS:
 
-- An **Apple-silicon Mac** (M1 or later) with **Apple Intelligence** enabled.
-- **macOS 27** — currently in **developer beta** (mid-2026), not yet public
-  release. The on-device coaching and goal analysis use Apple's new
+- An **Apple-silicon Mac** (M1 or later) with **Apple Intelligence** enabled,
+  and/or an **iPhone** that supports Apple Intelligence.
+- **macOS 27** / **iOS 27** — currently in **developer beta** (mid-2026), not yet
+  public release. The on-device coaching and goal analysis use Apple's new
   **Foundation Models** framework (`import FoundationModels`), which is only
-  available on macOS 27, so the app targets that version.
-- **Xcode** with the macOS 27 beta SDK.
+  available on 27, so both targets require it.
+- **Xcode** with the macOS 27 / iOS 27 beta SDKs.
+
+> **iPhone note:** system-audio capture ("them") is macOS-only — no iOS app can
+> record another app's output. On iPhone a session is microphone-only, so the
+> transcript is your side of the conversation. Everything else is identical.
+> The Simulator cannot capture microphone input at all (`AURemoteIO -10851`),
+> so test recording on a physical device.
 
 You can either **download a prebuilt build** or **build it from source** in
 Xcode (a few minutes).
@@ -155,17 +162,21 @@ open Kochi.xcodeproj
 
 ### 2. Set your signing team
 
-Because macOS apps must be signed:
+Because Apple apps must be signed, and the checked-in project carries the
+original author's team:
 
 1. In Xcode, select the **KochiApp** target → **Signing & Capabilities**.
 2. Pick your **Team** (your free Apple ID works).
 3. Change the **Bundle Identifier** to something of your own, e.g.
    `com.yourname.kochi`.
+4. Repeat both for the **Kochi-iOS** target if you want the iPhone build.
 
 ### 3. Run
 
-- Choose the **KochiApp** scheme and **My Mac** as the destination, then press
-  **▶︎ Run**.
+- **Mac:** choose the **KochiApp** scheme and **My Mac** as the destination, then
+  press **▶︎ Run**.
+- **iPhone:** choose the **Kochi-iOS** scheme and your device. Use a real device,
+  not the Simulator — the Simulator can't capture microphone input.
 - Kōchi opens its window and shows up in the Dock. There's also a **menu-bar
   icon** — click it any time to bring the window to the front (it reopens a
   window if you've closed it).
@@ -246,18 +257,24 @@ with `#if os(macOS)` / `#if os(iOS)`.
 
 ### Build & test
 
+Two app targets share one codebase: **`KochiApp`** (macOS) and **`Kochi-iOS`**
+(iPhone). Each has a shared scheme of the same name.
+
 ```bash
 cd app
 
 # Build macOS
 xcodebuild -project Kochi.xcodeproj -scheme KochiApp -destination 'platform=macOS' build
 
+# Build iOS
+xcodebuild -project Kochi.xcodeproj -scheme Kochi-iOS -destination 'generic/platform=iOS' build
+
 # Tests
 xcodebuild -project Kochi.xcodeproj -scheme KochiApp -destination 'platform=macOS' test
 ```
 
-Always confirm the macOS build succeeds before committing, and don't commit
-secrets or build artifacts (`DerivedData/`, `.build/`).
+Confirm **both** targets build before committing, and don't commit secrets or
+build artifacts (`DerivedData/`, `.build/`).
 
 ### Building a signed release
 
@@ -280,11 +297,16 @@ doesn't need notarization.
 
 ### Project layout
 
-- **`KochiApp.swift`** — app entry. A regular windowed app (Dock icon + window)
+- **`KochiApp.swift`** — macOS entry. A regular windowed app (Dock icon + window)
   with a menu-bar status item whose icon brings the window to the front,
   reopening one if every window was closed.
-- **`ContentView.swift`** — home screen: coach video, goals, live transcript.
-  `GoalRow` is the goal bar (tap to toggle hit). Phases: `.pre / .live / .ended`.
+- **`KochiApp_iOS.swift`** — iPhone entry. The only file that differs between the
+  two targets besides `KochiApp.swift`.
+- **`Views/KochiMC1View.swift`** — the home screen, and the *only* layout: both
+  targets render it, at the same scale, so the two platforms cannot drift apart.
+  Instrument modules top to bottom — coach screen, three goal rows, live
+  transcript, tape deck, transport keys. Its one platform conditional is window
+  chrome (top inset for the macOS hidden title bar), not layout.
 - **`Views/SettingsView.swift`** — settings panel (Transcripts · Search · Goals ·
   AI · About) plus `MeetingDetailView`, presented as a full-panel overlay.
 - **`Managers/`** — `AudioManager`, `TranscriptionManager`, `GoalManager`,
@@ -300,7 +322,15 @@ doesn't need notarization.
   stays out of the Swift build. Remove once Apple ships a usable Swift overlay.
 - **Design system — `KochiDeviceStyle.swift`** — `KColor`, `KFont` (Zilla Slab /
   JetBrains Mono / Hanken Grotesk), `kCard()`, `SlabLabel`, `BeveledKeyStyle`,
-  `ChatTranscriptView`. Reuse these instead of system fonts and colors.
+  `ChatTranscriptView`, and the tape deck (`TapeDeckPanel`, `TapeReel`,
+  `DeckCounterWindow`). Reuse these instead of system fonts and colors.
+
+  Colors come from `KColor`, which reads the `ActivePalette` mirror rather than a
+  published property — so a view that paints with `KColor` has **no** SwiftUI
+  dependency on the theme. `ThemeStore.select` bumps `themeVersion` for exactly
+  this reason; anything that needs to repaint on a theme change must consume it
+  with `.id(themeStore.themeVersion)`. Same for `ActiveDeck`, `ActiveGoal` and
+  `ActiveChrome`.
 
 ## License
 

@@ -1,4 +1,10 @@
 import SwiftUI
+#if canImport(AppKit)
+import AppKit
+#endif
+#if canImport(UIKit)
+import UIKit
+#endif
 
 struct SettingsView: View {
     @Binding var isPresented: Bool
@@ -80,6 +86,13 @@ struct SettingsView: View {
                         }
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    // The theme picker lives in this content, and the tabs are
+                    // full of `KColor` reads that SwiftUI has no dependency on.
+                    // Re-identify on a theme change so they all repaint. Applied
+                    // here, not to the whole panel: `selectedTab` and
+                    // `selectedMeeting` are state on this view, so the picker
+                    // stays put and you can keep trying themes.
+                    .id(themeStore.themeVersion)
                 }
         // Fill the card top-aligned (no centering ZStack — that was clipping the
         // header), with the halftone as a non-inflating background.
@@ -859,8 +872,8 @@ private struct ThemeSwatch: View {
     /// The chip's face: the theme's `theme.png` portrait when present, otherwise
     /// the theme's signature key gradient.
     @ViewBuilder private var swatchFill: some View {
-        if let url = theme.swatchImageURL, let nsImage = NSImage(contentsOf: url) {
-            Image(nsImage: nsImage)
+        if let url = theme.swatchImageURL, let portrait = PlatformImageLoader.image(at: url) {
+            portrait
                 .resizable()
                 .scaledToFill()
         } else {
@@ -1061,7 +1074,15 @@ struct MeetingDetailView: View {
                 .padding(.horizontal, 14)
                 .padding(.top, 2)
                 .padding(.bottom, 16)
-                .frame(maxWidth: .infinity, alignment: .leading)
+                // Pin the scroll content to the container's width instead of
+                // `.frame(maxWidth: .infinity)`. That was a *flexible* upper
+                // bound: it caps what this frame asks for, but does nothing to
+                // stop a child that demands more from widening the whole column.
+                // One over-wide card therefore pushed every other card out with
+                // it — the page reading wider than the phone. A definite
+                // container-relative width means an over-wide child is clipped
+                // inside its own card and the page stays put.
+                .containerRelativeFrame(.horizontal, alignment: .leading)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -1210,9 +1231,13 @@ struct MeetingDetailView: View {
         VStack(alignment: .leading, spacing: 10) {
             SlabLabel("Audio")
             HStack(spacing: 9) {
+                #if os(macOS)
+                // "Reveal in Finder" has no iOS counterpart — Share and Export
+                // (the document picker) cover getting the file out there.
                 AudioActionButton(icon: "folder", label: "Reveal") {
                     NSWorkspace.shared.activateFileViewerSelecting([audioURL])
                 }
+                #endif
                 AudioActionButton(icon: "square.and.arrow.up", label: "Share") {
                     showAudioShare = true
                 }
@@ -1234,6 +1259,7 @@ struct MeetingDetailView: View {
 
     /// Copy the recording to a user-chosen location via the sandbox-safe save panel.
     private func exportAudio(_ url: URL) {
+        #if os(macOS)
         let panel = NSSavePanel()
         panel.nameFieldStringValue = "\(meeting.audioFolderName ?? "meeting")-audio.m4a"
         panel.canCreateDirectories = true
@@ -1241,6 +1267,11 @@ struct MeetingDetailView: View {
             try? FileManager.default.removeItem(at: dest)
             try? FileManager.default.copyItem(at: url, to: dest)
         }
+        #else
+        // iOS has no save panel; the share sheet is the export path (it offers
+        // "Save to Files" among the destinations).
+        showAudioShare = true
+        #endif
     }
 
     /// True when there's anything worth copying (goals and/or a transcript).
@@ -1289,8 +1320,12 @@ struct MeetingDetailView: View {
     /// "Copied" confirmation.
     private func copyMeeting() {
         let text = meetingPlainText()
+        #if os(macOS)
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(text, forType: .string)
+        #else
+        UIPasteboard.general.string = text
+        #endif
         didCopy = true
         Task {
             try? await Task.sleep(nanoseconds: 1_500_000_000)
@@ -1349,7 +1384,7 @@ struct MeetingDetailView: View {
             if cloudAnalysisManager.isConfigured {
                 HStack(spacing: 12) {
                     Toggle("Include goals", isOn: $includeGoals)
-                        .toggleStyle(.checkbox)
+                        .checkboxToggleStyle()
                         .font(KFont.sans(12, .medium))
                         .foregroundColor(KColor.inkSoft)
                         .tint(KColor.orange)
@@ -1483,7 +1518,7 @@ struct MeetingDetailView: View {
 // MARK: - Meeting Goal Row
 /// A goal as it reads in the recap: a hit goal becomes the app's glossy orange
 /// key (white check, white text); an unmet goal stays a plain white row.
-/// Mirrors ContentView's GoalRow.
+/// Mirrors KochiMC1View's goal row.
 private struct MeetingGoalRow: View {
     let goal: Goal
     private var done: Bool { goal.isCompleted }
@@ -1546,6 +1581,7 @@ struct SettingsTab: View {
 }
 
 // MARK: - Share Sheet
+#if os(macOS)
 struct ShareSheet: NSViewRepresentable {
     let items: [Any]
 
@@ -1560,6 +1596,33 @@ struct ShareSheet: NSViewRepresentable {
     }
 
     func updateNSView(_ nsView: NSView, context: Context) {}
+}
+#else
+/// iOS share sheet — the `UIActivityViewController` counterpart of the macOS
+/// sharing picker, so callers present `ShareSheet(items:)` on either platform.
+struct ShareSheet: UIViewControllerRepresentable {
+    let items: [Any]
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: items, applicationActivities: nil)
+    }
+
+    func updateUIViewController(_ controller: UIActivityViewController, context: Context) {}
+}
+#endif
+
+/// Loads a loose image file (theme art shipped outside the asset catalog) as a
+/// SwiftUI `Image` on whichever platform is compiling.
+enum PlatformImageLoader {
+    static func image(at url: URL) -> Image? {
+        #if os(macOS)
+        guard let image = NSImage(contentsOf: url) else { return nil }
+        return Image(nsImage: image)
+        #else
+        guard let data = try? Data(contentsOf: url), let image = UIImage(data: data) else { return nil }
+        return Image(uiImage: image)
+        #endif
+    }
 }
 
 // MARK: - Audio Action Button

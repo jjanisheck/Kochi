@@ -62,8 +62,16 @@ final class SpeechChannel {
     private func setup(inputStream: AsyncStream<AnalyzerInput>) async {
         let transcriber = SpeechTranscriber(locale: locale, preset: .progressiveTranscription)
         // Ensure the on-device model for this locale is installed (no-op if present).
-        if let request = try? await AssetInventory.assetInstallationRequest(supporting: [transcriber]) {
-            try? await request.downloadAndInstall()
+        // Failures here were previously swallowed, which made a missing ASR asset
+        // look identical to a dead microphone — the analyzer just never emits.
+        // (The Simulator commonly cannot fetch the GeneralASR asset at all.)
+        do {
+            if let request = try await AssetInventory.assetInstallationRequest(supporting: [transcriber]) {
+                try await request.downloadAndInstall()
+            }
+        } catch {
+            print("⚠️ [\(label)] speech model unavailable for \(locale.identifier): "
+                  + "\(error.localizedDescription) — this channel will produce no transcript.")
         }
         let format = await SpeechAnalyzer.bestAvailableAudioFormat(compatibleWith: [transcriber])
         let analyzer = SpeechAnalyzer(modules: [transcriber])
@@ -165,7 +173,9 @@ final class DualTranscriptionEngine: ObservableObject {
 
     private let micChannel = SpeechChannel(label: DualTranscriptionEngine.micLabel)
     private let systemChannel = SpeechChannel(label: DualTranscriptionEngine.systemLabel)
+    #if os(macOS)
     private let systemCapture = SystemAudioCapture()
+    #endif
 
     /// Finalized lines per speaker, plus the current live partial per speaker.
     private var finalized: [TranscriptLine] = []
@@ -200,6 +210,7 @@ final class DualTranscriptionEngine: ObservableObject {
 
         micChannel.start()
 
+        #if os(macOS)
         if includeSystemAudio {
             systemChannel.start()
             systemCapture.onBuffer = { [weak self] buffer in
@@ -212,6 +223,11 @@ final class DualTranscriptionEngine: ObservableObject {
                 }
             }
         }
+        #else
+        // iOS has no third-party route to another app's output audio, so the
+        // "Them" channel never starts and the session is mic-only.
+        _ = includeSystemAudio
+        #endif
     }
 
     /// Feed a microphone buffer (from AudioManager's existing input tap).
@@ -222,7 +238,9 @@ final class DualTranscriptionEngine: ObservableObject {
     func stop() {
         micChannel.stop()
         systemChannel.stop()
+        #if os(macOS)
         systemCapture.stop()
+        #endif
         DispatchQueue.main.async { self.isRunning = false }
     }
 
