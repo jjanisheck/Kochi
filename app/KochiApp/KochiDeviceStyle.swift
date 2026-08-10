@@ -362,11 +362,15 @@ struct ChatTranscriptView: View {
                     .foregroundColor(labelColor(turn.speaker))
             }
             Text(turn.text)
-                .font(KFont.mono(11.5))
+                // Medium, not regular: white on a saturated key needs the extra
+                // stroke weight at 11.5pt, and it is what pushes the text into
+                // WCAG's bold-text band rather than its body-text one.
+                .font(KFont.mono(11.5, .medium))
                 .foregroundColor(ink(turn.speaker))
-                // The same lift the primary key gives its label.
-                .shadow(color: .black.opacity(turn.speaker == .other ? 0 : 0.18),
-                        radius: 0.5, x: 0, y: 1)
+                // The lift the primary key gives its own label, a little stronger
+                // — this text is smaller than the key's.
+                .shadow(color: .black.opacity(turn.speaker == .other ? 0 : 0.35),
+                        radius: 1, x: 0, y: 1)
                 .multilineTextAlignment(rightAligned ? .trailing : .leading)
                 .fixedSize(horizontal: false, vertical: true)
         }

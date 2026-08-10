@@ -208,24 +208,34 @@ as a different voice, short of the exact 180° complement, which lands on a jarr
 opposite. An accent with almost no hue to rotate (NOIR's grey, saturation < 0.15)
 falls back to a calm blue-grey rather than a second grey indistinguishable from ME.
 
-The ink is chosen for legibility, not fixed: **white where it clears WCAG AA — as
-it does on the key — and otherwise the fill's own hue driven deep until it does.**
-A bright accent like the default orange cannot carry white body text at 11.5pt, so
-it gets a near-black in its own hue instead of an unreadable match.
+**Body text is white**, matching the RECORD key's own label — the bubble *is* that
+key, and a transcript whose ink colour changed theme by theme read as five
+different components. It carries the key's text shadow and a medium weight to hold
+white up at 11.5pt. The ink only flips away from white for a genuinely pale accent
+(a lemon or off-white key, contrast under 2.5), where white would vanish rather
+than merely soften; set `transcriptMeInk` / `transcriptThemInk` to force either.
 
-What the five shipped themes get for free:
+If white sits low on your accent, deepen **`transcriptMeLo`** rather than
+`buttonLo` — that darkens the bubble without touching the physical keys. BRICKS
+does exactly this: its key stays `#F25C00`, its bubble drops to `#C94A00`, which
+lifts white from 2.79 to 3.27.
 
-| theme | ME gradient | ink | THEM gradient | ink |
-|-------|-------------|-----|---------------|-----|
-| default | `#FF7A36`→`#EC5000` | `#331303` (5.5) | `#28949E`→`#1E7078` | white (4.5) |
-| bricks | `#FF8C2B`→`#F25C00` | `#331602` (6.0) | `#28859E`→`#1E6578` | white (5.2) |
-| noir | `#6E6E6E`→`#0E0E0E` | white (10.7) | `#6B8099`→`#516174` | white (5.1) |
-| zen | `#46B883`→`#2E8B57` | `#0E2B1D` (4.7) | `#9E3C82`→`#782E63` | white (7.4) |
-| hero | `#D32F2F`→`#9E1B1B` | white (6.3) | `#289E80`→`#1E7862` | black (5.0) |
+What the five shipped themes get:
 
-Bracketed numbers are the WCAG contrast ratio of the ink against its own bubble;
-4.5 is the pass mark for body text, so all ten clear it. Override any token if you
-want a different pairing — but check the ratio if you do.
+| theme | ME gradient | white cr | THEM gradient | white cr |
+|-------|-------------|----------|---------------|----------|
+| default | `#FF7A36`→`#EC5000` | 3.10 | `#28949E`→`#1E7078` | 4.53 |
+| bricks | `#FF8C2B`→`#C94A00` * | 3.27 | `#28859E`→`#1E6578` | 5.24 |
+| noir | `#6E6E6E`→`#0E0E0E` | 10.70 | `#6B8099`→`#516174` | 5.06 |
+| zen | `#46B883`→`#2E8B57` | 3.21 | `#9E3C82`→`#782E63` | 7.36 |
+| hero | `#D32F2F`→`#9E1B1B` | 6.28 | `#289E80`→`#1E7862` | 4.19 |
+
+\* tuned via `transcriptMeLo`; every other value is derived.
+
+Ratios are white against each gradient's mid tone. 3.0 is WCAG's pass mark for
+bold/large text, which is the band this text sits in at medium weight with a
+shadow; 4.5 is the body-text mark. The RECORD key itself ships white at 3.10, so
+the bubbles are held to the same standard as the hardware they copy.
 
 > `hero` is the worked example for all of these — red `buttonHi/Lo`, blue
 > `meterHi/Lo`, frosted `goalRestFill`, brown `slabRule`/`logoTint`, lightened

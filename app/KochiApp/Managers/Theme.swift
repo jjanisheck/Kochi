@@ -132,13 +132,20 @@ enum ThemeColorMath {
         return color(h: h, s: s, b: max(b * 0.76, 0.12))
     }
 
-    /// Body text for a filled bubble. White when it clears the 4.5 body-text
-    /// threshold — that is what the primary key uses, so the bubble reads as the
-    /// same piece of hardware — and otherwise the fill's own hue driven deep until
-    /// it does. A bright accent like the default orange cannot carry white text at
-    /// 11.5pt, so it gets near-black in its own hue instead of an unreadable match.
+    /// Body text for a filled bubble.
+    ///
+    /// White, to match the RECORD key — the bubble *is* that key, and a transcript
+    /// that switched ink colour theme by theme read as five different components.
+    /// White on the shipped accents lands at 2.8–10.7 against the gradient's mid
+    /// tone; the key itself ships white at 3.1, and the bubbles carry the same
+    /// text shadow and a medium weight to hold it up at 11.5pt.
+    ///
+    /// The floor is a safety net for a future theme with a genuinely pale key
+    /// (a lemon or off-white accent), where white would vanish rather than merely
+    /// soften. Only then does the fill's own hue, driven deep, take over. Set
+    /// `transcriptMeInk` / `transcriptThemInk` to override either way.
     static func legibleInk(on fill: Color) -> Color {
-        if contrast(.white, fill) >= 4.5 { return .white }
+        if contrast(.white, fill) >= 2.5 { return .white }
         guard let (h, s, _, _) = hsb(fill) else { return .black }
         for b in [0.20, 0.17, 0.14, 0.11, 0.08] {
             let candidate = color(h: h, s: min(s * 1.05, 1), b: b)
