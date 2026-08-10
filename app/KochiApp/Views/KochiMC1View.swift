@@ -59,7 +59,6 @@ struct KochiMC1View: View {
 
     private var isLive: Bool { audioManager.isRecording }
     private var goals: [Goal] { Array(goalManager.goals.prefix(3)) }
-    private var goalsHit: Int { goals.filter(\.isCompleted).count }
 
     var body: some View {
         VStack(spacing: 8) {
@@ -149,24 +148,16 @@ struct KochiMC1View: View {
                 .frame(height: 26)
                 .colorMultiply(KColor.logoTint ?? .white)
                 // Themes that bake the wordmark into their own background art
-                // hide it here. Only the mark goes — the rest of the row is the
-                // only live state on screen, so it always stays.
+                // hide it here. The record lamp beside it always stays.
                 .opacity(ActiveChrome.hideBrandRow ? 0 : 1)
 
             Spacer(minLength: 8)
 
-            // Session state.
-            Text(isLive ? "live" : "ready")
-                .font(KFont.mono(10))
-                .tracking(1.8)
-                .foregroundColor(KColor.onBgFaint)
-            // No clock here — the meeting clock is the tape counter in the deck
-            // window, between the two reels. Removing `.blendMode(.screen)` from
-            // the reels is what made it readable again.
-            Text("\(goalsHit)/3")
-                .font(KFont.mono(10))
-                .tracking(1.8)
-                .foregroundColor(isLive ? KColor.orange : KColor.onBgFaint)
+            // The lamp is the whole status readout. The "ready/live" word and the
+            // goals tally were both redundant: the lamp already says whether tape
+            // is rolling, the goal rows light up as they are hit, and the clock
+            // lives in the deck window. Nothing here is the only home for
+            // anything.
             RecordLamp(isLive: isLive)
         }
         .padding(.horizontal, 4)
