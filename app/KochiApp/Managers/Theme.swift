@@ -184,7 +184,8 @@ struct ThemePalette {
     /// Live-transcript recess: a translucent tint laid over a blur of the theme
     /// background, so the panel sits *in* the theme instead of on top of it as a
     /// solid white slab. Use 8-digit `#RRGGBBAA` hex — the alpha is the point.
-    /// Optional; defaults to the theme's own `paper`/`panel` at ~62% .
+    /// Optional; defaults to the theme's own `paper`/`panel` at ~22–30% — a wash,
+    /// not a fill, so the background art stays legible through it.
     let transcriptFill: Color
     /// The two speakers' bubbles. ME defaults to the theme accent (`buttonHi`),
     /// THEM to that accent rotated 165° round the wheel — clearly a different
@@ -274,7 +275,7 @@ struct ThemePalette {
         let me = self.buttonHi
         let them = ThemeColorMath.counterpart(of: me)
         self.transcriptFill = c("transcriptFill")
-            ?? (dark ? panel.opacity(0.55) : paper.opacity(0.62))
+            ?? (dark ? panel.opacity(0.30) : paper.opacity(0.22))
         self.transcriptMeFill = c("transcriptMeFill") ?? ThemeColorMath.bubbleFill(me, isDark: dark)
         self.transcriptMeInk = c("transcriptMeInk") ?? ThemeColorMath.bubbleInk(me, isDark: dark)
         self.transcriptThemFill = c("transcriptThemFill") ?? ThemeColorMath.bubbleFill(them, isDark: dark)
@@ -314,7 +315,7 @@ struct ThemePalette {
         // with the JSON path without repeating five more parameters.
         let dark = ThemeColorMath.isDark(ink: ink)
         let them = ThemeColorMath.counterpart(of: buttonHi)
-        self.transcriptFill = dark ? panel.opacity(0.55) : paper.opacity(0.62)
+        self.transcriptFill = dark ? panel.opacity(0.30) : paper.opacity(0.22)
         self.transcriptMeFill = ThemeColorMath.bubbleFill(buttonHi, isDark: dark)
         self.transcriptMeInk = ThemeColorMath.bubbleInk(buttonHi, isDark: dark)
         self.transcriptThemFill = ThemeColorMath.bubbleFill(them, isDark: dark)

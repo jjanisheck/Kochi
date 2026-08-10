@@ -192,7 +192,7 @@ default shown.
 | `logoTint` | — (no tint) | Multiply-recolor for a **white** `KochiLogo.png` |
 | `onBg`, `onBgFaint` | `inkSoft` / `muted` | Text that sits directly on the background (labels, status) |
 | `deckScrimTop`, `deckScrimBottom` | black 0.45 → 0.7 | Gradient darkening over the reel (use `#RRGGBBAA` to lighten) |
-| `transcriptFill` | `paper` @62% (light) / `panel` @55% (dark) | The live-transcript recess. It is frosted — a blur of your background under this tint — so **keep it translucent**; a solid value puts the white slab back. |
+| `transcriptFill` | `paper` @22% (light) / `panel` @30% (dark) | The live-transcript recess. It is a **wash over your background**, not a card — keep the alpha low or the panel goes back to reading as a solid slab. Raise it if your art is busy enough to fight the text. |
 | `transcriptMeFill`, `transcriptMeInk` | derived from `buttonHi` | Your side of the conversation: bubble tint + body text |
 | `transcriptThemFill`, `transcriptThemInk` | derived, `buttonHi` rotated 165° | The other side |
 

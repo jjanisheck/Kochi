@@ -251,17 +251,24 @@ struct KochiMC1View: View {
                     .allowsHitTesting(false)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            // Frosted, not solid: a blur of the theme background under a
-            // translucent tint, so the transcript sits *in* the theme rather than
-            // as a white slab on top of it. The blur is what keeps the text
-            // readable over busy art — the same treatment the goal rows use when
-            // a theme opts into `goalRestBlur`.
-            .background(.ultraThinMaterial)
+            // A pane of glass over the theme, not a card sitting on it. No
+            // `.ultraThinMaterial`: it is itself near-white in a light scheme, and
+            // it was chained *after* the tint so it painted over it — between them
+            // that is why this panel still read as a white slab. Legibility comes
+            // from the bubbles' own theme-derived fills and inks, which clear
+            // WCAG AA on every shipped theme.
             .background(KColor.transcriptFill)
             .clipShape(RoundedRectangle(cornerRadius: MC1.screenRadius, style: .continuous))
+            // The same liquid-glass sheen the coach screen and tape deck wear, so
+            // all three read as panes of one instrument.
+            .liquidGlass(MC1.screenRadius, inset: 3)
             .overlay(
                 RoundedRectangle(cornerRadius: MC1.screenRadius, style: .continuous)
-                    .strokeBorder(KColor.line.opacity(0.45), lineWidth: 1)
+                    .strokeBorder(
+                        LinearGradient(colors: [Color.white.opacity(0.55),
+                                                KColor.line.opacity(0.45)],
+                                       startPoint: .top, endPoint: .bottom),
+                        lineWidth: 1)
             )
         }
         .frame(minHeight: MC1.deckHeight + 2 * MC1.modulePad)
