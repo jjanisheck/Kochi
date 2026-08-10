@@ -192,7 +192,11 @@ class VideoCoachingManager: ObservableObject {
     }
 
     // MARK: - Video Playback
-    func playVideo(label requestedLabel: VideoLabel) {
+    /// - Parameter force: reload the clip even if this label is already playing.
+    ///   A theme switch asks for the *same* label from a different folder, which
+    ///   the "already playing" check below would otherwise treat as a no-op — the
+    ///   coach then kept the old theme's clip until it happened to loop.
+    func playVideo(label requestedLabel: VideoLabel, force: Bool = false) {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
 
@@ -211,8 +215,9 @@ class VideoCoachingManager: ObservableObject {
             // Cancel idle timer
             self.idleTimer?.invalidate()
 
-            // Skip if already playing this video AND player exists and is playing
-            if self.currentVideoLabel == label && self.player != nil && self.isPlaying {
+            // Skip if already playing this video AND player exists and is playing.
+            // `force` bypasses this: same label, different theme folder.
+            if !force, self.currentVideoLabel == label, self.player != nil, self.isPlaying {
                 print("🎬 Video already playing: \(label.rawValue)")
                 return
             }
@@ -481,8 +486,12 @@ class VideoCoachingManager: ObservableObject {
     @objc private func handleThemeChanged() {
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
+            // Clearing the cache alone only takes effect on the *next* clip, so the
+            // coach stayed on the old theme until the current one looped. Force the
+            // swap so the new theme's coach appears as soon as it is picked.
             self.videoCache.removeAll()
-            self.playVideo(label: self.currentVideoLabel)
+            self.currentPlayerItem = nil
+            self.playVideo(label: self.currentVideoLabel, force: true)
         }
     }
 

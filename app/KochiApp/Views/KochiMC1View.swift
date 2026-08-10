@@ -260,9 +260,9 @@ struct KochiMC1View: View {
 
     @ViewBuilder private var transcriptBody: some View {
         if audioManager.transcriptionText.isEmpty {
-            Text(isLive
-                 ? "Listening…"
-                 : "Transcription starts on record. Nothing leaves this iPhone.")
+            // Nothing at rest — the RECORD key already says what to do, and the
+            // privacy claim belongs in the About tab, not on the home screen.
+            Text(isLive ? "Listening…" : "")
                 .font(KFont.sans(14))
                 .foregroundColor(KColor.muted)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
