@@ -450,7 +450,9 @@ class AudioManager: NSObject, ObservableObject {
 
         } catch {
             print("❌ Speech recognition error: \(error)")
-            audioEngine = nil
+            // `self.`, not bare: the `guard let audioEngine = audioEngine` above
+            // shadows the property with a local constant for the rest of the body.
+            self.audioEngine = nil
             abortRecording("The audio engine failed to start: \(error.localizedDescription)")
         }
     }
