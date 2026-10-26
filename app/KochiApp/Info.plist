@@ -2,9 +2,9 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>Kochi needs access to your microphone to record and transcribe your meetings.</string>
-	<key>NSSpeechRecognitionUsageDescription</key>
-	<string>Kochi uses speech recognition to transcribe your meetings and provide real-time feedback on your communication goals.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>audio</string>
+	</array>
 </dict>
 </plist>

@@ -4,18 +4,16 @@ import UIKit
 #endif
 
 /// Manages meeting folder structure and real-time transcript file writing
-/// Guarantees all spoken words are captured to disk immediately, crash-safe
-class MeetingFileManager {
+/// Checkpoints the current transcript atomically off the UI thread.
+nonisolated final class MeetingFileManager: @unchecked Sendable {
 
     // MARK: - Meeting Folder Structure
     private let meetingsRootURL: URL
     var currentMeetingURL: URL?
-    private var transcriptFileHandle: FileHandle?
-    private var lastWrittenLength = 0
-
-    // Timestamp tracking
-    private var currentTimeChunk = 0  // Current 15-second chunk (0, 1, 2, ...)
-    private let chunkDuration = 15.0  // 15 seconds per chunk
+    private let transcriptQueue = DispatchQueue(label: "com.kochi.transcript.checkpoint", qos: .utility)
+    private let pendingLock = NSLock()
+    private var pendingTranscript: (text: String, time: TimeInterval, url: URL)?
+    private var checkpointWork: DispatchWorkItem?
 
     // File names
     private let transcriptFileName = "transcript.txt"
@@ -23,10 +21,10 @@ class MeetingFileManager {
     private let audioFileName = "audio.m4a"
     private let analysisFileName = "analysis.md"
 
-    init() {
+    init(rootURL: URL? = nil) {
         // Create root Meetings folder in Documents
         let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-        meetingsRootURL = documentsURL.appendingPathComponent("Meetings")
+        meetingsRootURL = rootURL ?? documentsURL.appendingPathComponent("Meetings")
 
         // Ensure root folder exists
         try? FileManager.default.createDirectory(at: meetingsRootURL, withIntermediateDirectories: true)
@@ -54,17 +52,6 @@ class MeetingFileManager {
             let transcriptURL = meetingURL.appendingPathComponent(transcriptFileName)
             FileManager.default.createFile(atPath: transcriptURL.path, contents: nil)
 
-            // Open file handle for appending
-            transcriptFileHandle = try FileHandle(forWritingTo: transcriptURL)
-            lastWrittenLength = 0
-            currentTimeChunk = 0
-
-            // Write initial timestamp header (00:00 - 00:15)
-            let initialHeader = "00:00 - 00:15 "
-            if let headerData = initialHeader.data(using: .utf8) {
-                try? headerData.write(to: transcriptURL)
-            }
-
             // Write metadata
             writeMetadata(startTime: Date())
 
@@ -78,61 +65,32 @@ class MeetingFileManager {
         }
     }
 
-    /// Appends new transcript text to the file (crash-safe, immediate write)
-    /// Only writes NEW text that hasn't been written before
-    /// Adds timestamp headers every 15 seconds
+    /// Coalesce volatile speech corrections into one atomic snapshot per second.
+    /// Only the newest pending value is retained; disk work cannot queue the entire
+    /// growing meeting on the main thread. Final stop flushes without waiting.
     func appendToTranscript(_ fullTranscript: String, currentTime: TimeInterval) {
-        guard let fileHandle = transcriptFileHandle else {
-            // Silent return - late-arriving transcripts after meeting ends are expected
-            return
+        guard let folder = currentMeetingURL else { return }
+        pendingLock.lock()
+        pendingTranscript = (fullTranscript, currentTime, folder.appendingPathComponent(transcriptFileName))
+        if checkpointWork == nil {
+            let work = DispatchWorkItem { [weak self] in self?.flushTranscriptCheckpoint() }
+            checkpointWork = work
+            transcriptQueue.asyncAfter(deadline: .now() + 1, execute: work)
         }
+        pendingLock.unlock()
+    }
 
-        // Check if we've crossed into a new time chunk
-        let newChunk = Int(currentTime / chunkDuration)
-        if newChunk > currentTimeChunk {
-            // Write timestamp header for new chunk
-            let startTime = formatTime(Double(newChunk) * chunkDuration)
-            let endTime = formatTime(Double(newChunk + 1) * chunkDuration)
-            let header = "\n\(startTime) - \(endTime) "
-
-            if let headerData = header.data(using: .utf8) {
-                fileHandle.seekToEndOfFile()
-                fileHandle.write(headerData)
-                try? fileHandle.synchronize()
-                print("⏱️ New time chunk: \(startTime) - \(endTime)")
-            }
-
-            currentTimeChunk = newChunk
-        }
-
-        // Only write NEW text (avoid duplicates)
-        guard fullTranscript.count > lastWrittenLength else {
-            return // No new text to write
-        }
-
-        // Extract only the new portion
-        let startIndex = fullTranscript.index(fullTranscript.startIndex, offsetBy: lastWrittenLength)
-        let newText = String(fullTranscript[startIndex...])
-
-        guard !newText.isEmpty else { return }
-
-        // Write to disk immediately
-        if let data = newText.data(using: .utf8) {
-            do {
-                fileHandle.seekToEndOfFile()
-                fileHandle.write(data)
-
-                // Force sync to disk (crash-safe)
-                if #available(iOS 13.0, *) {
-                    try fileHandle.synchronize()
-                }
-
-                lastWrittenLength = fullTranscript.count
-                print("💾 Wrote \(newText.count) chars to transcript (total: \(lastWrittenLength))")
-
-            } catch {
-                print("❌ Failed to write transcript: \(error)")
-            }
+    private func flushTranscriptCheckpoint() {
+        pendingLock.lock()
+        let snapshot = pendingTranscript
+        pendingTranscript = nil
+        checkpointWork = nil
+        pendingLock.unlock()
+        guard let snapshot else { return }
+        let document = "00:00 - \(formatTime(snapshot.time))\n\(snapshot.text)"
+        do { try Data(document.utf8).write(to: snapshot.url, options: .atomic) }
+        catch {
+            RecordingDiagnostics.shared.event("transcript_checkpoint_failed", ["error": error.localizedDescription])
         }
     }
 
@@ -148,13 +106,10 @@ class MeetingFileManager {
         // Write any remaining text (with final timestamp)
         appendToTranscript(finalTranscript, currentTime: duration)
 
-        // Close file handle
-        if #available(iOS 13.0, *) {
-            try? transcriptFileHandle?.close()
-        } else {
-            transcriptFileHandle?.closeFile()
-        }
-        transcriptFileHandle = nil
+        pendingLock.lock()
+        checkpointWork?.cancel()
+        pendingLock.unlock()
+        transcriptQueue.sync { flushTranscriptCheckpoint() }
 
         // Update metadata with end time
         updateMetadata(endTime: Date(), duration: duration, transcriptLength: finalTranscript.count)
@@ -163,7 +118,6 @@ class MeetingFileManager {
         print("📁 Saved to: \(currentMeetingURL?.path ?? "unknown")")
 
         currentMeetingURL = nil
-        lastWrittenLength = 0
     }
 
     // MARK: - Audio File Management
@@ -216,7 +170,7 @@ class MeetingFileManager {
         #if os(macOS)
         let deviceName = Host.current().localizedName ?? "Mac"
         #else
-        let deviceName = UIDevice.current.name
+        let deviceName = ProcessInfo.processInfo.hostName
         #endif
 
         let metadata: [String: Any] = [

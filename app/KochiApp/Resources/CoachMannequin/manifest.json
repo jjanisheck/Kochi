@@ -1,0 +1,290 @@
+{
+  "version": 1,
+  "model": "Original mannequin",
+  "three": "186",
+  "binaryBytes": 5857064,
+  "animations": [
+    {
+      "name": "Arm Stretching",
+      "duration": 8.866666793823242
+    },
+    {
+      "name": "Breathing Idle",
+      "duration": 9.933333396911621
+    },
+    {
+      "name": "Cheering",
+      "duration": 2.9000000953674316
+    },
+    {
+      "name": "Clapping",
+      "duration": 1.1666666269302368
+    },
+    {
+      "name": "Defeated",
+      "duration": 6.733333110809326
+    },
+    {
+      "name": "Happy Idle",
+      "duration": 2
+    },
+    {
+      "name": "Hard Head Nod",
+      "duration": 1.6333333253860474
+    },
+    {
+      "name": "Laughing",
+      "duration": 9.766666412353516
+    },
+    {
+      "name": "Lengthy Head Nod",
+      "duration": 1.7333333492279053
+    },
+    {
+      "name": "Pointing",
+      "duration": 2.7666666507720947
+    },
+    {
+      "name": "Salute",
+      "duration": 2.8333332538604736
+    },
+    {
+      "name": "Shaking Head No",
+      "duration": 1.7999999523162842
+    },
+    {
+      "name": "Shrugging",
+      "duration": 2
+    },
+    {
+      "name": "Silly Dancing",
+      "duration": 3.8333332538604736
+    },
+    {
+      "name": "Sitting Fist Pump",
+      "duration": 3.2666666507720947
+    },
+    {
+      "name": "Sitting Thumbs Up",
+      "duration": 3.8333332538604736
+    },
+    {
+      "name": "Surprised",
+      "duration": 4
+    },
+    {
+      "name": "Talking",
+      "duration": 3.933333396911621
+    },
+    {
+      "name": "Thinking",
+      "duration": 4.233333110809326
+    },
+    {
+      "name": "Waving",
+      "duration": 4.733333110809326
+    },
+    {
+      "name": "acknowledging",
+      "duration": 1.5666667222976685
+    },
+    {
+      "name": "angry gesture",
+      "duration": 2.1666667461395264
+    },
+    {
+      "name": "annoyed head shake",
+      "duration": 2.433333396911621
+    },
+    {
+      "name": "being cocky",
+      "duration": 2.866666555404663
+    },
+    {
+      "name": "dismissing gesture",
+      "duration": 3.2666666507720947
+    },
+    {
+      "name": "happy hand gesture",
+      "duration": 2.7333333492279053
+    },
+    {
+      "name": "hard head nod",
+      "duration": 1.6333333253860474
+    },
+    {
+      "name": "head nod yes",
+      "duration": 2.4000000953674316
+    },
+    {
+      "name": "lengthy head nod",
+      "duration": 1.7000000476837158
+    },
+    {
+      "name": "look away gesture",
+      "duration": 1.7999999523162842
+    },
+    {
+      "name": "relieved sigh",
+      "duration": 3
+    },
+    {
+      "name": "sarcastic head nod",
+      "duration": 2.1666667461395264
+    },
+    {
+      "name": "shaking head no",
+      "duration": 1.7000000476837158
+    },
+    {
+      "name": "thoughtful head shake",
+      "duration": 3.066666603088379
+    },
+    {
+      "name": "weight shift",
+      "duration": 9.433333396911621
+    }
+  ],
+  "sources": [
+    {
+      "file": "Arm Stretching.fbx",
+      "sha256": "e2925c516b09abc0781970fbd9f2b58e140ee22fe185371ad439ee842d4b318f"
+    },
+    {
+      "file": "Breathing Idle.fbx",
+      "sha256": "d0316497d4b6e07457679b55dd4a157b85fdedd2c2715e783245eb072ba5ba2a"
+    },
+    {
+      "file": "Cheering.fbx",
+      "sha256": "e50a409ef9a5a0bd11c1c72a708dbfaff52582f65e7f85f75af0d74ff2c8d08f"
+    },
+    {
+      "file": "Clapping.fbx",
+      "sha256": "65e6bbbc48c4e3e88f4670dc7cff106ab291b5e6aea8010c4d1ea3ee71ec204d"
+    },
+    {
+      "file": "Defeated.fbx",
+      "sha256": "0e648fa09ae803cc6f7fa50aed4f0633ee3d11935c50421ef7887418f1ed0e0d"
+    },
+    {
+      "file": "Happy Idle.fbx",
+      "sha256": "30e842f4a423624226e402e2328eeb5ffbd00fd4c13473705486016f61bbaa79"
+    },
+    {
+      "file": "Hard Head Nod.fbx",
+      "sha256": "f4986cefb477739757c808043e47046bee5aeb119019bf0ae81e95fc09da1d3c"
+    },
+    {
+      "file": "Laughing.fbx",
+      "sha256": "3922560ace66e8b39f1d805514401ae931885e559f0528abf7847956d3f404f5"
+    },
+    {
+      "file": "Lengthy Head Nod.fbx",
+      "sha256": "084ab8f772f7c039c73edf868ba1a8902dc9a29e0e55b08d91aa79f4adce73f1"
+    },
+    {
+      "file": "Pointing.fbx",
+      "sha256": "3b4c5e78041a63958fa6e9a385f7f6b8aade48b0ead8abf0f3e4c0db08ff0112"
+    },
+    {
+      "file": "Salute.fbx",
+      "sha256": "a8ca5bc506829eea536d95963e7d81e18b050c4d0712ae4d0e03d2356a8b4669"
+    },
+    {
+      "file": "Shaking Head No.fbx",
+      "sha256": "18ae1d241a5b8b5eadfb14381ddf9043878fe0bac7040476291c1c8bbea5b521"
+    },
+    {
+      "file": "Shrugging.fbx",
+      "sha256": "b472e520601341c405cdf4393e037e29bca7b78802f08d44d4727ebbb5748042"
+    },
+    {
+      "file": "Silly Dancing.fbx",
+      "sha256": "3e16d7c7a5c8526bc3492182aa01b2e653e04f85f5a892bccb3b163e73a09ba6"
+    },
+    {
+      "file": "Sitting Fist Pump.fbx",
+      "sha256": "e94bb856b9c8239b584a9c6743db289b5f2acc84547990348cf8205a7bb6720b"
+    },
+    {
+      "file": "Sitting Thumbs Up.fbx",
+      "sha256": "4349d09771fbeedc883a288b319252ce017d30f6ca6fe4f452f92b744c16d3d8"
+    },
+    {
+      "file": "Surprised.fbx",
+      "sha256": "dc1966cead4b3c0879e888c596cc30c42d8a7e9f06e01d07cdf88da82224dec7"
+    },
+    {
+      "file": "Talking.fbx",
+      "sha256": "268be1abaff33bd45ccd790e822253a7e1e20526be32ef431e27b1e7a8eb42ec"
+    },
+    {
+      "file": "Thinking.fbx",
+      "sha256": "4b53a69e8c85caa52b55236a9054ab113ec8a448715671afa23c3301a614c48d"
+    },
+    {
+      "file": "Waving.fbx",
+      "sha256": "20748e6f6fa60b37adaaa8791d5b20039c634f09146075303b5e27fa977e005c"
+    },
+    {
+      "file": "acknowledging.fbx",
+      "sha256": "3ec964b23532eebb4f026058cc23bfda0daf67151db084ff5e1fcdb93ce451ab"
+    },
+    {
+      "file": "angry gesture.fbx",
+      "sha256": "7e1adf7eada572dff2726cec53e7807b7bb72e13416551ab9f85b788b7f8ee6d"
+    },
+    {
+      "file": "annoyed head shake.fbx",
+      "sha256": "684de6b34b2335e39d922b04c2e94ae0d627530eee57892b24003065d90a6fdf"
+    },
+    {
+      "file": "being cocky.fbx",
+      "sha256": "e64e1c366bbc48e370676bf116a33d92d44df7b0ec638316b7ba265c51258e58"
+    },
+    {
+      "file": "dismissing gesture.fbx",
+      "sha256": "5b2066e8ddf0c2b79efdcb40ed08ed7e6f5ba92afb03e196db09a1003037a4d5"
+    },
+    {
+      "file": "happy hand gesture.fbx",
+      "sha256": "7ba44f043eec11b836d68ca828398fb3e36189fbedf387df5ea8f1ed533fd0af"
+    },
+    {
+      "file": "hard head nod.fbx",
+      "sha256": "e39757e0cab4f3530e3635279ba2fa2c7b20ce612dc1e83234440380c9755e02"
+    },
+    {
+      "file": "head nod yes.fbx",
+      "sha256": "ac9e6dbdcded6c396dee3123b79a6948cafb07a861949fc79caacd00d08879c0"
+    },
+    {
+      "file": "lengthy head nod.fbx",
+      "sha256": "73da044203cdbddb65bd7a8322563d78241d6644fab82f3a3f3744db48be4603"
+    },
+    {
+      "file": "look away gesture.fbx",
+      "sha256": "34f18c99ca7249b6cb9f2e57dc1ba9f1ae4ae267523e9a52da71b3efec74b13c"
+    },
+    {
+      "file": "relieved sigh.fbx",
+      "sha256": "9370d93dd55f8d091ebe646247ab432ac185f01714e336786e734189de38b726"
+    },
+    {
+      "file": "sarcastic head nod.fbx",
+      "sha256": "449982bbf201da6cd6bb3cd7dcdbbb2c83745b4b14ab9c2df045216061d340a6"
+    },
+    {
+      "file": "shaking head no.fbx",
+      "sha256": "7bf550128eaaa64e0bc9aaca5b496cecf75424d3d501f4ad31d28198abf17533"
+    },
+    {
+      "file": "thoughtful head shake.fbx",
+      "sha256": "2fd1501496d10705b85e18a822a354813d49531a08e3a431d2c46cae133e4274"
+    },
+    {
+      "file": "weight shift.fbx",
+      "sha256": "f175c5f73da0e397292594115be1ce4b7725b48578bba70991d1902cefb931d5"
+    }
+  ]
+}

@@ -35,7 +35,7 @@ final class FoundationModelsService {
         Goals:
         \(goalsText)
         Transcript:
-        "\(transcript)"
+        "\(String(transcript.suffix(8_000)))"
 
         Return one result per goal, using its 1-based number. Mark a goal achieved ONLY
         when the transcript contains clear, specific evidence that the goal was actually
@@ -52,19 +52,33 @@ final class FoundationModelsService {
     // MARK: - Coaching (on-device, plain text, prewarmed)
 
     func generateCoachingResponse(transcript: String, goals: [Goal]) async throws -> String {
+        try await generateCoachReaction(transcript: transcript, goals: goals, recentReactions: []).caption
+    }
+
+    func generateCoachReaction(transcript: String, goals: [Goal], recentReactions: [String]) async throws -> CoachReaction {
         let completed = goals.filter { $0.isCompleted }.map { $0.text }
         let pending = goals.filter { !$0.isCompleted }.map { $0.text }
         let session = LanguageModelSession(model: onDevice, instructions: Self.coachInstructions)
         session.prewarm()
         let prompt = """
-        Transcript: "\(transcript)"
+        Recent transcript (speaker labels identify who spoke): "\(String(transcript.suffix(8_000)))"
         Completed goals: \(completed.isEmpty ? "None" : completed.joined(separator: ", "))
         Pending goals: \(pending.isEmpty ? "None" : pending.joined(separator: ", "))
+        Recent reactions (avoid repeating advice): \(recentReactions.suffix(3).joined(separator: " | "))
 
-        Give ONE short sentence (max 15 words) of direct, motivating coaching. No emojis.
+        Choose a useful coaching intent, expression, and restrained gesture. If no
+        intervention is warranted, listen attentively. Ground advice in what was actually
+        said. Don't infer emotions, interruptions, silence duration, or speaking balance
+        from text alone. Never choose goal or salute: verified achievements come from
+        the app's goal events. Caption: ONE sentence, max 15 words, no emojis.
+        Match the gesture to YOUR coaching response: acknowledge or agree for useful
+        contributions; talk for a suggestion; disagree for an explicit correction;
+        shrug for uncertainty; sigh for relief after resolution. Most routine updates
+        should use none. Use a firm expression for a clear redirect, never anger,
+        sarcasm, or ridicule. Positive wording alone is not a completed goal.
         """
-        return try await session.respond(to: prompt).content
-            .trimmingCharacters(in: .whitespacesAndNewlines)
+        let directive = try await session.respond(to: prompt, generating: CoachingDirective.self).content
+        return CoachReaction(directive: directive)
     }
 
     // MARK: - Session notes (on-device, structured -> markdown)

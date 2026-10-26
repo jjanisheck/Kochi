@@ -29,6 +29,7 @@ final class ThemeStore: ObservableObject {
             ?? found[0]   // discover() guarantees a non-empty array
         ActivePalette.current = current.palette
         ActiveThemeVideo.subdirectory = current.videoSubdirectory
+        ActiveThemeVideo.renderer = current.coachRenderer
         ActiveDeck.reelGrayscale = current.deckReelGrayscale
         ActiveDeck.reelBrightness = current.deckReelBrightness
         ActiveGoal.restBlur = current.goalRestBlur
@@ -64,6 +65,7 @@ final class ThemeStore: ObservableObject {
         current = theme
         ActivePalette.current = theme.palette
         ActiveThemeVideo.subdirectory = theme.videoSubdirectory
+        ActiveThemeVideo.renderer = theme.coachRenderer
         ActiveDeck.reelGrayscale = theme.deckReelGrayscale
         ActiveDeck.reelBrightness = theme.deckReelBrightness
         ActiveGoal.restBlur = theme.goalRestBlur

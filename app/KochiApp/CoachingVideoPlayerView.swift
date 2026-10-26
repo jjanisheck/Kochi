@@ -20,7 +20,9 @@ struct CoachingVideoPlayerView: View {
     var body: some View {
         // Video Player - fills entire available space
         ZStack {
-            if let player = videoManager.player {
+            if videoManager.usesAvatar {
+                MannequinCoachView(manager: videoManager)
+            } else if let player = videoManager.player {
                 // Bare AVPlayerLayer surface: just the video frames, with no
                 // transport controls and no hover/click behavior of any kind.
                 PlayerLayerView(player: player, cornerRadius: cornerRadius)

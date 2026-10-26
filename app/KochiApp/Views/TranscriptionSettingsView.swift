@@ -9,12 +9,14 @@ struct TranscriptionSettingsView: View {
     @EnvironmentObject var themeManager: ThemeManager
     @EnvironmentObject var llmManager: LLMManager
 
+    @State private var supportsLocalSpeech: Bool?
+
     private var accentColor: Color { Color(red: 249/255, green: 81/255, blue: 0) }
 
     /// Whether on-device speech recognition is authorized and available.
     private var speechAvailable: Bool {
         SFSpeechRecognizer.authorizationStatus() == .authorized
-            && (SFSpeechRecognizer()?.isAvailable ?? false)
+            && supportsLocalSpeech == true
     }
 
     private var authorizationStatusText: String {
@@ -47,7 +49,7 @@ struct TranscriptionSettingsView: View {
                             .foregroundColor(KColor.ink)
                     }
 
-                    Text("Speech-to-text runs entirely on this device using Apple's Speech framework. No internet connection or API key is required, and audio never leaves your device.")
+                    Text("Speech-to-text runs entirely on this device using Apple's Speech framework. Speech models may need an initial download; once installed, recognition works offline. Audio never leaves your device.")
                         .font(.caption)
                         .foregroundColor(KColor.ink.opacity(0.7))
 
@@ -55,7 +57,10 @@ struct TranscriptionSettingsView: View {
                         Image(systemName: speechAvailable ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
                             .foregroundColor(speechAvailable ? .green : .orange)
                         VStack(alignment: .leading, spacing: 2) {
-                            Text(speechAvailable ? "On-device speech recognition is ready" : "On-device speech recognition is not ready")
+                            Text(audioManager.isRecording ? audioManager.transcriptionStatus.message
+                                 : supportsLocalSpeech == nil ? "Checking on-device speech support…"
+                                 : speechAvailable ? "On-device speech is supported; models are checked when recording starts"
+                                 : "On-device speech recognition is unavailable")
                                 .font(.caption)
                                 .fontWeight(.medium)
                                 .foregroundColor(KColor.ink)
@@ -111,6 +116,7 @@ struct TranscriptionSettingsView: View {
             }
             .padding(.bottom)
         }
+        .task { supportsLocalSpeech = await SpeechChannel.supportsOnDeviceRecognition() }
         .navigationTitle("Transcription Settings")
         .inlineNavigationTitle()
     }

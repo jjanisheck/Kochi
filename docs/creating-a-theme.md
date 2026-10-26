@@ -44,7 +44,7 @@ app/KochiApp/Resources/Themes/<your-theme>/
     theme.png                     ← swatch shown in the theme picker
     BackgroundImage.png           ← full home-screen background
     BackgroundPlainImage.png      ← texture behind the reel + settings/detail
-    FilmReel.png                  ← the spinning transcript reel
+    FilmReel.png                  ← shared artwork for both tape reels
     KochiLogo.png                 ← the brand wordmark
   videos/
     idle-1.mp4 … idle-4.mp4       ← the resting coach loop (required)
@@ -97,7 +97,7 @@ or stretching oddly.
 | `theme.png` | The chip in the THEMES picker | ~1310 × 1057 | A representative still of your theme. Resolved **by convention** — it doesn't need a `theme.json` entry. If absent, the picker falls back to your key-button gradient. |
 | `BackgroundImage.png` | The whole **home screen** + the **Settings** page | ~1054 × 2284 (tall portrait) | The hero surface. Use [`screenlayout.png`](screenshots/screenlayout.png) to keep important art out from behind the UI. |
 | `BackgroundPlainImage.png` | Behind the **spinning reel**, and the **meeting-detail** page | ~1536 × 1024 | A quieter, **edge-bleed texture** (no framed border) — it gets cropped to fill, and a dark scrim sits over the reel portion. |
-| `FilmReel.png` | The **reel** that spins behind the live transcript | 1254 × 1254 (square) | Centered art that reads while rotating. By default it's desaturated + dimmed (tunable, see options). |
+| `FilmReel.png` | Both spinning reels in the standard tape transport | 1254 × 1254 (square) | Centered art that reads while rotating. Both reels use this image at different speeds, with the counter and sound meter between them. By default it's desaturated + dimmed (tunable, see options). |
 | `KochiLogo.png` | The brand wordmark, top-left | ~305 × 87 (wide) | Transparent PNG. If you ship a **solid white** wordmark you can recolor it per-theme with `logoTint` (no need to re-export). |
 
 #### Two helpers to make the art easier
@@ -118,9 +118,9 @@ get covered, so your decorative art lands in the gaps (corners, edges, the top
 banner) instead of behind a panel.
 
 > **Tools:** any image generator (MidJourney, etc.) or editor works. For framed,
-> "whole-page" backgrounds (like `hero`'s 1776 parchment), turn on
-> [`backgroundStretch`](#options-reference) so the frame fits the window instead
-> of being cropped.
+> "whole-page" backgrounds (like `hero`'s 1776 parchment), keep the decorative
+> border at the artwork's edges. Mac and iPhone both fit the complete background
+> to the same phone canvas.
 
 #### Colors love hex — and alpha
 
@@ -185,6 +185,8 @@ default shown.
 | `buttonHi`, `buttonLo` | `orange` / `orangeDeep` | Primary key gradient (START/END/NEW) |
 | `goalDoneHi`, `goalDoneLo` | `buttonHi` / `buttonLo` | A **hit** goal's gradient |
 | `meterHi`, `meterLo` | `buttonHi` / `buttonLo` | The audio meter bars |
+| `deckCounterFill`, `deckCounterInk` | `deck` / live accent or idle gray | Background and timer text between the reels; ink also tints unlit meter segments |
+| `liveTranscriptFill`, `liveTranscriptInk` | themed image with deck scrim / white | Home transcript surface and text, independent of the reel transport |
 | `goalRestFill`, `goalRestInk` | `paper` / `ink` | An **unmet** goal row's fill + text/checkbox |
 | `goalRestBorder` | clear | Outline around an unmet goal row |
 | `neutralKeyFill` | — (gray bevel) | Tint for the neutral keys (INFO, disabled END) |
@@ -193,8 +195,8 @@ default shown.
 | `onBg`, `onBgFaint` | `inkSoft` / `muted` | Text that sits directly on the background (labels, status) |
 | `deckScrimTop`, `deckScrimBottom` | black 0.45 → 0.7 | Gradient darkening over the reel (use `#RRGGBBAA` to lighten) |
 
-> `hero` is the worked example for all of these — red `buttonHi/Lo`, blue
-> `meterHi/Lo`, frosted `goalRestFill`, brown `slabRule`/`logoTint`, lightened
+> `hero` is the worked example for all of these — red `buttonHi/Lo`, brown
+> `meterHi/Lo` and timer text on a pale counter, frosted `goalRestFill`, brown `slabRule`/`logoTint`, lightened
 > scrim. Read its `theme.json` alongside this table.
 
 ---
@@ -210,7 +212,7 @@ optional:
 |-----|------|---------|--------|
 | `deckReelGrayscale` | 0–1 | `1` | Reel desaturation. `0` = full color, `1` = fully gray. |
 | `deckReelBrightness` | −1–1 | `-0.15` | Reel brightness. `0` = untouched, negative = dimmer. |
-| `backgroundStretch` | bool | `false` | Fit `BackgroundImage` to the window exactly (frame flush to all edges) instead of cropping. Use for **framed** art meant to be seen whole. |
+| `backgroundStretch` | bool | `false` | Legacy option retained for compatibility. The shared Mac/iPhone canvas now always fits the complete background to its edges. |
 | `goalRestBlur` | bool | `false` | Frost unmet goal rows — a blur behind the (translucent) `goalRestFill`. Pairs with an `#RRGGBBAA` fill. |
 | `hideBrandRow` | bool | `false` | Hide the top brand row (logo + "MEETING COACH" + status). The space is **kept** so nothing shifts — good when your background art supplies its own titling. |
 | `chromeOnBackground` | bool | `true` | Settings header + tab bar float on the themed background (vs. legacy gray chrome). |

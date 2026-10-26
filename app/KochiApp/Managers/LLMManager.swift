@@ -70,17 +70,21 @@ class LLMManager: ObservableObject {
     // MARK: - Coaching
 
     func generateCoachingResponse(for transcription: String, goals: [Goal]) async throws {
+        let reaction = try await generateCoachReaction(for: transcription, goals: goals, recentReactions: [])
+        coachingResponse = reaction.caption
+        streamingText = reaction.caption
+    }
+
+    /// Returns a value without publishing the caption, so a caller can reject stale work.
+    func generateCoachReaction(for transcription: String, goals: [Goal], recentReactions: [String]) async throws -> CoachReaction {
         isProcessing = true
         defer { isProcessing = false }
         do {
-            let response = try await fm.generateCoachingResponse(transcript: transcription, goals: goals)
-            self.coachingResponse = response
-            self.streamingText = response
+            return try await fm.generateCoachReaction(transcript: transcription, goals: goals, recentReactions: recentReactions)
         } catch {
             print("❌ LLMManager.generateCoachingResponse: \(error)")
-            let fallback = generateFallbackCoachingMessage(goals: goals)
-            self.coachingResponse = fallback
-            self.streamingText = fallback
+            if Task.isCancelled { throw CancellationError() }
+            return CoachReaction.fallback(goals: goals)
         }
     }
 

@@ -38,11 +38,16 @@ enum KColor {
     static var goalUnmetInk: Color  { p.goalUnmetInk }
     static var goalKeyFill: Color   { p.goalKeyFill }
     static var transcriptRowFill: Color { p.transcriptRowFill }
+    static var liveTranscriptFill: Color? { p.liveTranscriptFill }
+    static var liveTranscriptInk: Color { p.liveTranscriptInk ?? .white }
+    static var liveTranscriptShadow: Color { p.liveTranscriptFill == nil ? .black.opacity(0.6) : .clear }
     static var goalRestBorder: Color { p.goalRestBorder }
     static var goalDoneHi: Color { p.goalDoneHi }
     static var goalDoneLo: Color { p.goalDoneLo }
     static var meterHi: Color { p.meterHi }
     static var meterLo: Color { p.meterLo }
+    static var deckCounterFill: Color { p.deckCounterFill ?? p.deck }
+    static var deckCounterInk: Color? { p.deckCounterInk }
     static var neutralKeyFill: Color? { p.neutralKeyFill }
     static var logoTint: Color? { p.logoTint }
     static var slabRule: Color { p.slabRule }
@@ -327,7 +332,65 @@ func parseTranscript(_ raw: String) -> [TranscriptTurn] {
     return turns
 }
 
-/// Renders transcript turns as chat bubbles — "Me" (mic) on the left, "Them"
+/// Bound the live text layout work during long meetings. The complete transcript
+/// remains in the meeting's file and saved history.
+struct LiveTranscriptText: View, Equatable {
+    let lines: [TranscriptLine]
+    let isLive: Bool
+
+    /// Keep long recordings inexpensive to lay out while retaining complete
+    /// transcript text in the meeting file and history.
+    private var recentLines: [TranscriptLine] {
+        var count = 0
+        var recent: [TranscriptLine] = []
+        for line in lines.reversed().prefix(100) {
+            let remaining = 16_000 - count
+            guard remaining > 0 else { break }
+            recent.append(line.replacingText(String(line.text.suffix(remaining))))
+            count += line.text.count
+        }
+        return recent.reversed()
+    }
+
+    var body: some View {
+        let recent = recentLines
+        LazyVStack(alignment: .leading, spacing: 0) {
+            if recent.count < lines.count || recent.first?.text != lines.first?.text {
+                Text("Latest conversation · full transcript saved")
+                    .font(KFont.mono(9))
+                    .foregroundStyle(KColor.liveTranscriptInk.opacity(0.7))
+                    .padding(.bottom, 8)
+            }
+            ForEach(recent) { line in
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    Text(deckTime(line.elapsedTime))
+                        .font(KFont.mono(9))
+                        .frame(width: 38, alignment: .leading)
+                    Text(line.speaker == DualTranscriptionEngine.micLabel ? "YOU" : line.speaker.uppercased())
+                        .font(KFont.mono(8.5, .medium))
+                        .frame(width: 34, alignment: .leading)
+                    Text(line.text)
+                        .font(KFont.zilla(13, .medium))
+                        .foregroundStyle(KColor.liveTranscriptInk)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .foregroundStyle(KColor.liveTranscriptFill != nil ? KColor.liveTranscriptInk
+                    : (isLive && line.id == lines.last?.id ? KColor.buttonHi : KColor.liveTranscriptInk.opacity(0.7)))
+                .padding(.vertical, 9)
+                if line.id != recent.last?.id {
+                    Rectangle()
+                        .fill(KColor.liveTranscriptInk.opacity(0.14))
+                        .frame(height: 0.5)
+                }
+            }
+        }
+        .shadow(color: KColor.liveTranscriptShadow, radius: 2, x: 0, y: 1)
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+/// Renders saved transcript turns as chat bubbles — "Me" (mic) on the left, "Them"
 /// (system audio) on the right — so the two inputs read as a conversation.
 struct ChatTranscriptView: View {
     let turns: [TranscriptTurn]
@@ -408,3 +471,188 @@ struct ChatTranscriptView: View {
     }
 }
 
+// MARK: - Two-reel transport (shared by iOS and macOS)
+
+//
+// The transport of a real deck: two reels — supply and take-up — with a
+// recessed counter/VU window between them, over the theme's own plate art.
+// Shared so the desktop and the phone render one deck, not two that drift.
+
+/// mm:ss, the tape counter's format.
+func deckTime(_ t: TimeInterval) -> String {
+    let s = max(0, Int(t))
+    return String(format: "%02d:%02d", s / 60, s % 60)
+}
+
+/// One tape reel, drawn from the app's own reel art over the themed deck plate,
+/// with the per-theme grayscale/brightness treatment from `ActiveDeck`. No blend
+/// mode: `.screen` only works while the plate is a literal near-black, and washes
+/// the deck out once the plate is theme art.
+struct TapeReel: View {
+    let isSpinning: Bool
+    /// Seconds per revolution. The take-up reel runs faster than the supply
+    /// reel, the way real tape does.
+    let revolutionSeconds: Double
+    let size: CGFloat
+
+    @State private var angle: Double = 0
+
+    var body: some View {
+        ThemeImage("FilmReel")
+            .scaledToFit()
+            .frame(width: size, height: size)
+            .grayscale(ActiveDeck.reelGrayscale)
+            .brightness(ActiveDeck.reelBrightness)
+            .rotationEffect(.degrees(angle))
+            .allowsHitTesting(false)
+            .onChange(of: isSpinning) { _, spinning in
+                if spinning { spin() } else { halt() }
+            }
+            .onAppear { if isSpinning { spin() } }
+    }
+
+    private func spin() {
+        angle = 0
+        withAnimation(.linear(duration: revolutionSeconds).repeatForever(autoreverses: false)) {
+            angle = 360
+        }
+    }
+
+    private func halt() {
+        withAnimation(.easeOut(duration: 0.35)) { angle = 0 }
+    }
+}
+
+/// The recessed window between the reels: tape counter over an 8-segment VU
+/// meter, the way the transport of a real deck reads.
+struct DeckCounterWindow: View {
+    let elapsed: TimeInterval
+    let level: Float
+    let isLive: Bool
+
+    private static let segments = 8
+
+    var body: some View {
+        Text(deckTime(elapsed))
+            .font(KFont.mono(18, .medium))
+            .tracking(0.4)
+            .foregroundColor(KColor.deckCounterInk ?? (isLive ? KColor.orange : KColor.muted2))
+            .frame(minWidth: 66)
+            .frame(height: 20)
+            .padding(.horizontal, 11)
+            .padding(.bottom, 10)
+            .overlay(alignment: .bottom) {
+                // Fill the window with evenly spaced pips and a small edge inset.
+                HStack(spacing: 3) {
+                    ForEach(0..<Self.segments, id: \.self) { i in
+                        Rectangle()
+                            .fill(i < lit
+                                  ? AnyShapeStyle(LinearGradient(colors: [KColor.meterHi, KColor.meterLo],
+                                                                 startPoint: .top, endPoint: .bottom))
+                                  : AnyShapeStyle(KColor.deckCounterInk?.opacity(0.25) ?? KColor.deckBorder))
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 10)
+                    }
+                }
+                .frame(height: 10)
+                .padding(.horizontal, 6)
+                .animation(.easeOut(duration: 0.12), value: lit)
+            }
+            .padding(.vertical, 1)
+            .background(
+                RoundedRectangle(cornerRadius: 4, style: .continuous)
+                    .fill(KColor.deckCounterFill)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 4, style: .continuous)
+                            .strokeBorder(.white.opacity(0.06), lineWidth: 1)
+                    )
+            )
+            .liquidGlass(4, inset: 1)
+    }
+
+    private var lit: Int {
+        guard isLive else { return 0 }
+        return max(1, min(Self.segments, Int(level * Float(Self.segments))))
+    }
+}
+
+/// The whole deck: themed plate, two reels cropped in half by the deck floor,
+/// and the counter window centred between them.
+struct TapeDeckPanel: View {
+    let elapsed: TimeInterval
+    let level: Float
+    let isLive: Bool
+    var height: CGFloat = 96
+    var cornerRadius: CGFloat = 5
+    private let glassInset: CGFloat = 3
+
+    /// Reels are twice the deck's height, so the floor crops them in half and
+    /// only their top halves are on show.
+    private var reelSize: CGFloat { height * 2 }
+    /// Inset of each reel's centre from its edge, scaled off the reel so the
+    /// pair always leaves the counter window clear in the middle.
+    private var reelInset: CGFloat { reelSize * 0.3 }
+
+    /// Bring each centre 20% toward the midpoint, reducing their separation 20%.
+    private func reelOffset(in width: CGFloat) -> CGFloat {
+        max(0, width / 2 - reelInset) * 0.8
+    }
+
+    var body: some View {
+        GeometryReader { geo in
+            ZStack {
+                // Base tone, so a theme with no plate art never flashes white.
+                KColor.deck
+
+                // The plate needs a definite frame, exactly as `ThemeBackground`
+                // gives its art. A bare `scaledToFill()` keeps the image's own
+                // (much larger) size, which inflates the ZStack — and since a
+                // GeometryReader pins its content to the top-leading corner, the
+                // centred counter then sits well below the visible deck.
+                ThemeImage("BackgroundPlainImage")
+                    .scaledToFill()
+                    .frame(width: geo.size.width, height: geo.size.height)
+                    .clipped()
+
+                // The themed deck scrim. This is what makes the deck read like
+                // the coach screen: that module lays its caption gradient over a
+                // black base, so the liquid-glass sheen — which is pure white —
+                // has something dark to catch on. Straight onto bright plate art
+                // the same sheen all but disappears and the deck goes flat.
+                //
+                // `deckScrimTop`/`deckScrimBottom` are first-class palette tokens
+                // (BRICKS and HERO already tune them; everything else takes the
+                // black 0.45 → 0.7 default) that nothing was reading. Sitting
+                // under the reels, the scrim also restores the dark field the
+                // silver-on-black reel art was drawn for.
+                LinearGradient(colors: [KColor.deckScrimTop, KColor.deckScrimBottom],
+                               startPoint: .top, endPoint: .bottom)
+
+                // Reels hang half below the floor: centred on the deck's bottom
+                // edge, so only their top halves show.
+                ZStack {
+                    TapeReel(isSpinning: isLive, revolutionSeconds: 2.4, size: reelSize)
+                        .position(x: geo.size.width / 2 - reelOffset(in: geo.size.width), y: geo.size.height)
+                    TapeReel(isSpinning: isLive, revolutionSeconds: 3.6, size: reelSize)
+                        .position(x: geo.size.width / 2 + reelOffset(in: geo.size.width), y: geo.size.height)
+                }
+                .frame(width: geo.size.width, height: geo.size.height)
+                .mask {
+                    // Match the glass pane exactly, leaving the outer rim clear.
+                    RoundedRectangle(cornerRadius: max(4, cornerRadius - glassInset * 0.4),
+                                     style: .continuous)
+                        .padding(glassInset)
+                }
+
+                // The compact window starts at the deck's midline. Its bottom
+                // stays at the former full-height window's lower edge.
+                DeckCounterWindow(elapsed: elapsed, level: level, isLive: isLive)
+                    .position(x: geo.size.width / 2, y: geo.size.height / 2 + 16)
+            }
+            .frame(width: geo.size.width, height: geo.size.height)
+        }
+        .frame(height: height)
+        .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+        .liquidGlass(cornerRadius, inset: glassInset)
+    }
+}

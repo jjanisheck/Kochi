@@ -1,5 +1,6 @@
 {
   "displayName": "ZEN",
+  "coachRenderer": "video",
   "colorScheme": "light",
   "deckReelGrayscale": 0,
   "deckReelBrightness": 0,

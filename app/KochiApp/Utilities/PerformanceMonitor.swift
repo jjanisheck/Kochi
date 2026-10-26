@@ -31,6 +31,7 @@ final class PerformanceMonitor: ObservableObject {
     
     // MARK: - Monitoring Control
     func startMonitoring() {
+        guard performanceTimer == nil else { return }
         // CPU and Memory monitoring
         performanceTimer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: true) { [weak self] _ in
             self?.updateSystemMetrics()

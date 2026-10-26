@@ -5,9 +5,71 @@ import AppKit
 import UIKit
 #endif
 
+/// Settings typography and spacing follow the existing Transcripts list.
+private enum InfoTabStyle {
+    static let pageInset: CGFloat = 16
+    static let cardInset: CGFloat = 16
+    static let pageGap: CGFloat = 15
+    static let contentGap: CGFloat = 10
+    static let relatedGap: CGFloat = 6
+    static let cornerRadius: CGFloat = 10
+    static var title: Font { KFont.zilla(14, .bold) }
+    static var body: Font { KFont.mono(11) }
+    static var metadata: Font { KFont.mono(10) }
+    static var caption: Font { KFont.mono(9) }
+    static var field: Font { KFont.zilla(14, .medium) }
+    static var action: Font { KFont.zilla(12.5, .bold) }
+
+    static func heading(_ title: String) -> some View {
+        Text(title).font(Self.title).foregroundStyle(KColor.ink)
+    }
+}
+
+private extension View {
+    func infoCard(horizontalInset: CGFloat = InfoTabStyle.pageInset) -> some View {
+        frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
+            .padding(InfoTabStyle.cardInset)
+            .background(KColor.paper.opacity(0.92))
+            .clipShape(RoundedRectangle(cornerRadius: InfoTabStyle.cornerRadius))
+            .padding(.horizontal, horizontalInset)
+    }
+}
+
+/// Every info page gets the same viewport, margins, and section rhythm. A wide
+/// image or field inside a card must not enlarge the entire settings screen.
+private struct InfoTabPage<Content: View>: View {
+    let content: Content
+
+    init(@ViewBuilder content: () -> Content) { self.content = content() }
+
+    var body: some View {
+        GeometryReader { viewport in
+            ScrollView {
+                VStack(alignment: .leading, spacing: InfoTabStyle.pageGap) {
+                    content
+                }
+                .frame(width: viewport.size.width, alignment: .leading)
+                .padding(.bottom, InfoTabStyle.pageInset)
+            }
+            .frame(width: viewport.size.width, height: viewport.size.height)
+        }
+    }
+}
+
 struct SettingsView: View {
     @Binding var isPresented: Bool
-    @State private var selectedTab = 0
+    @State private var selectedTab: Int = {
+        #if DEBUG
+        if let argument = CommandLine.arguments.first(where: { $0.hasPrefix("--preview-info-tab=") }),
+           let index = Int(argument.replacingOccurrences(of: "--preview-info-tab=", with: "")),
+           (0...4).contains(index) { return index }
+        #endif
+        #if os(macOS)
+        return CommandLine.arguments.contains("--character-workshop") ? 5 : 0
+        #else
+        return 0
+        #endif
+    }()
     @State private var showGoals = false
     /// The transcript being viewed. Non-nil shows the detail as a full-panel
     /// overlay (covering the header + tab bar) rather than a nav push beneath them.
@@ -22,7 +84,7 @@ struct SettingsView: View {
         VStack(spacing: 0) {
                     // Header — MEETING DETAILS + beveled Done key
                     HStack {
-                        Text("MEETING DETAILS")
+                        Text(panelTitle)
                             .font(KFont.mono(11))
                             .tracking(1.6)
                             .foregroundColor(KColor.onBg)
@@ -42,7 +104,7 @@ struct SettingsView: View {
                     .padding(.top, 8)
                     .background(headerChrome)
 
-                    // Beveled tab bar — 5 tabs
+                    // Beveled tab bar
                     HStack(spacing: 5) {
                         TabButton(title: "Transcripts", icon: "doc.text.fill", isSelected: selectedTab == 0) {
                             withAnimation { selectedTab = 0 }
@@ -59,6 +121,13 @@ struct SettingsView: View {
                         TabButton(title: "About", icon: "info.circle", isSelected: selectedTab == 4) {
                             withAnimation { selectedTab = 4 }
                         }
+                        #if os(macOS)
+                        if CommandLine.arguments.contains("--character-workshop") {
+                            TabButton(title: "Character", icon: "figure.stand", isSelected: selectedTab == 5) {
+                                withAnimation { selectedTab = 5 }
+                            }
+                        }
+                        #endif
                     }
                     .padding(.horizontal, 10)
                     .padding(.vertical, 8)
@@ -80,6 +149,10 @@ struct SettingsView: View {
                             AITab()
                         case 4:
                             AboutTab()
+                        #if os(macOS)
+                        case 5:
+                            CharacterWorkshopView()
+                        #endif
                         default:
                             TranscriptsTab(onSelect: { selectedMeeting = $0 })
                         }
@@ -102,6 +175,14 @@ struct SettingsView: View {
             }
         }
         .animation(.easeOut(duration: 0.22), value: selectedMeeting?.id)
+    }
+
+    private var panelTitle: String {
+        #if os(macOS)
+        return selectedTab == 5 ? "CHARACTER WORKSHOP" : "MEETING DETAILS"
+        #else
+        return "MEETING DETAILS"
+        #endif
     }
 
     /// Header strip backing. Themes that opt into `chromeOnBackground` (e.g. BRICKS)
@@ -193,34 +274,31 @@ struct TranscriptsTab: View {
     @EnvironmentObject var audioManager: AudioManager
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 15) {
-                TabHeader(
-                    icon: "doc.text.fill",
-                    title: "Transcripts",
-                    subtitle: "Your recorded meetings and their transcripts."
-                )
+        InfoTabPage {
+            TabHeader(
+                icon: "doc.text.fill",
+                title: "Transcripts",
+                subtitle: "Your recorded meetings and their transcripts."
+            )
 
-                if goalManager.meetingHistory.isEmpty {
-                    Text("No transcripts yet. Start a recording to see history here.")
-                        .font(.body)
-                        .foregroundColor(KColor.ink.opacity(0.6))
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(KColor.paper.opacity(0.92))
-                        .cornerRadius(10)
-                        .padding(.horizontal)
-                } else {
-                    ForEach(goalManager.meetingHistory) { meeting in
-                        TranscriptRow(meeting: meeting, onTap: {
-                            onSelect(meeting)
-                        }, onDelete: {
-                            goalManager.deleteMeeting(meeting)
-                        })
-                    }
+            if goalManager.meetingHistory.isEmpty {
+                Text("No transcripts yet. Start a recording to see history here.")
+                    .font(InfoTabStyle.body)
+                    .foregroundColor(KColor.ink.opacity(0.6))
+                    .padding(InfoTabStyle.cardInset)
+                    .frame(maxWidth: .infinity)
+                    .background(KColor.paper.opacity(0.92))
+                    .cornerRadius(InfoTabStyle.cornerRadius)
+                    .padding(.horizontal, InfoTabStyle.pageInset)
+            } else {
+                ForEach(goalManager.meetingHistory) { meeting in
+                    TranscriptRow(meeting: meeting, onTap: {
+                        onSelect(meeting)
+                    }, onDelete: {
+                        goalManager.deleteMeeting(meeting)
+                    })
                 }
             }
-            .padding(.bottom)
         }
     }
 }
@@ -240,26 +318,26 @@ struct TranscriptRow: View {
                     // Show the meeting name when set, with the timestamp kept visible but small.
                     if let name = meeting.name, !name.isEmpty {
                         Text(name)
-                            .font(KFont.zilla(14, .bold))
+                            .font(InfoTabStyle.title)
                             .foregroundColor(KColor.ink)
                         Text(formatDate(meeting.startTime))
-                            .font(KFont.mono(9))
+                            .font(InfoTabStyle.caption)
                             .foregroundColor(KColor.muted)
                     } else {
                         Text(formatDate(meeting.startTime))
-                            .font(KFont.zilla(14, .bold))
+                            .font(InfoTabStyle.title)
                             .foregroundColor(KColor.ink)
                     }
 
                     let completedCount = meeting.goals.filter { $0.isCompleted }.count
                     Text("\(completedCount)/\(meeting.goals.count) goals")
-                        .font(KFont.mono(10))
+                        .font(InfoTabStyle.metadata)
                         .tracking(0.5)
                         .foregroundColor(completedCount == meeting.goals.count && completedCount > 0 ? KColor.good : KColor.muted)
 
                     if !meeting.notes.isEmpty {
                         Text(meeting.notes)
-                            .font(KFont.mono(11))
+                            .font(InfoTabStyle.body)
                             .foregroundColor(KColor.muted)
                             .lineLimit(2)
                             .padding(.top, 2)
@@ -277,10 +355,10 @@ struct TranscriptRow: View {
                 }
                 .buttonStyle(PlainButtonStyle())
             }
-            .padding()
+            .padding(InfoTabStyle.cardInset)
             .background(KColor.transcriptRowFill.opacity(0.92))
-            .cornerRadius(10)
-            .padding(.horizontal)
+            .cornerRadius(InfoTabStyle.cornerRadius)
+            .padding(.horizontal, InfoTabStyle.pageInset)
         }
         .buttonStyle(PlainButtonStyle())
         .alert("Delete Transcript", isPresented: $showDeleteAlert) {
@@ -334,36 +412,33 @@ struct SearchTab: View {
     }
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 15) {
-                TabHeader(
-                    icon: "magnifyingglass",
-                    title: "Search",
-                    subtitle: "Find a word or phrase across your transcripts."
-                )
+        InfoTabPage {
+            TabHeader(
+                icon: "magnifyingglass",
+                title: "Search",
+                subtitle: "Find a word or phrase across your transcripts."
+            )
 
-                searchField
+            searchField
 
-                if trimmed.count < 2 {
-                    hintCard("Type at least two characters to search your saved transcripts.")
-                } else if hits.isEmpty {
-                    hintCard("No transcripts mention “\(trimmed)”.")
-                } else {
-                    HStack {
-                        Text("\(hits.count) transcript\(hits.count == 1 ? "" : "s")")
-                            .font(KFont.mono(10))
-                            .tracking(0.5)
-                            .foregroundColor(KColor.muted)
-                        Spacer()
-                    }
-                    .padding(.horizontal)
+            if trimmed.count < 2 {
+                hintCard("Type at least two characters to search your saved transcripts.")
+            } else if hits.isEmpty {
+                hintCard("No transcripts mention “\(trimmed)”.")
+            } else {
+                HStack {
+                    Text("\(hits.count) transcript\(hits.count == 1 ? "" : "s")")
+                        .font(InfoTabStyle.metadata)
+                        .tracking(0.5)
+                        .foregroundColor(KColor.muted)
+                    Spacer()
+                }
+                .padding(.horizontal, InfoTabStyle.pageInset)
 
-                    ForEach(hits) { hit in
-                        SearchResultRow(hit: hit, onTap: { onSelect(hit.meeting) })
-                    }
+                ForEach(hits) { hit in
+                    SearchResultRow(hit: hit, onTap: { onSelect(hit.meeting) })
                 }
             }
-            .padding(.bottom)
         }
     }
 
@@ -374,7 +449,7 @@ struct SearchTab: View {
                 .foregroundColor(KColor.muted)
             TextField("Search transcripts…", text: $query)
                 .textFieldStyle(.plain)
-                .font(KFont.sans(13.5, .medium))
+                .font(InfoTabStyle.field)
                 .foregroundColor(KColor.ink)
             if !query.isEmpty {
                 Button(action: { query = "" }) {
@@ -385,26 +460,25 @@ struct SearchTab: View {
                 .buttonStyle(.plain)
             }
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 10)
+        .padding(InfoTabStyle.cardInset)
         .background(
             RoundedRectangle(cornerRadius: 10, style: .continuous)
                 .fill(KColor.paper)
                 .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous)
                     .strokeBorder(KColor.line, lineWidth: 1))
         )
-        .padding(.horizontal)
+        .padding(.horizontal, InfoTabStyle.pageInset)
     }
 
     private func hintCard(_ text: String) -> some View {
         Text(text)
-            .font(KFont.mono(11))
+            .font(InfoTabStyle.body)
             .foregroundColor(KColor.muted)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding()
+            .padding(InfoTabStyle.cardInset)
             .background(KColor.paper.opacity(0.92))
-            .cornerRadius(10)
-            .padding(.horizontal)
+            .cornerRadius(InfoTabStyle.cornerRadius)
+            .padding(.horizontal, InfoTabStyle.pageInset)
     }
 
     // MARK: Search helpers
@@ -457,7 +531,7 @@ private struct SearchResultRow: View {
             VStack(alignment: .leading, spacing: 6) {
                 HStack {
                     Text(formatDate(hit.meeting.startTime))
-                        .font(KFont.zilla(14, .bold))
+                        .font(InfoTabStyle.title)
                         .foregroundColor(KColor.ink)
                     Spacer()
                     Text("\(hit.count)×")
@@ -473,11 +547,11 @@ private struct SearchResultRow: View {
                     .fixedSize(horizontal: false, vertical: true)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .padding()
+            .padding(InfoTabStyle.cardInset)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(KColor.paper.opacity(0.92))
-            .cornerRadius(10)
-            .padding(.horizontal)
+            .cornerRadius(InfoTabStyle.cornerRadius)
+            .padding(.horizontal, InfoTabStyle.pageInset)
         }
         .buttonStyle(.plain)
     }
@@ -502,34 +576,31 @@ struct GoalsTab: View {
     @State private var goalSpeechError: String?
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 15) {
-                TabHeader(
-                    icon: "target",
-                    title: "Goals",
-                    subtitle: "Set up to three goals to track during meetings."
-                )
+        InfoTabPage {
+            TabHeader(
+                icon: "target",
+                title: "Goals",
+                subtitle: "Set up to three goals to track during meetings."
+            )
 
-                // Running tally across all saved meetings
-                HStack(spacing: 9) {
-                    StatTile(value: goalManager.meetingHistory.count, label: "meetings")
-                    StatTile(value: goalManager.meetingHistory.reduce(0) { $0 + $1.goals.filter { $0.isCompleted }.count }, label: "goals hit")
-                    StatTile(value: goalManager.meetingHistory.filter { !$0.goals.isEmpty && $0.goals.allSatisfy { $0.isCompleted } }.count, label: "perfect")
-                }
-                .padding(.horizontal)
-
-                speakGoalsButton
-
-                // Three fixed goal slots
-                ForEach(0..<3, id: \.self) { index in
-                    GoalSlotRow(
-                        index: index,
-                        text: bindingForGoal(at: index),
-                        isCompleted: goalManager.goals.count > index ? goalManager.goals[index].isCompleted : false
-                    )
-                }
+            // Running tally across all saved meetings
+            HStack(spacing: 9) {
+                StatTile(value: goalManager.meetingHistory.count, label: "meetings")
+                StatTile(value: goalManager.meetingHistory.reduce(0) { $0 + $1.goals.filter { $0.isCompleted }.count }, label: "goals hit")
+                StatTile(value: goalManager.meetingHistory.filter { !$0.goals.isEmpty && $0.goals.allSatisfy { $0.isCompleted } }.count, label: "perfect")
             }
-            .padding(.bottom)
+            .padding(.horizontal, InfoTabStyle.pageInset)
+
+            speakGoalsButton
+
+            // Three fixed goal slots
+            ForEach(0..<3, id: \.self) { index in
+                GoalSlotRow(
+                    index: index,
+                    text: bindingForGoal(at: index),
+                    isCompleted: goalManager.goals.count > index ? goalManager.goals[index].isCompleted : false
+                )
+            }
         }
         .onAppear {
             loadGoalTexts()
@@ -576,9 +647,9 @@ struct GoalsTab: View {
                         Text("speak new goals")
                     }
                 }
-                .font(KFont.zilla(12.5, .bold))
+                .font(InfoTabStyle.action)
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 9)
+                .padding(.vertical, 12)
                 .contentShape(Rectangle())
             }
             .buttonStyle(BeveledKeyStyle(variant: dictation.isListening ? .light : .primary, radius: 8))
@@ -586,17 +657,17 @@ struct GoalsTab: View {
 
             if dictation.isListening, !dictation.transcript.isEmpty {
                 Text(dictation.transcript)
-                    .font(KFont.sans(12, .regular))
+                    .font(InfoTabStyle.body)
                     .foregroundColor(KColor.inkSoft)
                     .fixedSize(horizontal: false, vertical: true)
             }
             if let goalSpeechError {
                 Text(goalSpeechError)
-                    .font(KFont.mono(10))
+                    .font(InfoTabStyle.metadata)
                     .foregroundColor(KColor.orangeDeep)
             }
         }
-        .padding(.horizontal)
+        .padding(.horizontal, InfoTabStyle.pageInset)
     }
 
     private func toggleDictation() {
@@ -635,15 +706,15 @@ struct StatTile: View {
     var body: some View {
         VStack(spacing: 4) {
             Text("\(value)")
-                .font(KFont.zilla(25, .bold))
+                .font(KFont.zilla(22, .bold))
                 .foregroundColor(KColor.orange)
             Text(label.uppercased())
-                .font(KFont.mono(8.5))
+                .font(InfoTabStyle.metadata)
                 .tracking(0.6)
                 .foregroundColor(KColor.muted)
         }
         .frame(maxWidth: .infinity)
-        .kCard(radius: 9, padding: 11)
+        .infoCard(horizontalInset: 0)
     }
 }
 
@@ -669,7 +740,7 @@ struct GoalSlotRow: View {
             if isEditing {
                 TextField("Goal \(index + 1)", text: $editText)
                     .textFieldStyle(PlainTextFieldStyle())
-                    .font(KFont.sans(14, .semibold))
+                    .font(InfoTabStyle.field)
                     .foregroundColor(KColor.ink)
                     .tint(KColor.orange)              // visible blinking caret
                     .focused($fieldFocused)
@@ -677,8 +748,8 @@ struct GoalSlotRow: View {
                     .onAppear { fieldFocused = true } // focus immediately on Edit
                     // Recessed white input box with a neutral border (no colored
                     // ring) — the blinking cursor signals it's editable.
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 7)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 10)
                     .background(
                         RoundedRectangle(cornerRadius: 6, style: .continuous)
                             .fill(KColor.paper)
@@ -688,14 +759,14 @@ struct GoalSlotRow: View {
 
                 Button(action: commit) {
                     Text("save")
-                        .font(KFont.zilla(12.5, .bold))
-                        .padding(.horizontal, 14)
+                        .font(InfoTabStyle.action)
+                        .padding(.horizontal, 16)
                         .padding(.vertical, 7)
                 }
                 .buttonStyle(BeveledKeyStyle(variant: .primary, radius: 7))
             } else {
                 Text(text.isEmpty ? "Goal \(index + 1)" : text)
-                    .font(KFont.sans(14, .semibold))
+                    .font(InfoTabStyle.title)
                     .foregroundColor(text.isEmpty ? KColor.muted2 : KColor.ink)
 
                 Spacer()
@@ -705,94 +776,107 @@ struct GoalSlotRow: View {
                     isEditing = true
                 }) {
                     Text("edit")
-                        .font(KFont.zilla(12.5, .bold))
-                        .padding(.horizontal, 14)
+                        .font(InfoTabStyle.action)
+                        .padding(.horizontal, 16)
                         .padding(.vertical, 7)
                 }
                 .buttonStyle(BeveledKeyStyle(variant: .light, radius: 7))
             }
         }
-        .padding(12)
+        .padding(InfoTabStyle.cardInset)
         .background(
-            RoundedRectangle(cornerRadius: 9, style: .continuous)
+            RoundedRectangle(cornerRadius: InfoTabStyle.cornerRadius, style: .continuous)
                 .fill(KColor.paper.opacity(0.92))
-                .overlay(RoundedRectangle(cornerRadius: 9, style: .continuous)
+                .overlay(RoundedRectangle(cornerRadius: InfoTabStyle.cornerRadius, style: .continuous)
                     .strokeBorder(KColor.line, lineWidth: 1))
         )
-        .padding(.horizontal)
+        .padding(.horizontal, InfoTabStyle.pageInset)
     }
 }
 
 // MARK: - About Tab
 struct AboutTab: View {
     @EnvironmentObject private var themeStore: ThemeStore
+    @State private var recordingDiagnosticURL: URL?
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 15) {
-                TabHeader(
-                    icon: "info.circle.fill",
-                    title: "About",
-                    subtitle: "How Kōchi works and handles your data."
-                )
+        InfoTabPage {
+            TabHeader(
+                icon: "info.circle.fill",
+                title: "About",
+                subtitle: "How Kōchi works and handles your data."
+            )
 
-                themesCard
+            themesCard
+            recordingDiagnosticsCard
 
-                // Main description
-                VStack(alignment: .leading, spacing: 16) {
-                    Text("Kochi transcribes your meetings entirely on-device with Apple Speech, and evaluates your goals and coaching using Apple's on-device Foundation model. Your audio never leaves your device.")
-                        .font(.body)
-                        .foregroundColor(KColor.ink.opacity(0.8))
-
-                    Divider()
-                        .background(KColor.ink.opacity(0.25))
-
-                    Text("How It Works")
-                        .font(.headline)
-                        .foregroundColor(KColor.ink)
-
-                    VStack(alignment: .leading, spacing: 12) {
-                        PrivacyFeatureRow(icon: "waveform", text: "Audio transcribed on-device with Apple Speech")
-                        PrivacyFeatureRow(icon: "brain", text: "Goal evaluation runs on Apple's on-device model")
-                        PrivacyFeatureRow(icon: "folder", text: "Transcripts stored locally on your device")
-                    }
-
-                    Divider()
-                        .background(KColor.ink.opacity(0.25))
-
-                    Text("Private by Design")
-                        .font(.headline)
-                        .foregroundColor(KColor.ink)
-
-                    VStack(alignment: .leading, spacing: 12) {
-                        PrivacyFeatureRow(icon: "wifi.slash", text: "Works without an internet connection")
-                        PrivacyFeatureRow(icon: "key.slash", text: "No API keys or accounts required")
-                        PrivacyFeatureRow(icon: "person.2.wave.2", text: "Dual-channel speaker separation (Me / Them)")
-                    }
-
-                    Divider()
-                        .background(KColor.ink.opacity(0.25))
-
-                    Text("Privacy Note")
-                        .font(.headline)
-                        .foregroundColor(KColor.ink)
-
-                    Text("K\u{014D}chi runs entirely on your device by default \u{2014} audio, transcription, and coaching all happen locally with no account or API key. The optional AI Analysis feature (Settings \u{2192} AI) is the one exception: if you add your own API key and tap Run AI Analysis on a meeting, that meeting\u{2019}s transcript is sent to your chosen provider. Your audio, transcripts, and goals stay stored locally on your device.")
-                        .font(.body)
-                        .foregroundColor(KColor.ink.opacity(0.8))
-                }
-                .padding()
-                .background(KColor.paper.opacity(0.92))
-                .cornerRadius(10)
-                .padding(.horizontal)
-            }
-            .padding(.bottom)
+            summaryCard
+            howItWorksCard
+            privacyCard
+            privacyNoteCard
         }
+        .task { recordingDiagnosticURL = await RecordingDiagnostics.shared.exportReport() }
+    }
+
+    private var summaryCard: some View {
+        Text("Kochi transcribes your meetings entirely on-device with Apple Speech, and evaluates your goals and coaching using Apple's on-device Foundation model. Your audio never leaves your device.")
+            .font(InfoTabStyle.body)
+            .foregroundStyle(KColor.inkSoft)
+            .infoCard()
+    }
+
+    private var howItWorksCard: some View {
+        VStack(alignment: .leading, spacing: InfoTabStyle.contentGap) {
+            InfoTabStyle.heading("How It Works")
+            PrivacyFeatureRow(icon: "waveform", text: "Audio transcribed on-device with Apple Speech")
+            PrivacyFeatureRow(icon: "brain", text: "Goal evaluation runs on Apple's on-device model")
+            PrivacyFeatureRow(icon: "folder", text: "Transcripts stored locally on your device")
+        }
+        .infoCard()
+    }
+
+    private var privacyCard: some View {
+        VStack(alignment: .leading, spacing: InfoTabStyle.contentGap) {
+            InfoTabStyle.heading("Private by Design")
+            PrivacyFeatureRow(icon: "wifi.slash", text: "Works without an internet connection")
+            PrivacyFeatureRow(icon: "key.slash", text: "No API keys or accounts required")
+            PrivacyFeatureRow(icon: "person.2.wave.2", text: "Dual-channel speaker separation (Me / Them)")
+        }
+        .infoCard()
+    }
+
+    private var privacyNoteCard: some View {
+        VStack(alignment: .leading, spacing: InfoTabStyle.contentGap) {
+            InfoTabStyle.heading("Privacy Note")
+            Text("Kōchi runs entirely on your device by default — audio, transcription, and coaching all happen locally with no account or API key. The optional AI Analysis feature (Settings → AI) is the one exception: if you add your own API key and tap Run AI Analysis on a meeting, that meeting’s transcript is sent to your chosen provider. Your audio, transcripts, and goals stay stored locally on your device.")
+                .font(InfoTabStyle.body)
+                .foregroundStyle(KColor.inkSoft)
+        }
+        .infoCard()
+    }
+
+    private var recordingDiagnosticsCard: some View {
+        VStack(alignment: .leading, spacing: InfoTabStyle.contentGap) {
+            InfoTabStyle.heading("Recording diagnostics")
+            Text("If recording stops unexpectedly, share the latest report to help identify audio interruptions, memory pressure, or storage problems. The report contains no transcript or audio.")
+                .font(InfoTabStyle.body)
+                .foregroundStyle(KColor.inkSoft)
+            if let recordingDiagnosticURL {
+                ShareLink(item: recordingDiagnosticURL) {
+                    Label("Share latest recording report", systemImage: "square.and.arrow.up")
+                        .font(InfoTabStyle.action)
+                }
+            } else {
+                Text("A report will be available after your next recording starts.")
+                    .font(InfoTabStyle.body).foregroundStyle(KColor.muted)
+            }
+        }
+        .infoCard()
     }
 
     private var themesCard: some View {
-        VStack(alignment: .leading, spacing: 11) {
-            SlabLabel("Themes") { EmptyView() }
+        VStack(alignment: .leading, spacing: InfoTabStyle.contentGap) {
+            InfoTabStyle.heading("Themes")
             // Inline swatch row: every theme previews its own signature key
             // gradient, so you pick by color instead of reading a dropdown.
             HStack(alignment: .top, spacing: 8) {
@@ -803,9 +887,7 @@ struct AboutTab: View {
                 }
             }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .kCard()
-        .padding(.horizontal)
+        .infoCard()
     }
 }
 
@@ -822,8 +904,11 @@ private struct ThemeSwatch: View {
     var body: some View {
         Button(action: onTap) {
             VStack(spacing: 6) {
-                swatchFill
-                    .frame(maxWidth: .infinity)
+                GeometryReader { slot in
+                    swatchFill
+                        .frame(width: slot.size.width, height: slot.size.height)
+                        .clipped()
+                }
                     .frame(height: 54)
                     .clipShape(shape)
                     // Glossy bevel like the device keys.
@@ -848,13 +933,13 @@ private struct ThemeSwatch: View {
                             radius: isSelected ? 4 : 2, x: 0, y: isSelected ? 2 : 1)
 
                 Text(theme.displayName.lowercased())
-                    .font(KFont.mono(8.5))
+                    .font(InfoTabStyle.metadata)
                     .tracking(0.4)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.7)
+                    .minimumScaleFactor(0.8)
                     .foregroundColor(isSelected ? KColor.ink : KColor.muted)
             }
-            .frame(maxWidth: .infinity)
+            .frame(minWidth: 0, maxWidth: .infinity)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -906,11 +991,11 @@ struct TabHeader: View {
                     .foregroundColor(KColor.onBg)
             }
             Text(subtitle)
-                .font(KFont.mono(11))
+                .font(InfoTabStyle.body)
                 .foregroundColor(KColor.onBgFaint)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal)
+        .padding(.horizontal, InfoTabStyle.pageInset)
         .padding(.top, 18)
     }
 }
@@ -921,12 +1006,13 @@ struct PrivacyFeatureRow: View {
     let text: String
 
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(alignment: .top, spacing: InfoTabStyle.contentGap) {
             Image(systemName: icon)
+                .font(.system(size: 14, weight: .medium))
                 .foregroundColor(KColor.buttonHi)
-                .frame(width: 24)
+                .frame(width: 18)
             Text(text)
-                .font(.subheadline)
+                .font(InfoTabStyle.body)
                 .foregroundColor(KColor.ink)
         }
     }
@@ -1919,29 +2005,24 @@ struct AITab: View {
     @State private var saveError: String?
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 15) {
-                TabHeader(
-                    icon: "sparkles",
-                    title: "AI",
-                    subtitle: "Bring your own key for optional cloud analysis."
-                )
+        InfoTabPage {
+            TabHeader(
+                icon: "sparkles",
+                title: "AI",
+                subtitle: "Bring your own key for optional cloud analysis."
+            )
 
-                VStack(alignment: .leading, spacing: 15) {
-                    providerCard
-                    keyCard
-                    disclosureCard
-                }
-                .padding(.horizontal)
+            VStack(alignment: .leading, spacing: InfoTabStyle.pageGap) {
+                providerCard
+                keyCard
+                disclosureCard
             }
-            .padding(.bottom)
-            .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 
     private var providerCard: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            SlabLabel("Provider") { EmptyView() }
+        VStack(alignment: .leading, spacing: InfoTabStyle.contentGap) {
+            InfoTabStyle.heading("Provider")
             providerSegmented
 
             HStack(spacing: 9) {
@@ -1954,12 +2035,12 @@ struct AITab: View {
                     set: { cloudAnalysisManager.setModel($0) }
                 ))
                 .textFieldStyle(.plain)
-                .font(KFont.sans(13, .medium))
+                .font(InfoTabStyle.field)
                 .foregroundColor(KColor.ink)
                 .tint(KColor.orange)
             }
             .padding(.horizontal, 12)
-            .padding(.vertical, 9)
+            .padding(.vertical, 10)
             .background(
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
                     .fill(KColor.paper)
@@ -1968,7 +2049,7 @@ struct AITab: View {
             )
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .kCard()
+        .infoCard()
     }
 
     /// Provider toggle — the selected segment carries the theme's primary key
@@ -1983,7 +2064,7 @@ struct AITab: View {
                     cloudAnalysisManager.selectProvider(p); keyInput = ""; saveError = nil
                 }) {
                     Text(p.displayName)
-                        .font(KFont.sans(13, .semibold))
+                        .font(InfoTabStyle.title)
                         .foregroundColor(selected ? .white : KColor.inkSoft)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 7)
@@ -2007,16 +2088,18 @@ struct AITab: View {
     }
 
     private var keyCard: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            SlabLabel("API Key") {
+        VStack(alignment: .leading, spacing: InfoTabStyle.contentGap) {
+            HStack {
+                InfoTabStyle.heading("API Key")
+                Spacer()
                 Text(cloudAnalysisManager.hasKey ? "✓ Key saved" : "No key set")
-                    .font(KFont.mono(10))
+                    .font(InfoTabStyle.metadata)
                     .foregroundColor(cloudAnalysisManager.hasKey ? KColor.good : KColor.muted)
             }
             SecureField("Paste your \(cloudAnalysisManager.provider.displayName) API key",
                         text: $keyInput)
                 .textFieldStyle(.plain)
-                .font(KFont.sans(13, .medium))
+                .font(InfoTabStyle.field)
                 .foregroundColor(KColor.ink)
                 .tint(KColor.orange)
                 .padding(.horizontal, 12)
@@ -2030,14 +2113,14 @@ struct AITab: View {
 
             if let saveError {
                 Text(saveError)
-                    .font(KFont.mono(10))
+                    .font(InfoTabStyle.metadata)
                     .foregroundColor(KColor.orangeDeep)
             }
 
             HStack(spacing: 8) {
                 Button(action: saveKey) {
                     Text("save")
-                        .font(KFont.zilla(12.5, .bold))
+                        .font(InfoTabStyle.action)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 7)
                         .contentShape(Rectangle())
@@ -2048,7 +2131,7 @@ struct AITab: View {
                 if cloudAnalysisManager.hasKey {
                     Button(action: { cloudAnalysisManager.removeKey(); keyInput = "" }) {
                         Text("remove key")
-                            .font(KFont.zilla(12.5, .bold))
+                            .font(InfoTabStyle.action)
                             .padding(.horizontal, 16)
                             .padding(.vertical, 7)
                             .contentShape(Rectangle())
@@ -2058,22 +2141,22 @@ struct AITab: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .kCard()
+        .infoCard()
     }
 
     private var disclosureCard: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            SlabLabel("Privacy") { EmptyView() }
+        VStack(alignment: .leading, spacing: InfoTabStyle.relatedGap) {
+            InfoTabStyle.heading("Privacy")
             Text("Kōchi is on-device by default. With a personal API key, the meeting "
                  + "transcript you choose to analyze is sent to your selected provider "
                  + "(Anthropic or OpenAI). This is the only feature that leaves your device, "
                  + "and it only runs when you tap \u{201C}Run AI Analysis\u{201D} on a meeting.")
-                .font(KFont.sans(12, .regular))
+                .font(InfoTabStyle.body)
                 .foregroundColor(KColor.inkSoft)
                 .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .kCard()
+        .infoCard()
     }
 
     private func saveKey() {

@@ -37,21 +37,12 @@ struct ThemeImage: View {
     }
 }
 
-/// Full-window themed background. Defaults to `scaledToFill` (the image bleeds
-/// edge-to-edge, cropping as needed). When the active theme sets
-/// `backgroundStretch`, the image is shown *whole* and undistorted (`scaledToFit`)
-/// so a decorative *framed* page (e.g. HERO's 1776 border) is fully visible —
-/// fit to width, with any leftover band above/below filled by a `scaledToFill`
-/// copy of the same art underneath. Because both layers are the identical
-/// parchment, the band reads as a seamless extension rather than a gray gap.
-/// The `GeometryReader` hands a definite frame so fill is reliable even for
-/// near-square art (see ContentView's note).
+/// Use the same edge-to-edge phone artwork on Mac and iOS, including framed
+/// themes. A definite canvas keeps borders and texture scaling consistent.
 struct ThemeBackground: View {
-    @EnvironmentObject private var themeStore: ThemeStore
     private let name: String
     /// Which screen edges the art bleeds under. Defaults to every edge (the
-    /// original behavior); callers can keep the top safe area clear (e.g. iOS,
-    /// so a black band can sit behind the Dynamic Island).
+    /// original behavior), including the phone's status bar and Dynamic Island.
     private let ignoredEdges: Edge.Set
 
     init(_ name: String, ignoresSafeAreaEdges: Edge.Set = .all) {
@@ -61,35 +52,8 @@ struct ThemeBackground: View {
 
     var body: some View {
         GeometryReader { geo in
-            #if os(iOS)
-            // Phone screens are far taller than the device-card art, so fit/fill
-            // would letterbox the frame (showing a zoomed copy at top/bottom) or
-            // crop the decorative border. Stretch the art to the exact background
-            // size so its border lines up with every screen edge — a slight,
-            // parchment-friendly distortion.
             ThemeImage(name)
                 .frame(width: geo.size.width, height: geo.size.height)
-            #else
-            if themeStore.current.backgroundStretch {
-                ZStack {
-                    // Underlay: same art filled edge-to-edge so the letterbox
-                    // band carries the parchment, never the window's gray base.
-                    ThemeImage(name)
-                        .scaledToFill()
-                        .frame(width: geo.size.width, height: geo.size.height)
-                        .clipped()
-                    // Overlay: the whole framed page, undistorted, fit to width.
-                    ThemeImage(name)
-                        .scaledToFit()
-                        .frame(width: geo.size.width, height: geo.size.height)
-                }
-            } else {
-                ThemeImage(name)
-                    .scaledToFill()
-                    .frame(width: geo.size.width, height: geo.size.height)
-                    .clipped()
-            }
-            #endif
         }
         .ignoresSafeArea(edges: ignoredEdges)
     }

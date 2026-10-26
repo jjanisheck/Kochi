@@ -97,12 +97,36 @@ Audio Data → Transcription → Goal Matching → Score Calculation
 
 ---
 
+## Coach rendering
+
+The transcript and reel transport are separate, evenly spaced panels. The transport
+uses two independently spinning reels with a center timer and sound meter. The
+coach and transcript panels share the remaining height equally. On iPhone, the
+theme background fills the entire screen,
+including behind the status bar and Dynamic Island; controls respect safe areas.
+The Mac app uses the same 402 × 874-point iPhone 17 Pro canvas, including 62-point
+top and 34-point bottom safe-area spacing. Both platforms share panel sizing,
+background scaling, fonts, and the five info tabs. Drag the Mac window by its
+background; use the File menu or Command-W to close it.
+
+On Mac, launch with `--character-workshop` to preview the installed mannequin and rehearse ten
+coaching responses without starting a meeting. Edit geometry and motion in the
+browser workshop. See
+[Character Workshop](../../docs/character-workshop.md).
+
+The Default theme uses the local mannequin, driven by structured on-device
+coaching decisions. Its 35 authored clips run in a bundled offline renderer with
+a fixed bust camera, pixel treatment, breathing idle, and contextual reactions.
+See [Animated coach](../../docs/animated-coach.md) for the architecture and render checks.
+
 ## Coaching Video Assets
 
-The coach hero plays short, silent, looping clips. Each theme ships its own set
+Bricks, Hero, Noir, and Zen use video coaching. Each theme loads its own video set
 under `Resources/Themes/<theme-id>/videos/`, named `<label>-<variation>.mp4`
 (e.g. `idle-1.mp4`). There are 11 labels — idle, goal, timing, pause, listen,
 prompt, mute, focus, check, steady, wrap — with up to 4 variations each.
+Bricks has the full reaction set; Hero, Noir, and Zen currently contain idle
+clips and fall back to those when a reaction clip is unavailable.
 
 To author or add clips for a theme, see
 [`docs/creating-coach-videos.md`](../../docs/creating-coach-videos.md), which

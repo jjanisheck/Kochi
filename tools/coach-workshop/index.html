@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f1efe8">
+  <title>Kōchi — Character workshop</title>
+  <link rel="stylesheet" href="/style.css">
+  <script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="wordmark" href="/" aria-label="Kōchi character workshop">kōchi<span>®</span></a>
+    <span class="header-rule"></span>
+    <div><p class="eyebrow">CHARACTER WORKSHOP</p><p class="header-sub">The movement comes first.</p></div>
+    <div class="local-badge"><span></span>LOCAL · LIVE 3D</div>
+  </header>
+
+  <main class="workspace">
+    <aside class="motion-panel panel">
+      <div class="panel-heading"><span class="eyebrow">MOTION LIBRARY</span><span id="clip-count" class="counter">0</span></div>
+      <p class="muted small">Your Mixamo animations, on one rig.</p>
+      <nav id="clips" aria-label="Animations"></nav>
+      <div class="library-bottom">
+        <label class="drop-button" for="files"><span>＋</span> Add FBX or GLB</label>
+        <input id="files" type="file" accept=".fbx,.glb" multiple hidden>
+        <p class="muted tiny">Or save files in <code>imports/</code>.<br>New animations appear automatically.</p>
+        <a class="text-link" href="https://www.mixamo.com/#/?page=1&amp;query=salute" target="_blank" rel="noreferrer">Find more on Mixamo ↗</a>
+      </div>
+    </aside>
+
+    <section class="viewer-panel">
+      <div class="model-picker panel">
+        <label for="model-select" class="eyebrow">CHARACTER</label>
+        <select id="model-select" aria-label="Character model" disabled><option>Finding character models…</option></select>
+        <span id="model-status" class="muted tiny">Swap the model. Keep the motions.</span>
+      </div>
+      <div class="viewer-heading">
+        <div><p class="eyebrow">LIVE PREVIEW</p><h1 id="motion-title">Loading your character…</h1></div>
+        <div class="camera-badge" title="Animations never change the camera">▣ Camera locked</div>
+      </div>
+      <div class="stage-toolbar">
+        <div class="segmented" aria-label="Render style"><button data-style="pixel" aria-pressed="true">Pixel</button><button data-style="clean" aria-pressed="false">Clean 3D</button></div>
+        <div class="segmented" aria-label="Framing"><button data-frame="bust" aria-pressed="true">Bust</button><button data-frame="full" aria-pressed="false">Full body</button></div>
+        <button id="capture" class="icon-button" title="Save preview image" aria-label="Save preview image">↓ PNG</button>
+      </div>
+      <div id="stage" class="stage" aria-label="Live animated character preview">
+        <div id="loading" class="loading"><div class="spinner"></div><strong>Loading your Mixamo files</strong><span id="loading-detail">Preparing the character and animation library…</span></div>
+        <div class="stage-label"><span class="live-dot"></span><span id="stage-label">FBX CHARACTER</span></div>
+        <div class="stage-corner">FIXED CAMERA<br><span id="frame-caption">MID-CHEST ↑</span></div>
+        <div id="drop-overlay">Drop your FBX or GLB files here</div>
+      </div>
+      <div class="transport">
+        <button id="play" class="play-button" aria-label="Pause animation">Ⅱ</button>
+        <button id="restart" class="icon-button" aria-label="Restart animation">↺</button>
+        <div class="timeline"><label class="sr-only" for="timeline">Animation timeline</label><input id="timeline" type="range" min="0" max="1" value="0" step="0.001"><div class="timeline-labels"><span id="current-time">0.00s</span><span id="duration">0.00s</span></div></div>
+        <label class="speed-control"><span class="sr-only">Playback speed</span><select id="speed"><option value="0.25">¼×</option><option value="0.5">½×</option><option value="1" selected>1×</option><option value="1.5">1.5×</option></select></label>
+      </div>
+      <div class="playback-options"><label><input id="loop" type="checkbox" checked> Loop this clip</label><span id="rig-info">Waiting for model</span><button id="rest-pose" class="text-link">Show rest pose</button></div>
+      <p id="notice" class="notice" role="status">The camera stays still. Motion comes from your FBX animations.</p>
+
+      <section class="cue-panel panel">
+        <div class="panel-heading"><span class="eyebrow">COACH RESPONSES</span><label class="live-toggle"><input id="liveCoach" type="checkbox" checked> Live coach</label></div>
+        <p class="muted small">Rehearse a response or receive live coaching from the Mac/simulator app.</p>
+        <blockquote id="response-caption">Waiting for a coach response. Try a context below.</blockquote>
+        <div id="reaction-reason" class="muted tiny">Intent and expression choose the motion; each reaction settles back to breathing.</div>
+        <div id="cue-buttons" class="cue-buttons"></div>
+        <details class="api-details"><summary>Response details / agent input</summary><p class="small muted">Send the coach’s intent, expression, gesture and caption. The workshop picks an available animation.</p><textarea id="cue-json" aria-label="Agent reaction JSON" spellcheck="false">{"intent":"steady","expression":"encouraging","gesture":"acknowledge","caption":"Good question. Give them a moment to respond."}</textarea><button id="send-cue" class="secondary-button">Rehearse response</button><code class="endpoint">POST /api/react</code></details>
+      </section>
+    </section>
+
+    <aside class="tuning-panel panel">
+      <div class="panel-heading"><span class="eyebrow">ART DIRECTION</span><button id="reset" class="text-link">Reset</button></div>
+      <p class="muted small">Tune the look without changing the animation.</p>
+      <div class="control-group"><h2>Pixel treatment</h2>
+        <label class="slider-label" for="resolution">Render width <output id="resolution-value">360 px</output></label><input id="resolution" type="range" min="120" max="720" step="20" value="360">
+        <label class="slider-label" for="tones">Grayscale palette <output id="tones-value">10 tones</output></label><input id="tones" type="range" min="3" max="24" step="1" value="10">
+      </div>
+      <div class="control-group"><h2>Proportions &amp; direction</h2>
+        <label class="slider-label" for="handScale">Hand size <output id="handScale-value">1.00×</output></label><input id="handScale" type="range" min="0.6" max="1.6" step="0.01" value="1">
+        <label class="slider-label" for="headYaw">Head turn <output id="headYaw-value">0°</output></label><input id="headYaw" type="range" min="-45" max="45" step="1" value="0">
+        <label class="slider-label" for="headPitch">Head tilt <output id="headPitch-value">0°</output></label><input id="headPitch" type="range" min="-25" max="25" step="1" value="0">
+        <label class="slider-label" for="turn">Character turn <output id="turn-value">0°</output></label><input id="turn" type="range" min="-180" max="180" step="1" value="0">
+        <label class="check-row"><input id="follow" type="checkbox"> Follow pointer with head</label>
+        <label class="check-row"><input id="skeleton" type="checkbox"> Show skeleton</label>
+      </div>
+      <div class="control-group"><h2>Transitions</h2><label class="slider-label" for="blend">Blend duration <output id="blend-value">0.40s</output></label><input id="blend" type="range" min="0" max="1.5" step="0.05" value="0.4"></div>
+      <details class="reference" open><summary>Original coach reference</summary><div class="reference-media"><img src="/reference/coach.png" alt="Original grayscale pixel-art general"><video id="reference-video" src="/reference/idle.mp4" controls loop playsinline preload="none" hidden></video></div><button id="reference-toggle" class="text-link">Compare with original video</button></details>
+      <button id="save-preset" class="secondary-button wide">Save setup as JSON ↓</button>
+      <label class="text-link preset-load" for="preset">Load a saved setup</label><input id="preset" type="file" accept=".json" hidden>
+    </aside>
+  </main>
+  <footer><span>KŌCHI LAB / 01</span><span id="import-status">Your files stay on this machine.</span><span>MODEL + MOTION, NOT VIDEO</span></footer>
+  <script type="module" src="/app.mjs"></script>
+</body>
+</html>

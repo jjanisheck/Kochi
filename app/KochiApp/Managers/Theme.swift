@@ -59,6 +59,8 @@ struct ThemePalette {
     /// `paper`. A dark theme can set this (e.g. NOIR's black) so the transcript
     /// rows read distinct from the other (lighter) cards.
     let transcriptRowFill: Color
+    /// Optional home transcript surface and text overrides, independent of reels.
+    let liveTranscriptFill, liveTranscriptInk: Color?
     /// Border stroked around an unachieved goal row. Optional; defaults to clear
     /// (no visible border) so themes opt in. Use an 8-digit `#RRGGBBAA` hex to
     /// control opacity.
@@ -70,8 +72,11 @@ struct ThemePalette {
     let goalDoneHi, goalDoneLo: Color
     /// Gradient stops for the audio meter's filled volume bars. Optional; default
     /// to `buttonHi`/`buttonLo` so the meter matches the primary key — themes can
-    /// override for a distinct meter color (e.g. HERO's patriotic blue).
+    /// override for a distinct meter color.
     let meterHi, meterLo: Color
+    /// Optional colors specific to the timer/VU window between the two reels.
+    /// Without overrides, retain the deck fill and live/idle timer colors.
+    let deckCounterFill, deckCounterInk: Color?
     /// Face fill for the neutral toolbar keys — the `.light` variant (info) and
     /// any disabled key (end, when not live). Optional; `nil` keeps the default
     /// light-gray bevel gradients, so themes opt in to a tinted key.
@@ -100,7 +105,8 @@ struct ThemePalette {
                              "good","deck","deckBorder","buttonHi","buttonLo",
                              "goalRestFill","goalRestInk",
                              "goalUnmetFill","goalUnmetInk","goalKeyFill","transcriptRowFill","goalRestBorder",
-                             "goalDoneHi","goalDoneLo","meterHi","meterLo",
+                             "liveTranscriptFill","liveTranscriptInk",
+                             "goalDoneHi","goalDoneLo","meterHi","meterLo","deckCounterFill","deckCounterInk",
                              "neutralKeyFill","logoTint","slabRule","onBg","onBgFaint",
                              "deckScrimTop","deckScrimBottom"]
 
@@ -125,7 +131,8 @@ struct ThemePalette {
         neutralKeyFill: nil, logoTint: nil,
         slabRule: Color(themeHex: "#CDCCC6")!,
         onBg: Color(themeHex: "#3B3A37")!, onBgFaint: Color(themeHex: "#8D8C86")!,
-        deckScrimTop: Color.black.opacity(0.45), deckScrimBottom: Color.black.opacity(0.7)
+        deckScrimTop: Color.black.opacity(0.45), deckScrimBottom: Color.black.opacity(0.7),
+        liveTranscriptFill: Color(themeHex: "#F8F8F6")!, liveTranscriptInk: Color(themeHex: "#444440")!
     )
 
     /// Build from a name→hex map. Returns nil if any required token is
@@ -152,11 +159,15 @@ struct ThemePalette {
         self.goalUnmetInk = c("goalUnmetInk") ?? self.goalRestInk
         self.goalKeyFill = c("goalKeyFill") ?? self.goalUnmetFill
         self.transcriptRowFill = c("transcriptRowFill") ?? self.paper
+        self.liveTranscriptFill = c("liveTranscriptFill")
+        self.liveTranscriptInk = c("liveTranscriptInk")
         self.goalRestBorder = c("goalRestBorder") ?? .clear
         self.goalDoneHi = c("goalDoneHi") ?? self.buttonHi
         self.goalDoneLo = c("goalDoneLo") ?? self.buttonLo
         self.meterHi = c("meterHi") ?? self.buttonHi
         self.meterLo = c("meterLo") ?? self.buttonLo
+        self.deckCounterFill = c("deckCounterFill")
+        self.deckCounterInk = c("deckCounterInk")
         self.neutralKeyFill = c("neutralKeyFill")
         self.logoTint = c("logoTint")
         self.slabRule = c("slabRule") ?? line
@@ -177,7 +188,9 @@ struct ThemePalette {
          meterHi: Color, meterLo: Color,
          neutralKeyFill: Color?, logoTint: Color?,
          slabRule: Color,
-         onBg: Color, onBgFaint: Color, deckScrimTop: Color, deckScrimBottom: Color) {
+         onBg: Color, onBgFaint: Color, deckScrimTop: Color, deckScrimBottom: Color,
+         deckCounterFill: Color? = nil, deckCounterInk: Color? = nil,
+         liveTranscriptFill: Color? = nil, liveTranscriptInk: Color? = nil) {
         self.orange = orange; self.orangeDeep = orangeDeep; self.ink = ink
         self.inkSoft = inkSoft; self.paper = paper; self.win = win; self.panel = panel
         self.panel2 = panel2; self.line = line; self.lineSoft = lineSoft
@@ -188,9 +201,11 @@ struct ThemePalette {
         self.goalUnmetFill = goalUnmetFill; self.goalUnmetInk = goalUnmetInk
         self.goalKeyFill = goalKeyFill
         self.transcriptRowFill = transcriptRowFill
+        self.liveTranscriptFill = liveTranscriptFill; self.liveTranscriptInk = liveTranscriptInk
         self.goalRestBorder = goalRestBorder
         self.goalDoneHi = goalDoneHi; self.goalDoneLo = goalDoneLo
         self.meterHi = meterHi; self.meterLo = meterLo
+        self.deckCounterFill = deckCounterFill; self.deckCounterInk = deckCounterInk
         self.neutralKeyFill = neutralKeyFill
         self.logoTint = logoTint; self.slabRule = slabRule
         self.onBg = onBg; self.onBgFaint = onBgFaint
@@ -199,8 +214,13 @@ struct ThemePalette {
 }
 
 /// Raw decode of theme.json.
+enum CoachRenderer: String, Decodable {
+    case video, pixelAvatar, mannequin
+}
+
 struct ThemeManifest: Decodable {
     let displayName: String
+    let coachRenderer: CoachRenderer?
     let colorScheme: String?
     let colors: [String: String]
     let images: [String: String]?
@@ -249,6 +269,7 @@ struct Theme: Identifiable {
     let chromeOnBackground: Bool
     /// Hide the home-screen brand row (logo + "MEETING COACH" + status).
     let hideBrandRow: Bool
+    var coachRenderer: CoachRenderer = .mannequin
 
     /// Subdirectory (relative to bundle resources) where this theme's videos live.
     var videoSubdirectory: String { "Themes/\(id)/videos" }
@@ -287,7 +308,8 @@ struct Theme: Identifiable {
                      backgroundStretch: m.backgroundStretch ?? false,
                      goalRestBlur: m.goalRestBlur ?? false,
                      chromeOnBackground: m.chromeOnBackground ?? true,
-                     hideBrandRow: m.hideBrandRow ?? false)
+                     hideBrandRow: m.hideBrandRow ?? false,
+                     coachRenderer: m.coachRenderer ?? (folderURL.lastPathComponent == "default" ? .mannequin : .video))
     }
 
     /// Guaranteed-valid default, used before discovery or if nothing is found.
@@ -319,6 +341,7 @@ enum ActivePalette {
 /// actor), in `init` and `select`.
 enum ActiveThemeVideo {
     nonisolated(unsafe) static var subdirectory: String = "Themes/default/videos"
+    nonisolated(unsafe) static var renderer: CoachRenderer = .mannequin
 }
 
 /// Nonisolated mirror of the active theme's tape-deck reel treatment, read by

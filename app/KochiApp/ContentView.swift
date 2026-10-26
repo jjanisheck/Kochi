@@ -8,11 +8,17 @@ struct ContentView: View {
     @EnvironmentObject var goalManager: GoalManager
     @EnvironmentObject var themeManager: ThemeManager
     @EnvironmentObject var llmManager: LLMManager
+    @Environment(\.scenePhase) private var scenePhase
     @StateObject private var videoManager = VideoCoachingManager()
-    @State private var showSettings = false
+    @State private var showSettings = CommandLine.arguments.contains("--character-workshop")
     @State private var evaluationTimer: Timer?
     /// Length (in characters) of the transcript at the last goal evaluation.
     @State private var lastEvaluatedTranscriptLength = 0
+
+    @State private var analysisTask: Task<Void, Never>?
+    @State private var coachingSessionID = UUID()
+    @State private var recentReactions: [String] = []
+    @State private var isEndingMeeting = false
 
     private var phase: MeetingPhase {
         audioManager.isRecording ? .live : .pre
@@ -22,28 +28,33 @@ struct ContentView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            VStack(spacing: 12) {
+            MeetingPanelsLayout(preferredPanelHeight: 200) {
                 // Hidden (not removed) so the row still reserves its height and
                 // the layout below doesn't shift up.
                 BrandRow(phase: phase)
                     .opacity(ActiveChrome.hideBrandRow ? 0 : 1)
                 CoachHero(videoManager: videoManager, captionText: coachLine)
-                    .frame(height: coachHeroHeight)
+                    .layoutValue(key: MeetingMediaPanelKey.self, value: true)
                 goalsSection
-                transcriptSection
-                    #if os(iOS)
-                    // On the taller phone screen, let the transcript consume the
-                    // leftover vertical space instead of leaving dead area.
-                    .frame(maxHeight: .infinity)
-                    #endif
+                transcriptHeader
+                LiveTranscriptPanel(
+                    phase: phase,
+                    transcript: audioManager.transcriptionText,
+                    lines: audioManager.transcriptLines,
+                    recordingFailure: audioManager.recordingFailure,
+                    transcriptionStatus: audioManager.transcriptionStatus
+                )
+                .layoutValue(key: MeetingMediaPanelKey.self, value: true)
+                .layoutValue(key: MeetingPanelGapKey.self, value: 7)
+                TapeDeckPanel(elapsed: audioManager.recordingTime,
+                              level: audioManager.audioLevel,
+                              isLive: audioManager.isRecording,
+                              height: 96, cornerRadius: 9)
             }
             .padding(.horizontal, 14)
-            // Snug the logo row up under the macOS traffic lights.
-            .padding(.top, topInset)
-            .padding(.bottom, 13)
-            #if os(iOS)
+            .padding(.top, 8)
+            .padding(.bottom, 12)
             .frame(maxHeight: .infinity)
-            #endif
 
             Toolbar(
                 phase: phase,
@@ -60,13 +71,7 @@ struct ContentView: View {
         // far taller than the card; a near-square theme image (e.g. BRICKS, whose
         // ratio nearly matches the card) could otherwise under-fill and leak the
         // window's white base out the bottom.
-        .background(ThemeBackground("BackgroundImage", ignoresSafeAreaEdges: backgroundIgnoredEdges))
-        #if os(iOS)
-        // Behind the themed card: solid black filling the whole screen, so the
-        // top safe area (Dynamic Island / status bar) reads as a clean black band
-        // — the parchment art deliberately stops below it (see backgroundIgnoredEdges).
-        .background(Color.black.ignoresSafeArea())
-        #endif
+        .background(ThemeBackground("BackgroundImage"))
         // Settings sheet as an overlay so it's clamped to the card's bounds
         // rather than expanding the panel.
         .overlay {
@@ -75,44 +80,32 @@ struct ContentView: View {
                     .transition(.move(edge: .bottom))
             }
         }
-        .preferredColorScheme(.light)
         .onAppear {
-            DispatchQueue.main.async { videoManager.playVideo(label: .idle) }
+            DispatchQueue.main.async { videoManager.setMeetingActive(audioManager.isRecording) }
+        }
+        .onDisappear {
+            analysisTask?.cancel()
+            analysisTask = nil
+            coachingSessionID = UUID()
+        }
+        .onChange(of: audioManager.isRecording) { _, active in
+            videoManager.setMeetingActive(active && !isEndingMeeting)
+            if !active {
+                cancelLiveAnalysis()
+                if !isEndingMeeting, audioManager.recordingFailure != nil {
+                    isEndingMeeting = true
+                    goalManager.updateNotes(audioManager.transcriptionText)
+                    goalManager.endCurrentMeeting()
+                }
+            }
         }
         .onReceive(audioManager.$transcriptionText) { newText in
             handleTranscriptUpdate(newText)
         }
-    }
-
-    // MARK: - Layout metrics (platform-tuned; macOS keeps its exact numbers)
-
-    /// Coach hero height: fixed on macOS, a touch taller on the phone.
-    private var coachHeroHeight: CGFloat {
-        #if os(macOS)
-        return 166
-        #else
-        return 200
-        #endif
-    }
-
-    /// Top inset: snug under macOS traffic lights. On iOS, push the card down a
-    /// little from the black top band so it doesn't crowd the Dynamic Island.
-    private var topInset: CGFloat {
-        #if os(macOS)
-        return 8
-        #else
-        return 18
-        #endif
-    }
-
-    /// Edges the themed background bleeds under. macOS bleeds everywhere; iOS
-    /// keeps the top safe area clear so the black island band shows through.
-    private var backgroundIgnoredEdges: Edge.Set {
-        #if os(macOS)
-        return .all
-        #else
-        return [.horizontal, .bottom]
-        #endif
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .background { cancelLiveAnalysis() }
+            if phase == .active { handleTranscriptUpdate(audioManager.transcriptionText) }
+        }
     }
 
     // MARK: - Sections
@@ -130,27 +123,11 @@ struct ContentView: View {
         }
     }
 
-    private var transcriptSection: some View {
-        VStack(spacing: 7) {
-            SlabLabel("Transcript", tint: KColor.onBg) {
-                HStack(spacing: 8) {
-                    Text(phase == .live ? "live" : phase == .ended ? "final" : "ready")
-                        .font(KFont.mono(10))
-                        .foregroundColor(KColor.onBgFaint)
-                    Text(fmtTime(audioManager.recordingTime))
-                        .font(KFont.mono(11, .medium))
-                        .foregroundColor(KColor.onBg)
-                }
-            }
-            TapeDeck(
-                phase: phase,
-                transcript: audioManager.transcriptionText,
-                isRecording: audioManager.isRecording,
-                audioLevel: audioManager.audioLevel
-            )
-            #if os(iOS)
-            .frame(maxHeight: .infinity)
-            #endif
+    private var transcriptHeader: some View {
+        SlabLabel("Transcript", tint: KColor.onBg) {
+            Text(phase == .live ? audioManager.transcriptionStatus.shortLabel : phase == .ended ? "final" : "ready")
+                .font(KFont.mono(10))
+                .foregroundColor(KColor.onBgFaint)
         }
     }
 
@@ -158,6 +135,7 @@ struct ContentView: View {
     /// on-device coach's actual sentence (the canned line only for a goal-hit
     /// celebration); at rest it's the idle clip's ambient line.
     private var coachLine: String {
+        if videoManager.usesAvatar { return videoManager.coachingText }
         if phase == .live {
             if videoManager.currentVideoLabel != .goal, !llmManager.coachingResponse.isEmpty {
                 return llmManager.coachingResponse
@@ -182,6 +160,9 @@ struct ContentView: View {
     // MARK: - Recording Logic (unchanged behavior)
 
     private func startMeetingAndRecord() {
+        cancelLiveAnalysis()
+        isEndingMeeting = false
+        recentReactions = []
         goalManager.startNewMeeting()
         // Hold coaching videos for the duration (no idle revert until we stop).
         videoManager.setMeetingActive(true)
@@ -189,11 +170,18 @@ struct ContentView: View {
         lastEvaluatedTranscriptLength = 0
         llmManager.resetSession()
         audioManager.startRecording()
+        guard audioManager.isRecording else {
+            videoManager.setMeetingActive(false)
+            goalManager.currentMeeting = nil
+            return
+        }
         goalManager.attachAudioFolder(audioManager.activeMeetingFolderName)
         print("🎯 Recording started - capturing transcript only")
     }
 
     private func stopRecordingAndEvaluate() {
+        isEndingMeeting = true
+        cancelLiveAnalysis()
         evaluationTimer?.invalidate()
         evaluationTimer = nil
         // Meeting over — freeze the coach back on the idle frame.
@@ -218,6 +206,7 @@ struct ContentView: View {
             // gated on isRecording, so clearing here won't touch the saved notes.)
             await MainActor.run {
                 audioManager.transcriptionText = ""
+                audioManager.transcriptLines = []
                 audioManager.recordingTime = 0
                 llmManager.coachingResponse = ""
                 goalManager.resetGoals()
@@ -226,77 +215,124 @@ struct ContentView: View {
         }
     }
 
-    /// Live transcript → notes + history sync, plus growth-throttled on-device
-    /// goal evaluation and coach-video selection (behavior preserved from before).
+    private func cancelLiveAnalysis() {
+        coachingSessionID = UUID()
+        analysisTask?.cancel()
+        analysisTask = nil
+        videoManager.setThinking(false)
+    }
+
+    /// One analysis at a time. Debounce partial speech, coalesce incoming text,
+    /// and reject results from stopped/replaced sessions before changing UI or goals.
     private func handleTranscriptUpdate(_ newText: String) {
-        // Only sync notes / evaluate while actually recording. Once a meeting
-        // ends and we clear the live transcript, this must not run — otherwise
-        // it would overwrite the just-saved meeting's notes with empty text.
-        guard audioManager.isRecording else { return }
-
-        DispatchQueue.main.async {
-            goalManager.notes = newText
-            if !goalManager.meetingHistory.isEmpty {
-                goalManager.meetingHistory[0].notes = newText
-                goalManager.saveMeetingHistory()
-            }
-        }
-
-        let currentLength = newText.count
-        let evaluationGrowthThreshold = 50  // re-check goals after ~a sentence of speech
-        guard currentLength - lastEvaluatedTranscriptLength >= evaluationGrowthThreshold else { return }
-
-        let fullTranscript = newText
-        print("🎯 TRANSCRIPT GREW to \(currentLength) chars: Evaluating FULL transcript against goals")
-
-        guard !fullTranscript.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            lastEvaluatedTranscriptLength = currentLength
-            return
-        }
-        lastEvaluatedTranscriptLength = currentLength
-
-        Task {
-            do {
-                let evaluation = try await llmManager.evaluateFullTranscript(
-                    fullTranscript, goals: goalManager.goals)
-                print("📊 Evaluation complete: \(evaluation.evaluations.count) goals evaluated")
-
-                await MainActor.run {
-                    var anyGoalAchieved = false
-                    for (goalId, achieved) in evaluation.evaluations {
-                        if let goalIndex = goalManager.goals.firstIndex(where: { $0.id == goalId }),
-                           achieved && !goalManager.goals[goalIndex].isCompleted {
-                            let goal = goalManager.goals[goalIndex]
-                            print("✅ GOAL ACHIEVED: \(goal.text)")
-                            goalManager.toggleGoalCompletion(goal)
-                            anyGoalAchieved = true
-                        }
-                    }
-
-                    if anyGoalAchieved {
-                        videoManager.playVideo(label: .goal)
-                    } else {
-                        Task {
-                            do {
-                                try await llmManager.generateCoachingResponse(
-                                    for: fullTranscript, goals: goalManager.goals)
-                                videoManager.playForCoaching(response: llmManager.coachingResponse)
-                            } catch {
-                                videoManager.playForGoalProgress(goals: goalManager.goals, evaluation: evaluation)
-                            }
-                        }
+        guard audioManager.isRecording, !isEndingMeeting, scenePhase == .active else { return }
+        goalManager.notes = newText
+        // The current transcript is checkpointed to its meeting folder. Encoding
+        // all prior meetings on every partial blocked the UI and overwrote the
+        // previous meeting's notes with the current conversation.
+        guard analysisTask == nil,
+              newText.count - lastEvaluatedTranscriptLength >= 50 else { return }
+        let sessionID = coachingSessionID
+        analysisTask = Task { @MainActor in
+            defer {
+                if sessionID == coachingSessionID {
+                    analysisTask = nil
+                    videoManager.setThinking(false)
+                    // Evaluate text that arrived during the previous model call.
+                    if audioManager.isRecording, !isEndingMeeting {
+                        handleTranscriptUpdate(audioManager.transcriptionText)
                     }
                 }
+            }
+            do {
+                try await Task.sleep(nanoseconds: 900_000_000)
+                guard sessionID == coachingSessionID, audioManager.isRecording,
+                      !isEndingMeeting, !Task.isCancelled else { return }
+                let transcript = audioManager.transcriptionText
+                lastEvaluatedTranscriptLength = transcript.count
+                videoManager.setThinking(true)
+                let evaluation = try await llmManager.evaluateFullTranscript(transcript, goals: goalManager.goals)
+                guard sessionID == coachingSessionID, audioManager.isRecording,
+                      !isEndingMeeting, !Task.isCancelled else { return }
+
+                var achieved = false
+                for (goalID, completed) in evaluation.evaluations where completed {
+                    if let goal = goalManager.goals.first(where: { $0.id == goalID }), !goal.isCompleted {
+                        goalManager.toggleGoalCompletion(goal)
+                        achieved = true
+                    }
+                }
+                if achieved {
+                    videoManager.playVideo(label: .goal)
+                    recentReactions.append("Verified goal achieved")
+                } else {
+                    let reaction = try await llmManager.generateCoachReaction(
+                        for: transcript, goals: goalManager.goals, recentReactions: recentReactions)
+                    guard sessionID == coachingSessionID, audioManager.isRecording,
+                          !isEndingMeeting, !Task.isCancelled else { return }
+                    llmManager.coachingResponse = reaction.caption
+                    llmManager.streamingText = reaction.caption
+                    videoManager.applyReaction(reaction)
+                    recentReactions.append("\(reaction.intent.rawValue): \(reaction.caption)")
+                }
+                recentReactions = Array(recentReactions.suffix(3))
+            } catch is CancellationError {
+                // A stopped or replaced meeting must not receive this result.
             } catch {
-                print("❌ Goal evaluation failed: \(error)")
+                print("Live coaching unavailable: \(error)")
             }
         }
     }
+
 }
 
-private func fmtTime(_ t: TimeInterval) -> String {
-    let s = Int(t)
-    return String(format: "%02d:%02d", s / 60, s % 60)
+/// The coach and transcript divide the remaining height equally after measuring
+/// the brand, goals, transcript label, separate reel transport, and their spacing.
+private nonisolated struct MeetingMediaPanelKey: LayoutValueKey {
+    static let defaultValue = false
+}
+
+private nonisolated struct MeetingPanelGapKey: LayoutValueKey {
+    static let defaultValue: CGFloat = 12
+}
+
+private struct MeetingPanelsLayout: Layout {
+    let preferredPanelHeight: CGFloat
+
+    private func fixedHeight(width: CGFloat, subviews: Subviews) -> CGFloat {
+        subviews.indices.reduce(CGFloat.zero) { height, index in
+            let view = subviews[index]
+            let gap = index == 0 ? 0 : view[MeetingPanelGapKey.self]
+            let content = view[MeetingMediaPanelKey.self] ? 0
+                : view.sizeThatFits(ProposedViewSize(width: width, height: nil)).height
+            return height + gap + content
+        }
+    }
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let width = proposal.width ?? 408
+        let fixed = fixedHeight(width: width, subviews: subviews)
+        let panels = subviews.filter { $0[MeetingMediaPanelKey.self] }.count
+        let idealHeight = fixed + CGFloat(panels) * preferredPanelHeight
+        let height = proposal.height.flatMap { $0.isFinite && $0 > 0 ? $0 : nil } ?? idealHeight
+        return CGSize(width: width, height: max(fixed, height))
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        let fixed = fixedHeight(width: bounds.width, subviews: subviews)
+        let panels = subviews.filter { $0[MeetingMediaPanelKey.self] }.count
+        let panelHeight = max(0, (bounds.height - fixed) / CGFloat(max(1, panels)))
+        var y = bounds.minY
+        for index in subviews.indices {
+            let view = subviews[index]
+            if index > 0 { y += view[MeetingPanelGapKey.self] }
+            let height = view[MeetingMediaPanelKey.self] ? panelHeight
+                : view.sizeThatFits(ProposedViewSize(width: bounds.width, height: nil)).height
+            view.place(at: CGPoint(x: bounds.minX, y: y), anchor: .topLeading,
+                       proposal: ProposedViewSize(width: bounds.width, height: height))
+            y += height
+        }
+    }
 }
 
 // MARK: - Title bar
@@ -513,78 +549,62 @@ private struct GoalRow: View {
 
 }
 
-// MARK: - Tape-deck transcript
+// MARK: - Live transcript
 
-private struct TapeDeck: View {
+private struct LiveTranscriptPanel: View {
     let phase: MeetingPhase
     let transcript: String
-    let isRecording: Bool
-    let audioLevel: Float
-    @State private var rotation: Double = 0
-
+    let lines: [TranscriptLine]
+    let recordingFailure: String?
+    let transcriptionStatus: LiveTranscriptionStatus
     var body: some View {
-        VStack(spacing: 0) {
-            // 5px top inset so scrolling text clips a little below the deck's
-            // top edge instead of butting right against it.
-            stream
-                .padding(.top, 5)
-                #if os(macOS)
-                .frame(height: 124)
-                #else
-                // Let the deck (and the reel behind it) grow to fill the taller
-                // phone screen instead of sitting at a fixed height.
-                .frame(maxHeight: .infinity)
-                #endif
-                .clipped()
-
-            tape
-        }
-        // Spinning reel spans the WHOLE deck (behind the meter too) so it shows
-        // through the gaps between the volume bars.
-        .background(
-            GeometryReader { geo in
-                ThemeImage("FilmReel")
-                    .scaledToFit()
-                    .frame(width: geo.size.width, height: geo.size.width)
-                    .grayscale(ActiveDeck.reelGrayscale)
-                    .brightness(ActiveDeck.reelBrightness) // dim so transcript text stays readable (themeable)
-                    .rotationEffect(.degrees(rotation))
-                    .position(x: geo.size.width / 2, y: geo.size.height)
+        stream
+        .padding(.top, 5)
+        .frame(maxHeight: .infinity)
+        .clipped()
+        .background {
+            if let fill = KColor.liveTranscriptFill {
+                fill
+            } else {
+                GeometryReader { geometry in
+                    ThemeImage("BackgroundPlainImage")
+                        .scaledToFill()
+                        .frame(width: geometry.size.width, height: geometry.size.height)
+                        .clipped()
+                        .overlay {
+                            LinearGradient(colors: [KColor.deckScrimTop, KColor.deckScrimBottom],
+                                           startPoint: .top, endPoint: .bottom)
+                        }
+                }
             }
-            .allowsHitTesting(false)
-        )
-        .background(
-            // The themed deck plate — no scrim, so the background image shows at
-            // its true brightness behind the reel.
-            ThemeImage("BackgroundPlainImage")
-                .scaledToFill()
-        )
-        .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
-        // No hard border — the liquid-glass white→gray bevel defines the edge.
-        .liquidGlass(9)
-        .onChange(of: isRecording) { _, rec in
-            if rec { startSpin() } else { stopSpin() }
         }
-        .onAppear { if isRecording { startSpin() } }
+        .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
+        .liquidGlass(9)
     }
 
     private var stream: some View {
         ScrollViewReader { proxy in
             ScrollView {
                 VStack(alignment: .leading, spacing: 6) {
-                    if transcript.isEmpty {
-                        // No pre-meeting blurb — the big START button is self-explanatory.
-                        // While recording, a quiet "Listening…" stands in until words arrive.
-                        if phase == .live {
-                            Text("Listening…")
-                                .font(KFont.mono(11))
-                                .foregroundColor(Color(red: 226/255, green: 224/255, blue: 216/255))
-                                .shadow(color: .black.opacity(0.4), radius: 2, x: 0, y: 1)
-                        }
-                    } else {
-                        // Me (mic) left, Them (system) right — chat-style.
-                        // Light text reads crisply on the darker camo deck.
-                        ChatTranscriptView(turns: parseTranscript(transcript), onDark: true)
+                    if let recordingFailure {
+                        Text(recordingFailure)
+                            .font(KFont.zilla(13, .medium))
+                            .foregroundStyle(KColor.liveTranscriptInk)
+                            .padding(.bottom, 6)
+                    }
+                    if phase == .live && (transcript.isEmpty || transcriptionStatus.isFailure) {
+                        Text(transcriptionStatus.message)
+                            .font(KFont.zilla(13, .medium))
+                            .foregroundColor(KColor.liveTranscriptInk)
+                            .shadow(color: KColor.liveTranscriptShadow, radius: 2, x: 0, y: 1)
+                            .padding(transcriptionStatus.isFailure ? 8 : 0)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(transcriptionStatus.isFailure
+                                ? (KColor.liveTranscriptFill ?? Color.black.opacity(0.8)) : Color.clear)
+                    }
+                    if !transcript.isEmpty {
+                        LiveTranscriptText(lines: lines, isLive: phase == .live)
+                            .equatable()
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
                     Color.clear.frame(height: 1).id("end")
@@ -594,45 +614,11 @@ private struct TapeDeck: View {
                 .padding(.vertical, 10)
             }
             .onChange(of: transcript) {
-                withAnimation { proxy.scrollTo("end", anchor: .bottom) }
+                proxy.scrollTo("end", anchor: .bottom)
             }
         }
     }
 
-    private var tape: some View {
-        // Just the volume rectangles — no deck band behind them.
-        HStack(spacing: 4) {
-            ForEach(0..<14, id: \.self) { i in
-                let filled = tapeFilled
-                RoundedRectangle(cornerRadius: 2)
-                    .fill(i < filled
-                          ? AnyShapeStyle(LinearGradient(colors: [KColor.meterHi, KColor.meterLo],
-                                                         startPoint: .top, endPoint: .bottom))
-                          : AnyShapeStyle(Color.black.opacity(0.18)))
-                    .frame(height: 9)
-                    .shadow(color: (i == filled - 1 && phase == .live) ? KColor.buttonHi.opacity(0.85) : .clear,
-                            radius: 4)
-            }
-        }
-        .padding(.horizontal, 11)
-        .padding(.vertical, 8)
-    }
-
-    private var tapeFilled: Int {
-        switch phase {
-        case .pre:   return 0
-        case .live:  return max(1, min(14, Int(audioLevel * 14)))
-        case .ended: return 14
-        }
-    }
-
-    private func startSpin() {
-        rotation = 0
-        withAnimation(.linear(duration: 3.4).repeatForever(autoreverses: false)) { rotation = 360 }
-    }
-    private func stopSpin() {
-        withAnimation(.linear(duration: 0.2)) { rotation = 0 }
-    }
 }
 
 /// Subtle dot texture for the recessed deck (design `.panel` background).
@@ -678,7 +664,6 @@ private struct Toolbar: View {
             key(icon: "ⓘ", title: "info", variant: .goal, action: onInfo)
         }
         .padding(.horizontal, 11)
-        .padding(.top, 9)
         .padding(.bottom, 12)
         // No deck band — the keys sit on the card background like the logo row.
     }

@@ -7,6 +7,17 @@ struct KochiApp: App {
     static let mainWindowID = "kochi-main"
 
     init() {
+        if CommandLine.arguments.contains("--selftest-speech-status") {
+            TranscriptionSelfTest.runSpeechStatus()
+        }
+        #if os(macOS)
+        if CommandLine.arguments.contains("--selftest-avatar") {
+            CoachAvatarSelfTest.run()
+        }
+        if CommandLine.arguments.contains("--selftest-recording") {
+            TranscriptionSelfTest.runRecording()
+        }
+        #endif
         // Register the bundled KŌCHI fonts (Zilla Slab / JetBrains Mono /
         // Hanken Grotesk) so Font.custom resolves them.
         KFont.register()
@@ -58,18 +69,21 @@ struct KochiApp: App {
                 .animation(.easeInOut(duration: 0.3), value: themeStore.themeVersion)
                 .onAppear { setupApp() }
                 #if os(macOS)
-                // Fixed device-card width. The card fills to the very top;
-                // the header rows inset their content past the traffic lights so
-                // the READY bar snugs right up under the system dot bar.
-                .frame(width: 436)
+                // Match the iPhone 17 Pro canvas and its system safe areas.
+                .safeAreaPadding(.top, 62)
+                .safeAreaPadding(.bottom, 34)
+                .frame(width: 402, height: 874)
+                .ignoresSafeArea(.container)
                 // Hand SwiftUI's `openWindow` action to the AppKit delegate so the
                 // menu-bar icon can spawn a fresh window once the last one is closed.
                 .background(WindowOpenerBridge())
                 #endif
         }
         #if os(macOS)
-        .windowStyle(.hiddenTitleBar)
+        .windowStyle(.plain)
+        .windowBackgroundDragBehavior(.enabled)
         .windowResizability(.contentSize)
+        .defaultSize(width: 402, height: 874)
         .defaultPosition(.center)
         #endif
     }
@@ -77,8 +91,21 @@ struct KochiApp: App {
     private func setupApp() {
         // Defer state changes to avoid "Publishing changes from within view updates" warning
         DispatchQueue.main.async {
-            audioManager.requestMicrophonePermission()
+            // Renderer verification runs the real home screen without capture.
+            if !CommandLine.arguments.contains("--selftest-mannequin") {
+                audioManager.requestMicrophonePermission()
+            }
             goalManager.loadGoals()
+            #if DEBUG
+            if CommandLine.arguments.contains("--preview-live-transcript") {
+                audioManager.transcriptionText = "Me: Let’s agree on the next step before we finish.\nThem: I’ll send the draft tomorrow morning.\nMe: Great. We’ll review it together on Friday."
+                audioManager.transcriptLines = [
+                    TranscriptLine(speaker: "Me", text: "Let’s agree on the next step before we finish.", timestamp: Date(), elapsedTime: 3),
+                    TranscriptLine(speaker: "Them", text: "I’ll send the draft tomorrow morning.", timestamp: Date(), elapsedTime: 7),
+                    TranscriptLine(speaker: "Me", text: "Great. We’ll review it together on Friday.", timestamp: Date(), elapsedTime: 11)
+                ]
+            }
+            #endif
             themeManager.loadTheme()
             appStoreHelper.requestReviewIfAppropriate()
             performanceMonitor.startMonitoring()

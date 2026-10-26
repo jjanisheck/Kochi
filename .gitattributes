@@ -1,2 +1,6 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Bundled renderer output includes vendor GLSL whitespace and encoded model data.
+app/KochiApp/Resources/CoachMannequin/player.js linguist-generated=true -whitespace
+app/KochiApp/Resources/CoachMannequin/mannequin-data.js linguist-generated=true -diff

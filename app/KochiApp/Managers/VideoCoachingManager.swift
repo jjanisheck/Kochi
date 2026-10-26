@@ -72,6 +72,13 @@ enum VideoLabel: String, CaseIterable {
 // MARK: - Video Coaching Manager
 // Manages video playback for Army General coaching feedback
 class VideoCoachingManager: ObservableObject {
+    @Published private(set) var usesAvatar = ActiveThemeVideo.renderer != .video
+    @Published private(set) var avatarReaction: CoachReaction = .idle {
+        didSet { publishToWorkshop(avatarReaction) }
+    }
+    @Published private(set) var avatarMeetingActive = false
+    @Published private(set) var avatarThinking = false
+    private var performance = CoachPerformance()
     @Published var currentVideoLabel: VideoLabel = .idle
     @Published var isPlaying: Bool = false
     @Published var player: AVPlayer?
@@ -134,6 +141,10 @@ class VideoCoachingManager: ObservableObject {
     }
 
     private func preloadVideos() {
+        if usesAvatar {
+            coachingText = CoachReaction.idle.caption
+            return
+        }
         print("🎬 VideoCoachingManager: Preloading videos...")
         print("📂 Bundle path: \(Bundle.main.bundlePath)")
         print("📂 Resource path: \(Bundle.main.resourcePath ?? "none")")
@@ -201,6 +212,19 @@ class VideoCoachingManager: ObservableObject {
             // so stray async coaching results, goal toggles, or wrap clips never
             // animate when you're not in a meeting.
             let label = (requestedLabel == .idle || self.isMeetingActive) ? requestedLabel : .idle
+
+            if self.usesAvatar {
+                let reaction: CoachReaction
+                switch label {
+                case .goal: reaction = .achievement
+                case .idle: reaction = .idle
+                default:
+                    reaction = CoachReaction(intent: CoachIntent(rawValue: label.rawValue) ?? .listen,
+                                             caption: label.randomCoachingText)
+                }
+                self.applyReaction(reaction)
+                return
+            }
 
             print("🎬 Playing video: \(label.rawValue)")
 
@@ -443,6 +467,15 @@ class VideoCoachingManager: ObservableObject {
     /// the idle loop.
     func setMeetingActive(_ active: Bool) {
         isMeetingActive = active
+        avatarMeetingActive = active
+        avatarThinking = false
+        performance.setMeetingActive(active, at: ProcessInfo.processInfo.systemUptime)
+        if usesAvatar {
+            avatarReaction = performance.reaction
+            currentVideoLabel = active ? .listen : .idle
+            coachingText = performance.reaction.caption
+            return
+        }
         idleTimer?.invalidate()
         if active {
             // Coach comes alive when the meeting starts — kick off an animated
@@ -481,12 +514,50 @@ class VideoCoachingManager: ObservableObject {
     @objc private func handleThemeChanged() {
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
+            self.usesAvatar = ActiveThemeVideo.renderer != .video
+            self.player?.pause()
+            self.player = nil
+            self.isPlaying = false
+            self.statusObserver?.cancel()
+            if let observer = self.playerObserver {
+                NotificationCenter.default.removeObserver(observer)
+                self.playerObserver = nil
+            }
             self.videoCache.removeAll()
             self.playVideo(label: self.currentVideoLabel)
         }
     }
 
     // MARK: - Public Methods
+
+    func setThinking(_ thinking: Bool) {
+        let next = thinking && avatarMeetingActive
+        if next && !avatarThinking {
+            publishToWorkshop(CoachReaction(intent: .thinking, expression: .thoughtful,
+                caption: "Considering the conversation…"))
+        }
+        if !next && avatarThinking && avatarMeetingActive { publishToWorkshop(avatarReaction) }
+        avatarThinking = next
+    }
+
+    private func publishToWorkshop(_ reaction: CoachReaction) {
+        #if DEBUG && (os(macOS) || targetEnvironment(simulator))
+        Task { @MainActor in CoachWorkshopBridge.shared.publish(reaction) }
+        #endif
+    }
+
+    /// Apply the model's typed intent directly. Video themes can use the same directive.
+    func applyReaction(_ reaction: CoachReaction) {
+        if usesAvatar {
+            guard performance.receive(reaction, at: ProcessInfo.processInfo.systemUptime) else { return }
+            avatarReaction = performance.reaction
+            currentVideoLabel = performance.reaction.intent.videoLabel
+            coachingText = performance.reaction.caption
+        } else {
+            playVideo(label: reaction.intent.videoLabel)
+            publishToWorkshop(reaction)
+        }
+    }
 
     /// Play video based on goal progress - encourages user toward completing goals
     func playForGoalProgress(goals: [Goal], evaluation: GoalEvaluation) {

@@ -1,5 +1,6 @@
 {
   "displayName": "BRICKS",
+  "coachRenderer": "video",
   "colorScheme": "light",
   "chromeOnBackground": true,
   "deckReelGrayscale": 0,
@@ -13,6 +14,8 @@
     "muted": "#8D8C86", "muted2": "#A9A8A2",
     "good": "#1F8A4C", "deck": "#34332C", "deckBorder": "#26251F",
     "buttonHi": "#FF8C2B", "buttonLo": "#F25C00",
+    "deckCounterFill": "#F25C00", "deckCounterInk": "#FFFFFF",
+    "meterHi": "#FFFFFF", "meterLo": "#FFFFFF",
     "onBg": "#FFFFFF", "onBgFaint": "#FFFFFF",
     "goalRestFill": "#FFFFFF", "goalRestInk": "#EA5800",
     "goalUnmetFill": "#F7A402CC", "goalUnmetInk": "#FFFFFF", "goalRestBorder": "#FFFFFF",
